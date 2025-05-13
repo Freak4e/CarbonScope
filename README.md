@@ -1,2 +1,2 @@
-# OpsiCO2
+# Opsi-CO2
 Projekt - P II
