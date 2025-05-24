@@ -175,36 +175,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  async function updateEmissionsChart(countries, metric, startYear, endYear) {
+ async function updateEmissionsChart(countries, metric, startYear, endYear) {
     const datasets = [];
+    let labels = []; // Declare labels variable
     
     for (const country of countries) {
-      const data = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&metric=${metric}&startYear=${startYear}&endYear=${endYear}`)
-        .then(res => res.json());
-      
-      if (data.length > 0) {
-        if (emissionsChart.data.labels.length === 0) {
-          emissionsChart.data.labels = data.map(d => d.year);
+        try {
+            const response = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&metric=${metric}&startYear=${startYear}&endYear=${endYear}`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                // Set labels only once based on the first country's data
+                if (labels.length === 0) {
+                    labels = data.map(d => d.year);
+                }
+                
+                datasets.push({
+                    label: country,
+                    data: data.map(d => d.value),
+                    borderColor: getRandomColor(),
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                });
+            }
+        } catch (error) {
+            console.error(`Error fetching data for ${country}:`, error);
         }
-        
-        datasets.push({
-          label: country,
-          data: data.map(d => d.value),
-          borderColor: getRandomColor(),
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          fill: false,
-          tension: 0.1
-        });
-      }
     }
     
-    emissionsChart.data.datasets = datasets;
-    emissionsChart.options.scales.y.title.text = getAxisLabel(metric);
-    chartTitle.textContent = `${getMetricName(metric)} for ${countries.join(', ')}`;
-    emissionsChart.update();
-  }
-  
+    // Only update the chart if we have data
+    if (datasets.length > 0) {
+        emissionsChart.data.labels = labels;
+        emissionsChart.data.datasets = datasets;
+        emissionsChart.options.scales.y.title.text = getAxisLabel(metric);
+        chartTitle.textContent = `${getMetricName(metric)} for ${countries.join(', ')} (${startYear}-${endYear})`;
+        emissionsChart.update();
+    } else {
+        console.warn('No data available for the selected parameters');
+    }
+}
   async function updateSectorChart(country, year) {
     try {
       const response = await fetch(`/api/sectors/${encodeURIComponent(country)}?year=${year}`);
@@ -282,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error loading comparison data:', error);
     }
   }
+
   
   async function updateComparisonDashboard(selectedCountries, year = 2022) {
     if (!selectedCountries || selectedCountries.length === 0) return;
@@ -302,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const tableBody = document.querySelector('#metricsTable tbody');
       tableBody.innerHTML = countryData.map(country => `
         <tr>
-          <td><img src="/img/icons/flags/${country.iso_code?.toLowerCase() || 'default'}.png" width="20" class="me-2">${country.country}</td>
+            <td><span class="country-name">${country.country}</span></td>
           <td class="text-end">${country.co2_per_gdp ? country.co2_per_gdp.toFixed(2) + ' kg/$' : 'N/A'}</td>
           <td class="text-end">${country.energy_per_gdp ? (country.energy_per_gdp * 1000).toFixed(0) + ' Wh/$' : 'N/A'}</td>
         </tr>
