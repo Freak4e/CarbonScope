@@ -9,6 +9,8 @@
   <title>
     OgljikOVO
   </title>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <!-- Nucleo Icons -->
@@ -23,7 +25,7 @@
 </head>
 <body class="g-sidenav-show bg-gray-100">
   <div class="min-height-300 bg-dark position-absolute w-100"></div>
-  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4" id="sidenav-main">
+  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-2" id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html" target="_blank">
@@ -61,7 +63,7 @@
       </ul>
     </div>
   </aside>
-  </aside>
+  
 
   <main class="main-content position-relative border-radius-lg ">
     <!-- Navbar -->
@@ -282,6 +284,9 @@
           </div>
         </div>
       </div>
+      <div class="row">
+
+
       <div class="row mt-4">
         <div class="col-lg-7 mb-lg-0 mb-4">
           <div class="card ">
@@ -510,6 +515,225 @@
             </div>
           </div>
         </div>
+<div class="container-fluid mt-4">
+    <!-- Naslov strani -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">Nadzorna plošča emisij CO₂</h2>
+            <p class="lead">Vizualizacija podatkov o emisijah ogljikovega dioksida po državah, metrikah in sektorjih. Prilagodite izbire spodaj za primerjavo in analizo.</p>
+        </div>
+    </div>
+
+    <!-- Prva vrstica: Nadzor podatkov + Glavni graf -->
+    <div class="row mb-4">
+        <!-- Nadzor podatkov -->
+        <div class="col-lg-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5>Nadzor podatkov</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Države za primerjavo</label>
+                        <select id="countrySelect" multiple="multiple" style="width: 100%"></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Metrična vrednost</label>
+                        <select id="metricSelect" class="form-select">
+                            <option value="co2">Skupne emisije CO₂</option>
+                            <option value="co2_per_capita">CO₂ na prebivalca</option>
+                            <option value="share_global_co2">Delež v svetu</option>
+                            <option value="temperature_change_from_co2">Vpliv na temperaturo</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Od leta</label>
+                            <input type="number" id="startYear" class="form-control" min="1850" max="2023" value="1990">
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Do leta</label>
+                            <input type="number" id="endYear" class="form-control" min="1850" max="2023" value="2022">
+                        </div>
+                    </div>
+
+                    <button id="updateBtn" class="btn btn-primary mt-3 w-100">Posodobi grafe</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Glavni graf -->
+        <div class="col-lg-9">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 id="chartTitle">Emisije CO₂ skozi čas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height:315px; width:100%">
+                        <canvas id="emissionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row mb-3">
+    <div class="col-12">
+        <h3 class="mb-2">Primerjava emisij med državami</h3>
+        <p>
+            Spodnji graf omogoča primerjavo različnih držav po skupnih emisijah, emisijah na prebivalca in glede na bruto domači proizvod (BDP). To razkrivanje lahko osvetli, katere države prispevajo največ k globalnim emisijam glede na svojo velikost ali gospodarsko moč.
+        </p>
+        <p>
+            Uporabite gumbe zgoraj desno za preklop med metrikami in spremljajte tudi dodatne vrednosti v tabeli desno.
+        </p>
+    </div>
+</div>
+
+    <!-- Primerjava držav -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card h-100">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Primerjava držav</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary active" data-metric="co2">Skupni CO₂</button>
+                            <button class="btn btn-sm btn-outline-primary" data-metric="co2_per_capita">Na prebivalca</button>
+                            <button class="btn btn-sm btn-outline-primary" data-metric="co2_per_gdp">CO₂ glede na BDP</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="chart-container" style="position: relative; height:300px;">
+                                <canvas id="comparisonChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="text-center mb-3">Dodatne metrike</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover" id="metricsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Država</th>
+                                                    <th class="text-end">CO₂/BDP</th>
+                                                    <th class="text-end">Energija/BDP</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">Prikazano leto: <span id="currentYearDisplay">2022</span></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+    <div class="col-12">
+        <h4 class="mb-2">Trendi emisij skozi čas</h4>
+        <p>
+            Ta graf prikazuje skupni trend emisij CO₂ od leta 1990 do danes. Analiza trendov omogoča vpogled v to, kako uspešni so bili ukrepi za zmanjšanje emisij in kakšna je bila dinamika razvoja v različnih regijah.
+        </p>
+    </div>
+</div>
+
+
+                    <!-- Trendi emisij -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Trend emisij (1990-2022)</h6>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="chart-container" style="position: relative; height:200px;">
+                                        <canvas id="trendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <!-- Svetovni pregled emisij CO₂ po sektorjih -->
+    <div class="row mb-5 sector-summary">
+        <div class="col-12">
+            <h3 class="mb-3">Svetovne emisije CO₂ po sektorjih</h3>
+            <p>Leta 2022 so svetovne emisije CO₂ dosegle <strong>36,8 gigaton</strong>. Razdelitev po sektorjih je naslednja:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent border-0"><i class="fas fa-circle text-danger me-2"></i> <strong>Proizvodnja energije (35%)</strong>: Večinoma iz premoga in plina</li>
+                        <li class="list-group-item bg-transparent border-0"><i class="fas fa-circle text-primary me-2"></i> <strong>Promet (23%)</strong>: Cestni promet, letalstvo in ladijski promet</li>
+                        <li class="list-group-item bg-transparent border-0"><i class="fas fa-circle text-success me-2"></i> <strong>Industrija (19%)</strong>: Jeklo, kemikalije, proizvodnja</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent border-0"><i class="fas fa-circle text-warning me-2"></i> <strong>Stavbe (17%)</strong>: Ogrevanje, hlajenje, elektrika</li>
+                        <li class="list-group-item bg-transparent border-0"><i class="fas fa-circle text-info me-2"></i> <strong>Kmetijstvo (6%)</strong>: Živinoreja, gnojila</li>
+                        <li class="list-group-item bg-transparent border-0"><i class="fas fa-circle text-secondary me-2"></i> <strong>Ostalo (5%)</strong>: Upravljanje odpadkov, uhajajoči plini</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="note mt-3"><strong>Opomba:</strong> Energetski sektor je glavni vir emisij. Premog predstavlja približno 40% emisij iz fosilnih goriv. Prehod na obnovljive vire energije je ključen za zmanjšanje emisij.</p>
+            <hr>
+        </div>
+    </div>
+<div class="row mb-3">
+    <div class="col-12">
+        <h4 class="mb-2">Podrobna analiza po sektorjih</h4>
+        <p>
+            V tem razdelku lahko raziskujete, kako so emisije CO₂ razporejene med sektorji v posameznih državah. To omogoča natančnejše razumevanje, kateri sektorji imajo največji vpliv in kje so priložnosti za zmanjšanje emisij.
+        </p>
+        <p>
+            Izberite državo v spustnem meniju desno, da si ogledate njeno sektorsko razčlenitev.
+        </p>
+    </div>
+</div>
+
+    <!-- Analiza po sektorjih za izbrano državo -->
+    <div class="row mb-5 sector-summary">
+        <div class="col-md-6">
+            <h5 class="mb-3">Analiza po sektorjih za izbrano državo</h5>
+            <p>Graf na desni prikazuje razmerje emisij CO₂ po sektorjih za izbrano državo. Izpostavlja, kateri sektorji so glavni prispevki k nacionalnim emisijam.</p>
+            <p><strong>Ključni poudarki:</strong></p>
+            <ul class="list-group list-group-flush bg-transparent">
+                <li class="list-group-item bg-transparent border-0"><i class="fas fa-arrow-right text-dark me-2"></i> <strong>Države v razvoju</strong> pogosto izstopajo pri energiji in industriji</li>
+                <li class="list-group-item bg-transparent border-0"><i class="fas fa-arrow-right text-dark me-2"></i> <strong>Razvite države</strong> imajo izrazit delež prometa</li>
+                <li class="list-group-item bg-transparent border-0"><i class="fas fa-arrow-right text-dark me-2"></i> <strong>Proizvajalke nafte</strong> imajo visoke emisije zaradi sežiga</li>
+            </ul>
+            <p class="note mt-3"><strong>Nasvet za razlago:</strong> Primerjajte nacionalno razdelitev sektorjev z globalnimi povprečji za prepoznavanje možnosti zmanjšanja emisij.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header pb-2 border-0 bg-white">
+                    <div class="d-flex justify-content-end">
+                        <select id="detailCountrySelect" class="form-select w-50">
+                            <option value="">Izberi državo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <div class="chart-container" style="position: relative; height:300px; width:100%">
+                        <canvas id="sectorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
         
       <footer class="footer pt-3  ">
         <div class="container-fluid">
@@ -739,6 +963,7 @@
         },
       },
     });
+
 </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
@@ -753,6 +978,10 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
+  <script src="/js/dashboard.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 </body>
 
 </html>

@@ -5429,6 +5429,7 @@ fieldset:disabled .btn {
   border-top: 0;
 }
 
+
 .card-body {
   flex: 1 1 auto;
   padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
@@ -28248,6 +28249,60 @@ pre[class*=language-] {
   .ps {
     overflow: auto !important;
   }
+}
+.sector-description {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    height: calc(100% - 60px);
+    overflow-y: auto;
+}
+
+.sector-description h6 {
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.sector-description p {
+    margin-bottom: 15px;
+}
+
+.list-group-item {
+    padding: 8px 15px;
+    font-size: 0.85rem;
+}
+.sector-summary h4,
+.sector-summary h5 {
+  font-weight: 600;
+  color: #333;
+}
+
+.sector-summary p,
+.sector-summary li {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #555;
+}
+
+.sector-summary ul.list-group li {
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 0.5rem;
+}
+
+.sector-summary strong {
+  color: #212529;
+}
+
+.sector-summary .fa-circle,
+.sector-summary .fa-arrow-right {
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
+
+.sector-summary .note {
+  font-style: italic;
+  color: #666;
 }
 
 /*# sourceMappingURL=dashboard-free.css.map */
