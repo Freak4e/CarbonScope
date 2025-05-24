@@ -1,0 +1,96 @@
+<h2 class="text-dark mb-3">👥 CO₂ emisije na prebivalca v Sloveniji (2000–2022)</h2>
+
+<p class="text-dark fs-6">
+  Ta interaktivni graf prikazuje, koliko ogljikovega dioksida povprečen prebivalec Slovenije izpusti v ozračje vsako leto 🌍.
+  Podatki so izraženi v tonah (t) CO₂ na osebo in razkrivajo trende v zadnjih dveh desetletjih. Nekaj zanimivih dejstev:
+</p>
+
+<ul class="text-dark fs-6">
+  <li>📈 Najvišja vrednost: <strong>9.03 t CO₂/osebo</strong> v letu <strong>2008</strong></li>
+  <li>📉 Najnižja vrednost: <strong>6.00 t CO₂/osebo</strong> v letu <strong>2022</strong></li>
+  <li>🔄 Opazen padec po gospodarski krizi 2009 in pandemiji 2020</li>
+  <li>🏭 CO₂ emisije na osebo so v splošnem v upadanju, kar nakazuje na izboljšave v energetski učinkovitosti in prehod na čistejše vire</li>
+</ul>
+
+<p class="text-dark fs-6">
+  ℹ️ Z miško se pomakni nad posamezno točko na grafu za natančne vrednosti emisij v posameznem letu.
+</p>
+
+
+<div style="max-width: 800px; height: 400px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
+  <canvas id="sloveniaPerCapitaChart"></canvas>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (async () => {
+    const ctx = document.getElementById('sloveniaPerCapitaChart').getContext('2d');
+
+    // Show loading text on the canvas container while fetching data
+    const container = ctx.canvas.parentNode;
+    container.insertAdjacentHTML('beforebegin', '<p id="loadingText" class="text-muted text-center">Nalaganje podatkov ...</p>');
+
+    try {
+      // Use relative URL, adjust if your setup differs
+      const response = await fetch('/api/slovenia-per-capita');
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+
+      if (!data.length) {
+        document.getElementById('loadingText').textContent = 'Ni na voljo podatkov za Slovenijo.';
+        return;
+      }
+
+      // Remove loading text
+      document.getElementById('loadingText').remove();
+
+      const labels = data.map(d => d.year);
+      const values = data.map(d => d.co2_per_capita);
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Ton CO₂ na prebivalca',
+            data: values,
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.15)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.parsed.y.toFixed(2)} ton/osebo`
+              }
+            }
+          },
+          scales: {
+            y: {
+              title: { display: true, text: 'Ton CO₂ na prebivalca' },
+              beginAtZero: true
+            },
+            x: {
+              title: { display: true, text: 'Leto' }
+            }
+          }
+        }
+      });
+
+    } catch (error) {
+      const loadingText = document.getElementById('loadingText');
+      loadingText.textContent = 'Napaka pri nalaganju podatkov.';
+      console.error('Fetch error:', error);
+    }
+  })();
+</script>
