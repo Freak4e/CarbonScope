@@ -28305,4 +28305,7 @@ pre[class*=language-] {
   color: #666;
 }
 
-/*# sourceMappingURL=dashboard-free.css.map */
+#routeMap {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}

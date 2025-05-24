@@ -18,6 +18,9 @@
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css" rel="stylesheet" />
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <!-- CSS Files -->
@@ -226,7 +229,7 @@
             <div class="card-header pb-0 pt-3 bg-transparent">
               <h6 class="text-capitalize">CO2 Pregled</h6>
               <p class="text-sm mb-0">
-                <i class="fa fa-arrow-down text-danger"></i>
+                <i class="fa fa-arrow-up text-danger"></i>
                 <span class="font-weight-bold">37.4 Gt</span> v letu 2023
               </p>
             </div>
@@ -956,6 +959,78 @@
       </div>
     </div>
   </div>
+
+   <!--   Kalkulator   -->
+
+   <div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kalkulator CO₂ za prevoz</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zapri"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="startPoint">Začetna lokacija</label>
+                <input type="text" class="form-control" id="startPoint" placeholder="Vnesite začetno lokacijo">
+              </div>
+              <div class="form-group mt-3">
+                <label for="endPoint">Končna lokacija</label>
+                <input type="text" class="form-control" id="endPoint" placeholder="Vnesite končno lokacijo">
+              </div>
+              <div class="transport-modes mt-4">
+                <h6>Izberite način prevoza:</h6>
+                <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="walking" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-walking" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="cycling" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-bicycle" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode active" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-car" style="font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+                <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="bus" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-bus" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="results mt-4 p-3 bg-light rounded">
+                <h5>Rezultati</h5>
+                <div class="row">
+                  <div class="col-6">
+                    <p><strong>Razdalja:</strong></p>
+                    <p><strong>Emisije CO₂:</strong></p>
+                  </div>
+                  <div class="col-6">
+                    <p id="distanceResult">-</p>
+                    <p id="co2Result">-</p>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div id="routeMap" style="height: 400px; width: 100%; border-radius: 15px;"></div>
+              <div class="mt-2" id="co2Comparison"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
+          <button type="button" class="btn btn-primary" id="calculateBtn">Izračunaj</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!--   Core JS Files   -->
   <script src="/js/core/popper.min.js"></script>
   <script src="/js/core/bootstrap.min.js"></script>
@@ -1124,6 +1199,7 @@
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
   <script src="/js/dashboard.js"></script>
+  <script src="/js/kalkulator.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
