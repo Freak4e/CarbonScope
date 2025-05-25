@@ -333,6 +333,30 @@ router.get("/api/globe-data", (req, res) => {
     res.json(response);
   } catch (error) {
     console.error('Error in globe-data endpoint:', error);
+  }
+});
+
+router.get("/api/slovenia-per-capita", (req, res) => {
+  try {
+    const filteredData = emissionsData
+      .filter(item =>
+        item.country === "Slovenia" &&
+        item.co2_per_capita !== undefined &&
+        item.year >= 2000 &&
+        item.year <= 2022
+      )
+      .map(item => ({
+        year: item.year,
+        co2_per_capita: item.co2_per_capita,
+        population: item.population,
+        gdp: item.gdp,
+        iso_code: item.iso_code,
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(filteredData);
+  } catch (error) {
+    console.error("Error fetching Slovenia per capita data:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

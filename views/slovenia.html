@@ -5,10 +5,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="icon" type="/img/co2.png" href="/img/co2.png">
   <title>
-    Argon Dashboard 3 by Creative Tim
+    CO2 odtis-Slovenia
   </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -16,19 +15,28 @@
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
   <!-- CSS Files -->
   <link id="pagestyle" href="/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles_slovenia.css">
+
 </head>
 
 <body class="g-sidenav-show bg-gray-100">
-  <div class="min-height-300 bg-dark position-absolute w-100"></div>
-  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4" id="sidenav-main">
+ <div class="min-height-300 bg-dark position-absolute w-100"></div>
+  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-2" id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html" target="_blank">
-        <img src="/img/co2.png" width="26px" height="26px" class="navbar-brand-img h-100" alt="main_logo">
+        <img src="/img/co2.png" width="30px" height="30px" class="navbar-brand-img h-100" alt="main_logo">
         <span class="ms-1 font-weight-bold">OgljikOVO</span>
       </a>
     </div>
@@ -62,11 +70,12 @@
       </ul>
     </div>
   </aside>
-  </aside>
+  
 
-  <main class="main-content position-relative border-radius-lg ">
+
+  <main class="main-content position-relative border-radius-lg">
     <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
@@ -82,7 +91,7 @@
               <input type="text" class="form-control" placeholder="Išči državo...">
             </div>
           </div>
-          <ul class="navbar-nav  justify-content-end">
+          <ul class="navbar-nav justify-content-end">
             <li class="nav-item d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-white font-weight-bold px-0">
                 <i class="fa fa-calculator me-sm-1"></i>
@@ -103,91 +112,250 @@
                 <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
               </a>
             </li>
-            
+            <li class="nav-item d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="globeButton">
+                <i class="fas fa-globe me-sm-1"></i>
+                <span class="d-sm-inline d-none"></span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
     <!-- End Navbar -->
-   
-  </main>
-  <div class="fixed-plugin">
-    <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
-      <i class="fa fa-cog py-2"> </i>
-    </a>
-    <div class="card shadow-lg">
-      <div class="card-header pb-0 pt-3 ">
-        <div class="float-start">
-          <h5 class="mt-3 mb-0">Argon Configurator</h5>
-          <p>See our dashboard options.</p>
+ <div class="container-fluid py-4">
+  <div class="row">
+    <!-- Skupne emisije CO₂ Slovenije -->
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Skupne emisije CO₂ Slovenije (2022)</p>
+                <h5 class="font-weight-bolder">
+                  15,8 Mt
+                </h5>
+                <p class="mb-0">
+                  <span class="text-danger text-sm font-weight-bolder">+54%</span>
+                  od leta 2000
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                <i class="fas fa-industry text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="float-end mt-4">
-          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
-            <i class="fa fa-close"></i>
-          </button>
-        </div>
-        <!-- End Toggle Button -->
       </div>
-      <hr class="horizontal dark my-1">
-      <div class="card-body pt-sm-3 pt-0 overflow-auto">
-        <!-- Sidebar Backgrounds -->
-        <div>
-          <h6 class="mb-0">Sidebar Colors</h6>
-        </div>
-        <a href="javascript:void(0)" class="switch-trigger background-color">
-          <div class="badge-colors my-2 text-start">
-            <span class="badge filter bg-gradient-primary active" data-color="primary" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-dark" data-color="dark" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-info" data-color="info" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-success" data-color="success" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-warning" data-color="warning" onclick="sidebarColor(this)"></span>
-            <span class="badge filter bg-gradient-danger" data-color="danger" onclick="sidebarColor(this)"></span>
-          </div>
-        </a>
-        <!-- Sidenav Type -->
-        <div class="mt-3">
-          <h6 class="mb-0">Sidenav Type</h6>
-          <p class="text-sm">Choose between 2 different sidenav types.</p>
-        </div>
-        <div class="d-flex">
-          <button class="btn bg-gradient-primary w-100 px-3 mb-2 active me-2" data-class="bg-white" onclick="sidebarType(this)">White</button>
-          <button class="btn bg-gradient-primary w-100 px-3 mb-2" data-class="bg-default" onclick="sidebarType(this)">Dark</button>
-        </div>
-        <p class="text-sm d-xl-none d-block mt-2">You can change the sidenav type just on desktop view.</p>
-        <!-- Navbar Fixed -->
-        <div class="d-flex my-3">
-          <h6 class="mb-0">Navbar Fixed</h6>
-          <div class="form-check form-switch ps-0 ms-auto my-auto">
-            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
+    </div>
+
+    <!-- Emisije CO₂ na prebivalca Slovenije -->
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Emisije CO₂ na prebivalca (2022)</p>
+                <h5 class="font-weight-bolder">
+                  7,6 t/osebo
+                </h5>
+                <p class="mb-0">
+                  <span class="text-danger text-sm font-weight-bolder">+46%</span>
+                  od leta 2000
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
+                <i class="fas fa-user text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
           </div>
         </div>
-        <hr class="horizontal dark my-sm-4">
-        <div class="mt-2 mb-5 d-flex">
-          <h6 class="mb-0">Light / Dark</h6>
-          <div class="form-check form-switch ps-0 ms-auto my-auto">
-            <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
+      </div>
+    </div>
+
+    <!-- Emisije CO₂ na minuto Slovenije -->
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Emisije CO₂ na minuto (2022)</p>
+                <h5 class="font-weight-bolder">
+                  30.000 t/min
+                </h5>
+                <p class="mb-0">
+                  <span class="text-danger text-sm font-weight-bolder">+54%</span>
+                  od leta 2000
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+                <i class="fas fa-clock text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
           </div>
         </div>
-        <a class="btn bg-gradient-dark w-100" href="https://www.creative-tim.com/product/argon-dashboard">Free Download</a>
-        <a class="btn btn-outline-dark w-100" href="https://www.creative-tim.com/learning-lab/bootstrap/license/argon-dashboard">View documentation</a>
-        <div class="w-100 text-center">
-          <a class="github-button" href="https://github.com/creativetimofficial/argon-dashboard" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/argon-dashboard on GitHub">Star</a>
-          <h6 class="mt-3">Thank you for sharing!</h6>
-          <a href="https://twitter.com/intent/tweet?text=Check%20Argon%20Dashboard%20made%20by%20%40CreativeTim%20%23webdesign%20%23dashboard%20%23bootstrap5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fargon-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-twitter me-1" aria-hidden="true"></i> Tweet
-          </a>
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/argon-dashboard" class="btn btn-dark mb-0 me-2" target="_blank">
-            <i class="fab fa-facebook-square me-1" aria-hidden="true"></i> Share
-          </a>
+      </div>
+    </div>
+
+    <!-- Prihranjene emisije CO₂ Slovenije (random data) -->
+    <div class="col-xl-3 col-sm-6">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-8">
+              <div class="numbers">
+                <p class="text-sm mb-0 text-uppercase font-weight-bold">Prihranjene emisije CO₂ (2022)</p>
+                <h5 class="font-weight-bolder">
+                  1,2 Mt
+                </h5>
+                <p class="mb-0">
+                  <span class="text-success text-sm font-weight-bolder">+35%</span>
+                  od leta 2000
+                </p>
+              </div>
+            </div>
+            <div class="col-4 text-end">
+              <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
+                <i class="fas fa-leaf text-lg opacity-10" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <!-- Tab Navigation just BELOW the background image -->
+<div class="container position-relative tabs-container">
+  <ul class="nav nav-tabs nav-tabs-lg" id="emissionTabs" role="tablist" style="font-size: 1.1rem; font-weight: 600;">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" data-tab="overview.html" type="button" role="tab">Pregled</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-tab="capita.html" type="button" role="tab">Na Osebo</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-tab="fuel.html" type="button" role="tab">Po Vrsti Goriva</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-tab="sector.html" type="button" role="tab">Po Sektorju</button>
+    </li>
+    
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-tab="region.html" type="button" role="tab">Po Regiji</button>
+    </li>
+  </ul>
+</div>
+  <!--   Kalkulator   -->
+
+  <div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kalkulator CO₂ za prevoz</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zapri"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="startPoint">Začetna lokacija</label>
+                <input type="text" class="form-control" id="startPoint" placeholder="Vnesite začetno lokacijo">
+              </div>
+              <div class="form-group mt-3">
+                <label for="endPoint">Končna lokacija</label>
+                <input type="text" class="form-control" id="endPoint" placeholder="Vnesite končno lokacijo">
+              </div>
+              <div class="transport-modes mt-4">
+                <h6>Izberite način prevoza:</h6>
+                <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="walking" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-walking" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="cycling" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-bicycle" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode active" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-car" style="font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+                <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="bus" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-bus" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="results mt-4 p-3 bg-light rounded">
+                <h5>Rezultati</h5>
+                <div class="row">
+                  <div class="col-6">
+                    <p><strong>Razdalja:</strong></p>
+                    <p><strong>Emisije CO₂:</strong></p>
+                  </div>
+                  <div class="col-6">
+                    <p id="distanceResult">-</p>
+                    <p id="co2Result">-</p>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div id="routeMap" style="height: 400px; width: 100%; border-radius: 15px;"></div>
+              <div class="mt-2" id="co2Comparison"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
+          <button type="button" class="btn btn-primary" id="calculateBtn">Izračunaj</button>
         </div>
       </div>
     </div>
   </div>
+
+<!-- Map Popup -->
+<div id="mapOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;"></div>
+<div id="mapPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1000px; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1001; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 style="font-size: 24px; color: #333;">Globalne emisije CO₂ na prebivalca (2022)</h2>
+        <button id="closeMapPopup" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+    </div>
+    <div id="globeContainer" style="width: 100%; height: 60vh; position: relative;"></div>
+    <div style="margin-top: 20px; padding: 10px; background: rgba(142, 135, 135, 0.75); border-radius: 5px;">
+        <div id="legend" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+    </div>
+</div>
+
+<!-- Dynamic Tab Content -->
+<div class="container mt-3" id="tabContent">
+  <!-- Initial content loaded here -->
+</div>
+
+  </main>
+
   <!--   Core JS Files   -->
   <script src="/js/core/popper.min.js"></script>
   <script src="/js/core/bootstrap.min.js"></script>
   <script src="/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/kalkulator.js"></script>
+  <script src="/js/globe.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -201,6 +369,9 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
+
+  <script src="js/load-tabs.js"></script>
+
 </body>
 
 </html>
