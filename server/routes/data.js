@@ -307,4 +307,34 @@ router.get("/api/top-emitters", (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.get("/api/globe-data", (req, res) => {
+  try {
+    const targetYear = 2022; 
+    const metric = "co2_per_capita"; 
+    
+    // Filter data for the target year and where co2_per_capita exists
+    const filteredData = emissionsData.filter(item => 
+      item.year === targetYear && 
+      item.co2_per_capita != null &&
+      item.iso_code
+    );
+    
+    // Format the response with only needed fields
+    const response = filteredData.map(item => ({
+      year: item.year,
+      country: item.country,
+      iso_code: item.iso_code,
+      co2_per_capita: item.co2_per_capita,
+      co2: item.co2,
+      population: item.population
+    }));
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Error in globe-data endpoint:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 module.exports = router;
