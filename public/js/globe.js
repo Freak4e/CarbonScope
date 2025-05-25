@@ -4,7 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const mapOverlay = document.getElementById('mapOverlay');
     const closeMapPopup = document.getElementById('closeMapPopup');
     const sidenav = document.getElementById('sidenav-main');
+    const popupTitle = document.getElementById('popupTitle');
+    const legendContainer = document.getElementById('legendContainer'); // Updated to target legendContainer
+    const mapTab = document.getElementById('map-tab');
+    const graphTab = document.getElementById('graph-tab');
 
+    // Validate DOM elements
     if (!globeButton) {
         console.error('Globe button not found.');
         return;
@@ -17,19 +22,47 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Sidenav not found.');
         return;
     }
+    if (!popupTitle || !legendContainer) {
+        console.error('Popup title or legend container not found.');
+        return;
+    }
+    if (!mapTab || !graphTab) {
+        console.error('Map or graph tab not found.');
+        return;
+    }
 
+    // Open popup and initialize map
     globeButton.addEventListener('click', function () {
         mapPopup.style.display = 'block';
         mapOverlay.style.display = 'block';
-        sidenav.style.display = 'none'; 
+        sidenav.style.display = 'none';
+        popupTitle.textContent = 'Globalne emisije CO₂ na prebivalca (2022)';
+        legendContainer.style.display = 'block'; // Show legend on open
+        document.getElementById('globeContainer').innerHTML = ''; // Clear container
         initMap();
     });
 
+    // Close popup and clear map
     closeMapPopup.addEventListener('click', function () {
         mapPopup.style.display = 'none';
         mapOverlay.style.display = 'none';
-        sidenav.style.display = 'block'; 
-        document.getElementById('globeContainer').innerHTML = ''; 
+        sidenav.style.display = 'block';
+        document.getElementById('globeContainer').innerHTML = '';
+        legendContainer.style.display = 'none';
+    });
+
+    // Tab switching: Update title and legend
+    mapTab.addEventListener('click', function () {
+        popupTitle.textContent = 'Globalne emisije CO₂ na prebivalca (2022)';
+        legendContainer.style.display = 'block';
+        document.getElementById('globeContainer').innerHTML = ''; // Clear container
+        initMap();
+    });
+
+    graphTab.addEventListener('click', function () {
+        popupTitle.textContent = 'Globalne emisije CO₂ skozi čas';
+        legendContainer.style.display = 'none';
+        document.getElementById('globeContainer').innerHTML = ''; // Clear map when switching to graph
     });
 
     // Numeric to Alpha-3 ISO code mapping
@@ -85,13 +118,18 @@ document.addEventListener('DOMContentLoaded', function () {
     let countryData = {};
 
     async function initMap() {
+        const container = document.getElementById('globeContainer');
+        if (!container) {
+            console.error('Map container not found.');
+            return;
+        }
+        container.innerHTML = ''; // Always clear container
+
         try {
-            // Fetch CO₂ data from the API
             const response = await fetch('/api/globe-data');
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
 
-            // Map data by ISO alpha-3 code
             countryData = {};
             data.forEach(item => {
                 if (item.iso_code) {
@@ -106,17 +144,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (Object.keys(countryData).length === 0) {
                 console.warn('No data found for the map visualization.');
-                document.getElementById('globeContainer').innerHTML = '<p style="color: #fff;">No CO₂ data available.</p>';
+                container.innerHTML = '<p style="color: #fff;">No CO₂ data available.</p>';
                 return;
             }
 
             createMapVisualization();
         } catch (error) {
             console.error('Error loading CO₂ data:', error);
-            const container = document.getElementById('globeContainer');
-            if (container) {
-                container.innerHTML = '<p style="color: #fff;">Error loading CO₂ data. Please try again.</p>';
-            }
+            container.innerHTML = '<p style="color: #fff;">Error loading CO₂ data. Please try again.</p>';
         }
     }
 
@@ -126,9 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Map container not found.');
             return;
         }
-        container.innerHTML = '';
 
-       
         const width = container.clientWidth;
         const height = container.clientHeight;
         const svg = d3.select(container)
@@ -136,10 +169,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .attr('width', width)
             .attr('height', height);
 
-        
         const g = svg.append('g');
 
-        // Create tooltip div
         const tooltip = d3.select(container)
             .append('div')
             .attr('id', 'countryTooltip')
@@ -153,27 +184,23 @@ document.addEventListener('DOMContentLoaded', function () {
             .style('display', 'none')
             .style('z-index', '10');
 
-        // Define projection and path
         const projection = d3.geoMercator()
             .scale(width / 2.5 / Math.PI)
             .translate([width / 2, height / 1.5]);
         const path = d3.geoPath().projection(projection);
 
-        // Calculate max CO2 for color scaling
         const maxCo2 = Math.max(...Object.values(countryData).map(d => d.value || 0), 1);
         const colorScale = d3.scaleSequential(d3.interpolateViridis).domain([0, maxCo2]);
 
-       
         const zoom = d3.zoom()
-            .scaleExtent([1, 8]) 
-            .translateExtent([[0, 0], [width, height]]) 
+            .scaleExtent([1, 8])
+            .translateExtent([[0, 0], [width, height]])
             .on('zoom', (event) => {
-                g.attr('transform', event.transform); 
+                g.attr('transform', event.transform);
             });
 
-        svg.call(zoom); 
+        svg.call(zoom);
 
-        // Load world map data
         fetch('https://unpkg.com/world-atlas@2.0.2/countries-110m.json')
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -182,7 +209,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(topo => {
                 const countries = topojson.feature(topo, topo.objects.countries).features;
 
-                // Draw countries
                 g.selectAll('path')
                     .data(countries)
                     .enter()
@@ -234,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         d3.select(this).attr('fill', colorScale(countryData[alpha3Code].value || 0));
                         tooltip.style('display', 'none');
                     })
-                    .filter(d => !path(d)) 
+                    .filter(d => !path(d))
                     .remove();
 
                 createLegend(colorScale, maxCo2);
@@ -244,7 +270,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('globeContainer').innerHTML = '<p style="color: #fff;">Error loading map data. Please try again.</p>';
             });
 
-        
         window.addEventListener('resize', () => {
             const newWidth = container.clientWidth;
             const newHeight = container.clientHeight;
@@ -255,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!pathData) return null;
                 return pathData;
             }).filter(d => !path(d)).remove();
-            
+
             svg.call(zoom.transform, d3.zoomIdentity);
         });
     }
@@ -310,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Generate tooltip content
         const content = `
             <h5 style="margin: 0 0 5px; font-size: 14px; color: #fff;">${data.name}</h5>
             <table style="font-size: 12px; color: #fff;">
@@ -330,8 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
         tooltip.html(content);
 
-        // Calculate position above the country
-        const centroid = path.centroid(country); 
+        const centroid = path.centroid(country);
         if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) {
             tooltip.style('display', 'none');
             return;
@@ -341,7 +364,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const tooltipWidth = tooltip.node().offsetWidth;
         const tooltipHeight = tooltip.node().offsetHeight;
 
-        
         tooltip
             .style('left', `${x - tooltipWidth / 2}px`)
             .style('top', `${y - tooltipHeight - 10}px`)

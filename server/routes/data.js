@@ -5,7 +5,9 @@ const fs = require("fs");
 const csv = require("csv-parser");
 
 let emissionsData = [];
+let animatedGraphData = []; 
 const csvPath = path.join(__dirname, "../../data/co2-data.csv");
+const animatedGraphCsvPath = path.join(__dirname, "../../data/animatedgraph.csv");
 // Add at the top of your routes file
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -26,6 +28,21 @@ fs.createReadStream(csvPath)
   .on("end", () => {
     console.log("CSV data loaded with", emissionsData.length, "records");
   });
+
+  // Load animatedgraph.csv
+fs.createReadStream(animatedGraphCsvPath)
+.pipe(csv())
+.on("data", (row) => {
+  if (row.Entity === "World" && row.Year && row["Annual CO₂ emissions"]) {
+    animatedGraphData.push({
+      year: parseInt(row.Year),
+      co2: parseFloat(row["Annual CO₂ emissions"]) / 1e9 // Convert tons to billions
+    });
+  }
+})
+.on("end", () => {
+  console.log("animatedgraph.csv loaded with", animatedGraphData.length, "records");
+});
 
 // Get available metrics
 router.get("/api/metrics", (req, res) => {
@@ -357,6 +374,23 @@ router.get("/api/slovenia-per-capita", (req, res) => {
     res.json(filteredData);
   } catch (error) {
     console.error("Error fetching Slovenia per capita data:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/animated-graph", (req, res) => {
+  try {
+    const response = animatedGraphData
+      .filter(item => item.year >= 1750 && item.year <= 2023)
+      .map(item => ({
+        year: item.year,
+        co2: item.co2 // Already in billions
+      }))
+      .sort((a, b) => a.year - b.year);
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Error in animated-graph endpoint:', error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
