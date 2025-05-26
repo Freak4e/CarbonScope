@@ -1,6 +1,200 @@
-<h5>Emisije po Sektorju</h5>
-<ul>
-  <li>Industrija: 40%</li>
-  <li>Transport: 35%</li>
-  <li>Gospodinjstva: 25%</li>
-</ul>
+<h2 class="text-dark mb-3">🏭 CO₂ emisije po sektorjih v Sloveniji (vseh letih)</h2>
+
+<p class="text-dark fs-6">
+  Ta graf prikazuje letne emisije CO₂ iz različnih sektorjev v Sloveniji, kar omogoča pregled sprememb skozi čas. Primerjava med sektorji razkriva trende v industriji, prometu, gospodinjstvih in drugih virih.
+</p>
+
+<div style="max-width: 1000px; height: 450px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
+  <canvas id="emissionsBySectorChart"></canvas>
+</div>
+
+<script>
+(async () => {
+  const ctx = document.getElementById('emissionsBySectorChart').getContext('2d');
+  ctx.canvas.insertAdjacentHTML('beforebegin', '<p id="loadingSectors" class="text-muted text-center">Nalaganje podatkov ...</p>');
+
+  try {
+    const res = await fetch('/api/emissions-by-sector');
+    const data = await res.json();
+
+    if (!data.length) return document.getElementById('loadingSectors').textContent = 'Ni na voljo podatkov.';
+
+    document.getElementById('loadingSectors').remove();
+
+    const grouped = {};
+    data.forEach(d => {
+      if (!grouped[d.sector]) grouped[d.sector] = {};
+      grouped[d.sector][d.year] = d.value;
+    });
+
+    const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+
+    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#fd7e14', '#20c997', '#e83e8c'];
+
+    const datasets = Object.entries(grouped).map(([sector, values], i) => ({
+      label: sector,
+      data: years.map(y => values[y] ?? null),
+      borderColor: colors[i % colors.length],
+      backgroundColor: colors[i % colors.length] + '33',
+      fill: false,
+      tension: 0.3,
+    }));
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(2) ?? '-'} t CO₂`
+            }
+          }
+        },
+        scales: {
+          y: { title: { display: true, text: 'Emisije CO₂ (v terajoulih ali drugih enotah)' }, beginAtZero: true },
+          x: { title: { display: true, text: 'Leto' } }
+        }
+      }
+    });
+
+  } catch (err) {
+    document.getElementById('loadingSectors').textContent = 'Napaka pri nalaganju podatkov.';
+    console.error(err);
+  }
+})();
+</script>
+
+
+<h2 class="text-dark mb-3">🚗 Emisije CO₂ iz prometnega sektorja (Slovenija)</h2>
+
+<p class="text-dark fs-6">
+  Promet je eden glavnih virov emisij CO₂. Ta graf prikazuje spremembe emisij iz tega sektorja v zadnjih letih, kar odraža učinke prometnih politik, tehnologij in obnašanja.
+</p>
+
+<div style="max-width: 800px; height: 400px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
+  <canvas id="transportEmissionsChart"></canvas>
+</div>
+
+<script>
+(async () => {
+  const ctx = document.getElementById('transportEmissionsChart').getContext('2d');
+  ctx.canvas.insertAdjacentHTML('beforebegin', '<p id="loadingTransport" class="text-muted text-center">Nalaganje podatkov ...</p>');
+
+  try {
+    const res = await fetch('/api/transport-emissions');
+    const data = await res.json();
+
+    if (!data.length) return document.getElementById('loadingTransport').textContent = 'Ni podatkov.';
+
+    document.getElementById('loadingTransport').remove();
+
+    const years = data.map(d => d.year);
+    const values = data.map(d => d.value);
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [{
+          label: 'Transport – CO₂ emisije',
+          data: values,
+          borderColor: '#dc3545',
+          backgroundColor: 'rgba(220, 53, 69, 0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.parsed.y.toFixed(2)} t CO₂`
+            }
+          }
+        },
+        scales: {
+          y: { title: { display: true, text: 'Emisije CO₂' }, beginAtZero: true },
+          x: { title: { display: true, text: 'Leto' } }
+        }
+      }
+    });
+
+  } catch (err) {
+    document.getElementById('loadingTransport').textContent = 'Napaka pri nalaganju.';
+    console.error(err);
+  }
+})();
+</script>
+
+
+<h2 class="text-dark mb-3">🔝 Top 5 sektorjev glede na CO₂ emisije (najnovejše leto)</h2>
+
+<p class="text-dark fs-6">
+  Ta stolpčni graf prikazuje pet sektorjev z najvišjimi emisijami CO₂ v zadnjem razpoložljivem letu. Podatki ponujajo vpogled v glavne vire izpustov in pomagajo prepoznati prednostna področja za zmanjšanje emisij.
+</p>
+
+<div style="max-width: 700px; height: 400px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
+  <canvas id="top5SectorsChart"></canvas>
+</div>
+
+<script>
+(async () => {
+  const ctx = document.getElementById('top5SectorsChart').getContext('2d');
+  ctx.canvas.insertAdjacentHTML('beforebegin', '<p id="loadingTop5" class="text-muted text-center">Nalaganje podatkov ...</p>');
+
+  try {
+    const res = await fetch('/api/top5-emitting-sectors');
+    const data = await res.json();
+
+    if (!data.length) return document.getElementById('loadingTop5').textContent = 'Ni podatkov.';
+
+    document.getElementById('loadingTop5').remove();
+
+    const labels = data.map(d => d.sector);
+    const values = data.map(d => d.value);
+    const year = data[0].year;
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: `CO₂ emisije (${year})`,
+          data: values,
+          backgroundColor: '#28a745'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.parsed.y.toFixed(2)} t CO₂`
+            }
+          }
+        },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Emisije CO₂' } },
+          x: { title: { display: true, text: 'Sektor' } }
+        }
+      }
+    });
+
+  } catch (err) {
+    document.getElementById('loadingTop5').textContent = 'Napaka pri nalaganju.';
+    console.error(err);
+  }
+})();
+</script>

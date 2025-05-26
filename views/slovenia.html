@@ -15,8 +15,14 @@
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-svg.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
   <!-- CSS Files -->
   <link id="pagestyle" href="/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
 
@@ -107,6 +113,12 @@
             <li class="nav-item px-3 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-white p-0">
                 <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
+              </a>
+            </li>
+            <li class="nav-item d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="globeButton">
+                <i class="fas fa-globe me-sm-1"></i>
+                <span class="d-sm-inline d-none"></span>
               </a>
             </li>
           </ul>
@@ -248,6 +260,90 @@
     </li>
   </ul>
 </div>
+  <!--   Kalkulator   -->
+
+  <div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Kalkulator CO₂ za prevoz</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zapri"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="startPoint">Začetna lokacija</label>
+                <input type="text" class="form-control" id="startPoint" placeholder="Vnesite začetno lokacijo">
+              </div>
+              <div class="form-group mt-3">
+                <label for="endPoint">Končna lokacija</label>
+                <input type="text" class="form-control" id="endPoint" placeholder="Vnesite končno lokacijo">
+              </div>
+              <div class="transport-modes mt-4">
+                <h6>Izberite način prevoza:</h6>
+                <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="walking" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-walking" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="cycling" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-bicycle" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode active" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-car" style="font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+                <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="bus" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-bus" style="font-size: 1.2rem;"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40px;">
+                    <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="results mt-4 p-3 bg-light rounded">
+                <h5>Rezultati</h5>
+                <div class="row">
+                  <div class="col-6">
+                    <p><strong>Razdalja:</strong></p>
+                    <p><strong>Emisije CO₂:</strong></p>
+                  </div>
+                  <div class="col-6">
+                    <p id="distanceResult">-</p>
+                    <p id="co2Result">-</p>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div id="routeMap" style="height: 400px; width: 100%; border-radius: 15px;"></div>
+              <div class="mt-2" id="co2Comparison"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
+          <button type="button" class="btn btn-primary" id="calculateBtn">Izračunaj</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Map Popup -->
+<div id="mapOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;"></div>
+<div id="mapPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1000px; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1001; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 style="font-size: 24px; color: #333;">Globalne emisije CO₂ na prebivalca (2022)</h2>
+        <button id="closeMapPopup" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+    </div>
+    <div id="globeContainer" style="width: 100%; height: 60vh; position: relative;"></div>
+    <div style="margin-top: 20px; padding: 10px; background: rgba(142, 135, 135, 0.75); border-radius: 5px;">
+        <div id="legend" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+    </div>
+</div>
 
 <!-- Dynamic Tab Content -->
 <div class="container mt-3" id="tabContent">
@@ -261,6 +357,8 @@
   <script src="/js/core/bootstrap.min.js"></script>
   <script src="/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/kalkulator.js"></script>
+  <script src="/js/globe.js"></script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {

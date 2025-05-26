@@ -1,6 +1,166 @@
-<h5>Emisije po Vrsti Goriva</h5>
-<ul>
-  <li>Premog: 30%</li>
-  <li>Nafta: 45%</li>
-  <li>Plin: 25%</li>
-</ul>
+<h2 class="text-dark mb-3">🔥 CO₂ emisije po tipu goriva v Sloveniji (2000–2022)</h2>
+
+<p class="text-dark fs-6">
+  Ta interaktivni graf prikazuje emisije ogljikovega dioksida po glavnih virih goriva: premog, nafta in zemeljski plin.
+</p>
+
+<div style="max-width: 900px; height: 450px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
+  <canvas id="co2ByFuelChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (async () => {
+    const ctx = document.getElementById('co2ByFuelChart').getContext('2d');
+    const container = ctx.canvas.parentNode;
+    container.insertAdjacentHTML('beforebegin', '<p id="loadingText" class="text-muted text-center">Nalaganje podatkov ...</p>');
+
+    try {
+      const response = await fetch('/api/emissions-by-fuel');
+      if (!response.ok) throw new Error('Network response was not OK');
+      const data = await response.json();
+
+      if (!data.length) {
+        document.getElementById('loadingText').textContent = 'Ni na voljo podatkov.';
+        return;
+      }
+
+      document.getElementById('loadingText').remove();
+
+      // Group data by fuel type
+      const fuels = [...new Set(data.map(d => d.fuel))];
+      const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+
+      // Prepare datasets for Chart.js
+      const colors = {
+        'Coal': '#6f42c1',
+        'Oil': '#d6336c',
+        'Natural gas': '#0d6efd',
+      };
+
+      const datasets = fuels.map(fuel => ({
+        label: fuel,
+        data: years.map(year => {
+          const entry = data.find(d => d.fuel === fuel && d.year === year);
+          return entry ? entry.value : null;
+        }),
+        borderColor: colors[fuel] || '#888',
+        backgroundColor: (colors[fuel] || '#888') + '55',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }));
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: years,
+          datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.parsed.y.toFixed(2)} ${data[0].unit}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              title: { display: true, text: 'Mt CO₂' },
+              beginAtZero: true
+            },
+            x: {
+              title: { display: true, text: 'Leto' }
+            }
+          }
+        }
+      });
+
+    } catch (error) {
+      const loadingText = document.getElementById('loadingText');
+      loadingText.textContent = 'Napaka pri nalaganju podatkov.';
+      console.error('Fetch error:', error);
+    }
+  })();
+</script>
+
+
+
+<h2 class="text-dark mb-3">📊 Sestava CO₂ emisij po tipu goriva (2000–2022)</h2>
+
+<p class="text-dark fs-6">
+  Ta graf prikazuje prispevek posameznih vrst goriv (premog, olje, zemeljski plin) k skupnim CO₂ emisijam vsako leto.
+</p>
+
+<div style="max-width: 800px; height: 450px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
+  <canvas id="stackedFuelChart"></canvas>
+</div>
+
+<script>
+(async () => {
+  const ctx = document.getElementById('stackedFuelChart').getContext('2d');
+  const container = ctx.canvas.parentNode;
+  container.insertAdjacentHTML('beforebegin', '<p id="loadingStackedFuel" class="text-muted text-center">Nalaganje podatkov za goriva ...</p>');
+
+  try {
+    const res = await fetch('/api/emissions-by-fuel');
+    if (!res.ok) throw new Error('Failed to fetch fuel data');
+    const data = await res.json();
+
+    if (!data.length) {
+      document.getElementById('loadingStackedFuel').textContent = 'Ni podatkov za goriva.';
+      return;
+    }
+
+    document.getElementById('loadingStackedFuel').remove();
+
+    const fuels = ['Coal', 'Oil', 'Natural gas'];
+    const years = [...new Set(data.map(d => d.year))].sort((a,b) => a - b);
+
+    const datasets = fuels.map((fuel, i) => ({
+      label: fuel,
+      data: years.map(year => {
+        const entry = data.find(d => d.fuel === fuel && d.year === year);
+        return entry ? entry.value : 0;
+      }),
+      backgroundColor: i === 0 ? '#6c757d' : i === 1 ? '#fd7e14' : '#0d6efd',
+      borderColor: '#fff',
+      borderWidth: 1,
+    }));
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: years, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} Mt CO₂`
+            }
+          },
+        },
+        scales: {
+          x: { stacked: true, title: { display: true, text: 'Leto' } },
+          y: { stacked: true, title: { display: true, text: 'Mt CO₂' }, beginAtZero: true }
+        }
+      }
+    });
+
+  } catch (error) {
+    const loadingStackedFuel = document.getElementById('loadingStackedFuel');
+    loadingStackedFuel.textContent = 'Napaka pri nalaganju podatkov za goriva.';
+    console.error(error);
+  }
+})();
+</script>

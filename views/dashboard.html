@@ -22,6 +22,11 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
   <!-- CSS Files -->
   <link id="pagestyle" href="/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
 </head>
@@ -106,7 +111,12 @@
                 <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
               </a>
             </li>
-            
+            <li class="nav-item d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="globeButton">
+                <i class="fas fa-globe me-sm-1"></i>
+                <span class="d-sm-inline d-none"></span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -1030,6 +1040,57 @@
       </div>
     </div>
   </div>
+
+  <div id="mapOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;"></div>
+  <div id="mapPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1000px; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1001; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <h2 id="popupTitle" style="font-size: 24px; color: #333;">Globalne emisije CO₂ na prebivalca (2022)</h2>
+      <button id="closeMapPopup" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+    </div>
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs" id="popupTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#mapContent" type="button" role="tab" aria-controls="mapContent" aria-selected="true">🌍 Mapa</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="graph-tab" data-bs-toggle="tab" data-bs-target="#graphContent" type="button" role="tab" aria-controls="graphContent" aria-selected="false">📈 Graf</button>
+      </li>
+    </ul>
+    <!-- Tab Content -->
+    <div class="tab-content" id="popupTabContent">
+      <div class="tab-pane fade show active" id="mapContent" role="tabpanel" aria-labelledby="map-tab">
+        <div id="globeContainer" style="width: 100%; height: 60vh; position: relative;"></div>
+      </div>
+      <div class="tab-pane fade" id="graphContent" role="tabpanel" aria-labelledby="graph-tab">
+        <div id="graphContainer" style="width: 100%; height: 60vh;">
+          <canvas id="co2Chart" style="max-height: 100%;"></canvas>
+        </div>
+        <div class="timeline-component" style="display: flex; align-items: center; background: #e0e0e0; border: 1px solid #ccc; border-radius: 8px; padding: 8px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+          <div class="ActionButton" style="padding: 0 8px; margin-top: 10px;">
+            <button id="playPauseButton" class="btn btn-sm icon-only" style="background: #8a9e8b; color: #fff; border: none; border-radius: 4px; padding: 6px 10px;" aria-label="Predvajaj časovni prikaz" type="button">
+              <i class="fas fa-play"></i>
+            </button>
+          </div>
+          <span style="color: #697769; font-weight: bold; padding: 0 8px;">1750</span>
+          <div class="slider clickable" style="position: relative; flex: 1; height: 8px; background: #f5f5f5; border-radius: 4px; margin: 0 8px;">
+            <div id="startHandle" class="handle startMarker" role="slider" tabindex="0" aria-valuemin="1750" aria-valuenow="1750" aria-valuemax="2023" aria-label="Začetno leto" style="position: absolute; left: 0%; width: 14px; height: 14px; background: #4CAF50; border-radius: 50%; top: -3px; cursor: pointer; z-index: 2;">
+              <div class="icon"></div>
+            </div>
+            <div id="interval" class="interval" style="position: absolute; left: 0%; right: 0%; height: 8px; background: #4CAF50; border-radius: 4px; pointer-events: none;"></div>
+            <div id="endHandle" class="handle endMarker" role="slider" tabindex="0" aria-valuemin="1750" aria-valuenow="2023" aria-valuemax="2023" aria-label="Končno leto" style="position: absolute; left: 100%; width: 14px; height: 14px; background: #4CAF50; border-radius: 50%; top: -3px; cursor: pointer; z-index: 2;">
+              <div class="icon"></div>
+            </div>
+            <div id="startTooltip" style="display: none; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 3; top: -25px; transform: translateX(-50%);"></div>
+            <div id="endTooltip" style="display: none; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 3; top: -25px; transform: translateX(-50%);"></div>
+          </div>
+          <span style="color: #697769; font-weight: bold; padding: 0 8px;">2023</span>
+        </div>
+      </div>
+    </div>
+    <div id="legendContainer" style="margin-top: 20px; padding: 10px; background: rgba(142, 135, 135, 0.75); border-radius: 5px; display: none;">
+      <div id="legend" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+    </div>
+  </div>
   <!--   Core JS Files   -->
   <script src="/js/core/popper.min.js"></script>
   <script src="/js/core/bootstrap.min.js"></script>
@@ -1199,6 +1260,8 @@
   <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
   <script src="/js/dashboard.js"></script>
   <script src="/js/kalkulator.js"></script>
+  <script src="/js/globe.js"></script>
+  <script src="/js/animatedgraph.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 

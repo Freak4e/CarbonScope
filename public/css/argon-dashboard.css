@@ -28309,3 +28309,7 @@ pre[class*=language-] {
   border-radius: 8px;
   border: 1px solid #dee2e6;
 }
+
+.timeline-component { transition: all 0.2s; }
+.handle:hover { transform: scale(1.2); }
+.ActionButton button:hover { background: #45a049; }

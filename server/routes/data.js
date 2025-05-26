@@ -5,7 +5,13 @@ const fs = require("fs");
 const csv = require("csv-parser");
 
 let emissionsData = [];
+let animatedGraphData = []; 
+let sectorEmissionsData = [];
+let fuelEmissionsData = [];
 const csvPath = path.join(__dirname, "../../data/co2-data.csv");
+const animatedGraphCsvPath = path.join(__dirname, "../../data/animatedgraph.csv");
+const sectorCsvPath = path.join(__dirname, "../../data/co2-sectors.csv");
+const fuelCsvPath = path.join(__dirname, "../../data/co2-fuel.csv");
 // Add at the top of your routes file
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -25,6 +31,39 @@ fs.createReadStream(csvPath)
   })
   .on("end", () => {
     console.log("CSV data loaded with", emissionsData.length, "records");
+  });
+
+  // Load animatedgraph.csv
+fs.createReadStream(animatedGraphCsvPath)
+.pipe(csv())
+.on("data", (row) => {
+  if (row.Entity === "World" && row.Year && row["Annual CO₂ emissions"]) {
+    animatedGraphData.push({
+      year: parseInt(row.Year),
+      co2: parseFloat(row["Annual CO₂ emissions"]) / 1e9 // Convert tons to billions
+    });
+  }
+})
+.on("end", () => {
+  console.log("animatedgraph.csv loaded with", animatedGraphData.length, "records");
+});
+
+fs.createReadStream(sectorCsvPath)
+  .pipe(csv())
+  .on('data', (row) => {
+    sectorEmissionsData.push(row);
+  })
+  .on('end', () => {
+    console.log('Sector emissions CSV loaded, total rows:', sectorEmissionsData.length);
+  });
+
+fs.createReadStream(fuelCsvPath)
+  .pipe(csv())
+  .on('data', (row) => {
+    fuelEmissionsData.push(row);
+  })
+  .on('end', () => {
+    console.log('Fuel emissions CSV loaded, total rows:', fuelEmissionsData.length);
   });
 
 // Get available metrics
@@ -307,6 +346,35 @@ router.get("/api/top-emitters", (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.get("/api/globe-data", (req, res) => {
+  try {
+    const targetYear = 2022; 
+    const metric = "co2_per_capita"; 
+    
+    // Filter data for the target year and where co2_per_capita exists
+    const filteredData = emissionsData.filter(item => 
+      item.year === targetYear && 
+      item.co2_per_capita != null &&
+      item.iso_code
+    );
+    
+    // Format the response with only needed fields
+    const response = filteredData.map(item => ({
+      year: item.year,
+      country: item.country,
+      iso_code: item.iso_code,
+      co2_per_capita: item.co2_per_capita,
+      co2: item.co2,
+      population: item.population
+    }));
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Error in globe-data endpoint:', error);
+  }
+});
+
 router.get("/api/slovenia-per-capita", (req, res) => {
   try {
     const filteredData = emissionsData
@@ -365,6 +433,111 @@ router.get("/api/slovenia-absolute-change", (req, res) => {
     res.json(sloveniaData);
   } catch (error) {
     console.error("Error fetching Slovenia absolute change data:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/animated-graph", (req, res) => {
+  try {
+    const response = animatedGraphData
+      .filter(item => item.year >= 1750 && item.year <= 2023)
+      .map(item => ({
+        year: item.year,
+        co2: item.co2 // Already in billions
+      }))
+      .sort((a, b) => a.year - b.year);
+    
+    res.json(response);
+  } catch (error) {
+    console.error('Error in animated-graph endpoint:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/emissions-by-sector", (req, res) => {
+  try {
+    const data = sectorEmissionsData
+      .filter(item => item['CO2 emissions by sector in Slovenia'] && item.Value !== undefined && item.Year)
+      .map(item => ({
+        sector: item['CO2 emissions by sector in Slovenia'],
+        year: parseInt(item.Year),
+        value: parseFloat(item.Value),
+        unit: item.Units,
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching emissions by sector:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+router.get("/api/transport-emissions", (req, res) => {
+  try {
+    const data = sectorEmissionsData
+      .filter(item => item['CO2 emissions by sector in Slovenia'] === "Transport Sector" && item.Value !== undefined)
+      .map(item => ({
+        year: parseInt(item.Year),
+        value: parseFloat(item.Value),
+        unit: item.Units,
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching transport emissions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+router.get("/api/top5-emitting-sectors", (req, res) => {
+  try {
+    const allValidYears = sectorEmissionsData
+      .filter(item => item.Year && item.Value !== undefined)
+      .map(item => parseInt(item.Year));
+
+    const latestYear = Math.max(...allValidYears);
+
+    const data = sectorEmissionsData
+      .filter(item => parseInt(item.Year) === latestYear && item.Value !== undefined)
+      .map(item => ({
+        sector: item['CO2 emissions by sector in Slovenia'],
+        value: parseFloat(item.Value),
+        unit: item.Units,
+        year: parseInt(item.Year),
+      }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching top 5 emitting sectors:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/emissions-by-fuel", (req, res) => {
+  try {
+    const data = fuelEmissionsData
+      .filter(item =>
+        item["CO2 emissions by fuel in Slovenia"] &&
+        item.Value !== undefined &&
+        item.Year
+      )
+      .map(item => ({
+        fuel: item["CO2 emissions by fuel in Slovenia"],
+        year: parseInt(item.Year),
+        value: parseFloat(item.Value),
+        unit: item.Units.trim(),
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching emissions by fuel:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
