@@ -6,8 +6,12 @@ const csv = require("csv-parser");
 
 let emissionsData = [];
 let animatedGraphData = []; 
+let sectorEmissionsData = [];
+let fuelEmissionsData = [];
 const csvPath = path.join(__dirname, "../../data/co2-data.csv");
 const animatedGraphCsvPath = path.join(__dirname, "../../data/animatedgraph.csv");
+const sectorCsvPath = path.join(__dirname, "../../data/co2-sectors.csv");
+const fuelCsvPath = path.join(__dirname, "../../data/co2-fuel.csv");
 // Add at the top of your routes file
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -43,6 +47,24 @@ fs.createReadStream(animatedGraphCsvPath)
 .on("end", () => {
   console.log("animatedgraph.csv loaded with", animatedGraphData.length, "records");
 });
+
+fs.createReadStream(sectorCsvPath)
+  .pipe(csv())
+  .on('data', (row) => {
+    sectorEmissionsData.push(row);
+  })
+  .on('end', () => {
+    console.log('Sector emissions CSV loaded, total rows:', sectorEmissionsData.length);
+  });
+
+fs.createReadStream(fuelCsvPath)
+  .pipe(csv())
+  .on('data', (row) => {
+    fuelEmissionsData.push(row);
+  })
+  .on('end', () => {
+    console.log('Fuel emissions CSV loaded, total rows:', fuelEmissionsData.length);
+  });
 
 // Get available metrics
 router.get("/api/metrics", (req, res) => {
@@ -391,6 +413,94 @@ router.get("/api/animated-graph", (req, res) => {
     res.json(response);
   } catch (error) {
     console.error('Error in animated-graph endpoint:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/emissions-by-sector", (req, res) => {
+  try {
+    const data = sectorEmissionsData
+      .filter(item => item['CO2 emissions by sector in Slovenia'] && item.Value !== undefined && item.Year)
+      .map(item => ({
+        sector: item['CO2 emissions by sector in Slovenia'],
+        year: parseInt(item.Year),
+        value: parseFloat(item.Value),
+        unit: item.Units,
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching emissions by sector:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+router.get("/api/transport-emissions", (req, res) => {
+  try {
+    const data = sectorEmissionsData
+      .filter(item => item['CO2 emissions by sector in Slovenia'] === "Transport Sector" && item.Value !== undefined)
+      .map(item => ({
+        year: parseInt(item.Year),
+        value: parseFloat(item.Value),
+        unit: item.Units,
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching transport emissions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+router.get("/api/top5-emitting-sectors", (req, res) => {
+  try {
+    const allValidYears = sectorEmissionsData
+      .filter(item => item.Year && item.Value !== undefined)
+      .map(item => parseInt(item.Year));
+
+    const latestYear = Math.max(...allValidYears);
+
+    const data = sectorEmissionsData
+      .filter(item => parseInt(item.Year) === latestYear && item.Value !== undefined)
+      .map(item => ({
+        sector: item['CO2 emissions by sector in Slovenia'],
+        value: parseFloat(item.Value),
+        unit: item.Units,
+        year: parseInt(item.Year),
+      }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching top 5 emitting sectors:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/emissions-by-fuel", (req, res) => {
+  try {
+    const data = fuelEmissionsData
+      .filter(item =>
+        item["CO2 emissions by fuel in Slovenia"] &&
+        item.Value !== undefined &&
+        item.Year
+      )
+      .map(item => ({
+        fuel: item["CO2 emissions by fuel in Slovenia"],
+        year: parseInt(item.Year),
+        value: parseFloat(item.Value),
+        unit: item.Units.trim(),
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching emissions by fuel:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
