@@ -331,5 +331,42 @@ router.get("/api/slovenia-per-capita", (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+const absChangeCsvPath = path.join(__dirname, "../../data/absolute-change-co2.csv");
+
+let absChangeData = [];
+
+fs.createReadStream(absChangeCsvPath)
+  .pipe(csv())
+  .on("data", (row) => {
+    const processedRow = {};
+    for (const [key, value] of Object.entries(row)) {
+      processedRow[key] = isNaN(value) ? value : parseFloat(value);
+    }
+    absChangeData.push(processedRow);
+  })
+  .on("end", () => {
+    console.log("Absolute CO2 change CSV loaded with", absChangeData.length, "records");
+  });
+
+router.get("/api/slovenia-absolute-change", (req, res) => {
+  try {
+    const sloveniaData = absChangeData
+      .filter(item => item.Entity === "Slovenia")
+      .map(item => ({
+        year: item.Year,
+        value: item["Annual CO₂ emissions growth (abs)"]
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    if (!sloveniaData.length) {
+      return res.status(404).json({ error: "No Slovenia data found" });
+    }
+
+    res.json(sloveniaData);
+  } catch (error) {
+    console.error("Error fetching Slovenia absolute change data:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;
