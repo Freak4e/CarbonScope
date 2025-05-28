@@ -1,16 +1,14 @@
-/* style.css */
 .tabs-container {
-  margin-top: 64px; /* exactly below your fixed-size background image */
+  margin-top: 64px; 
 }
 
-/* Make navbar and tabs container full width minus sidebar */
 body.g-sidenav-show {
   position: relative;
   min-height: 100vh;
 }
 
 aside.sidenav {
-  width: 300px; /* adjust if your sidebar width differs */
+  width: 300px; 
   top: 0;
   bottom: 0;
   position: fixed;
@@ -18,18 +16,16 @@ aside.sidenav {
 }
 
 main.main-content {
-  margin-left: 300px; /* same as sidebar width */
-  padding-top: 0; /* navbar has its own spacing */
+  margin-left: 300px;
+  padding-top: 0;
 }
 
-/* Make navbar container-fluid take full width of main content */
 nav.navbar-main > .container-fluid {
   padding-left: 0;
   padding-right: 0;
   width: 100%;
 }
 
-/* Remove default container padding for tabs and tab-content for full width */
 .container.position-relative,
 .container.mt-3 {
   max-width: none !important;
@@ -37,8 +33,17 @@ nav.navbar-main > .container-fluid {
   padding-right: 1rem;
 }
 
-/* Optional: Improve tab button font weight and size globally */
 .nav-tabs .nav-link {
   font-weight: 600;
   font-size: 1.1rem;
+  color: #000 !important; /* Black text for all tab links */
+}
+
+.nav-link-pop {
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.nav-link-pop:hover {
+  transform: scale(1.05); /* Pop effect on hover */
 }
