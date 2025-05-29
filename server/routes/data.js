@@ -542,4 +542,89 @@ router.get("/api/emissions-by-fuel", (req, res) => {
   }
 });
 
+router.get('/api/emissions-extended', (req, res) => {
+  try {
+    const { country, metric, startYear, endYear } = req.query;
+    let filteredData = emissionsData;
+
+    if (country) {
+      const countries = Array.isArray(country) ? country : [country];
+      filteredData = filteredData.filter(item => countries.includes(item.country));
+    }
+    if (metric) {
+      filteredData = filteredData.filter(item => item[metric] !== undefined && item[metric] !== '');
+    }
+    if (startYear) {
+      filteredData = filteredData.filter(item => item.year >= parseInt(startYear));
+    }
+    if (endYear) {
+      filteredData = filteredData.filter(item => item.year <= parseInt(endYear));
+    }
+
+    const response = filteredData.map(item => ({
+      year: item.year,
+      value: item[metric] || item.co2,
+      country: item.country,
+      iso_code: item.iso_code,
+      population: item.population,
+      gdp: item.gdp,
+      gdp_per_capita: item.gdp && item.population ? item.gdp / item.population : null,
+      co2_per_gdp: item.co2_per_gdp,
+      energy_per_gdp: item.primary_energy_consumption && item.gdp ? item.primary_energy_consumption / item.gdp : null,
+      co2_growth_prct: item.co2_growth_prct,
+      co2_per_capita: item.co2_per_capita,
+      share_global_co2: item.share_global_co2,
+      primary_energy_consumption: item.primary_energy_consumption
+    })).filter(item => item.year && (item.value || item.gdp_per_capita || item.energy_per_gdp))
+      .sort((a, b) => a.year - b.year);
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error in emissions-extended endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+router.get("/api/top_countries", (req, res) => {
+  try {
+    const { startYear = 1750, endYear = 2023 } = req.query;
+    const topCountries = [
+      "China",
+      "United States",
+      "India",
+      "Russia",
+      "Japan",
+      "Iran",
+      "Germany",
+      "United Kingdom"
+    ];
+
+    // Filter data for top countries and year range
+    const filteredData = emissionsData
+      .filter(
+        (item) =>
+          topCountries.includes(item.country) &&
+          item.year >= parseInt(startYear) &&
+          item.year <= parseInt(endYear) &&
+          item.co2 != null &&
+          item.share_global_co2 != null,
+      )
+      .map((item) => ({
+        country: item.country,
+        year: item.year,
+        iso_code: item.iso_code,
+        co2: item.co2 / 1000, // Convert million tonnes to billion tonnes
+        share_global_co2: item.share_global_co2, // Percentage
+      }))
+      .sort((a, b) => a.year - b.year || a.country.localeCompare(b.country));
+
+    res.json({
+      yearRange: { start: parseInt(startYear), end: parseInt(endYear) },
+      countries: topCountries,
+      data: filteredData,
+    });
+  } catch (error) {
+    console.error("Error in top_countries endpoint:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 module.exports = router;

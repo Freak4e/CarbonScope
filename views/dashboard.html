@@ -9,8 +9,78 @@
     CO2 odtis-Svet
   </title>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+ 
 
-  <!--     Fonts and icons     -->
+
+#globeContainer {
+  min-width: 800px; /* Set a minimum width to match the desired map size (adjust as needed) */
+  width: 100%; /* Ensure it takes full available width up to the container */
+  height: 500px; /* Set a fixed or minimum height for consistency */
+  position: relative; /* For positioning tooltips and SVG */
+  overflow: hidden; /* Already set in JS, but reinforce here */
+}
+.tabs-container {
+  margin-top: 64px; 
+}
+
+body.g-sidenav-show {
+  position: relative;
+  min-height: 100vh;
+}
+
+aside.sidenav {
+  width: 300px; 
+  top: 0;
+  bottom: 0;
+  position: fixed;
+  overflow-y: auto;
+}
+
+main.main-content {
+  margin-left: 300px;
+  padding-top: 0;
+}
+
+nav.navbar-main > .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+}
+
+.container.position-relative,
+.container.mt-3 {
+  max-width: none !important;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.nav-tabs .nav-link {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #000 !important; /* Black text for all tab links */
+}
+
+.nav-link-pop {
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.nav-link-pop:hover {
+  transform: scale(1.05); /* Pop effect on hover */
+}
+/* Optional: Reduce padding/margins in the parent container if needed */
+.col-md-8.mx-auto {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Ensure the SVG inside globeContainer takes full width */
+#globeContainer svg {
+  width: 100%;
+  height: 100%;
+}</style>
+  <!-- Fonts and icons -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <!-- Nucleo Icons -->
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
@@ -30,6 +100,7 @@
   <!-- CSS Files -->
   <link id="pagestyle" href="/css/argon-dashboard.css?v=2.1.0" rel="stylesheet" />
 </head>
+
 <body class="g-sidenav-show bg-gray-100">
   <div class="min-height-300 bg-dark position-absolute w-100"></div>
   <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-2" id="sidenav-main">
@@ -70,11 +141,10 @@
       </ul>
     </div>
   </aside>
-  
 
-  <main class="main-content position-relative border-radius-lg ">
+  <main class="main-content position-relative border-radius-lg">
     <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
@@ -90,9 +160,9 @@
               <input type="text" class="form-control" placeholder="Išči državo...">
             </div>
           </div>
-          <ul class="navbar-nav  justify-content-end">
+          <ul class="navbar-nav justify-content-end">
             <li class="nav-item d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0">
+              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="calculatorButton">
                 <i class="fa fa-calculator me-sm-1"></i>
                 <span class="d-sm-inline d-none"></span>
               </a>
@@ -112,7 +182,7 @@
               </a>
             </li>
             <li class="nav-item d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="globeButton">
+              <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="mapTabButton">
                 <i class="fas fa-globe me-sm-1"></i>
                 <span class="d-sm-inline d-none"></span>
               </a>
@@ -230,582 +300,565 @@
         </div>
       </div>
     </div>
-      <!--  STARTING GRAPH AND sliki za premikanje -->
-  
-      <div class="row mt-4" id="co2-overview">
-        <div class="col-lg-7 mb-lg-0 mb-4">
-          <div class="card z-index-2 h-100">
-            <div class="card-header pb-0 pt-3 bg-transparent">
-              <h6 class="text-capitalize">CO2 Pregled</h6>
-              <p class="text-sm mb-0">
-                <i class="fa fa-arrow-up text-danger"></i>
-                <span class="font-weight-bold">37.4 Gt</span> v letu 2023
-              </p>
-            </div>
-            <div class="card-body p-3">
-              <div class="chart">
-                <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
-              </div>
-            </div>
+    <!-- CO2 Overview and Carousel -->
+    <div class="row mt-4" id="co2-overview">
+      <div class="col-lg-7 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-header pb-0 pt-3 bg-transparent">
+            <h6 class="text-capitalize">CO2 Pregled</h6>
+            <p class="text-sm mb-0">
+              <i class="fa fa-arrow-up text-danger"></i>
+              <span class="font-weight-bold">37.4 Gt</span> v letu 2023
+            </p>
           </div>
-        </div>
-        <div class="col-lg-5">
-          <div class="card card-carousel overflow-hidden h-100 p-0">
-            <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
-              <div class="carousel-inner border-radius-lg h-100">
-                <!--  Globalni CO₂ -->
-                <div class="carousel-item h-100 active" style="background-image: url('/img/earth.jpg'); background-size: cover;">
-                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                      <i class="ni ni-camera-compact text-dark opacity-10"></i>
-                    </div>
-                    <h5 class="text-white mb-1">Globalne emisije CO₂</h5>
-                    <p>Globalne emisije CO₂ so leta 2022 dosegle 36,8 gigaton, kar je 54 % več kot leta 2000.</p>
-                  </div>
-                </div>
-                <!--  CO₂ v Sloveniji -->
-                <div class="carousel-item h-100" style="background-image: url('/img/slo2.jpg'); background-size: cover;">
-                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                      <i class="ni ni-bulb-61 text-dark opacity-10"></i>
-                    </div>
-                    <h5 class="text-white mb-1">Emisije CO₂ v Sloveniji</h5>
-                    <p>Slovenija je leta 2022 izpustila 15,2 milijona ton CO₂, kar je rahlo povečanje v primerjavi z letom 2020.</p>
-                  </div>
-                </div>
-                <!--  Pričakovanja za leto 2028 -->
-                <div class="carousel-item h-100" style="background-image: url('/img/fut5.jpg'); background-size: cover;">
-                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                      <i class="ni ni-trophy text-dark opacity-10"></i>
-                    </div>
-                    <h5 class="text-white mb-1">Prihodnost emisij CO₂</h5>
-                    <p>Do leta 2028 Slovenija načrtuje zmanjšanje emisij za 20 % s prehodom na obnovljive vire energije in spodbujanjem trajnostne mobilnosti.</p>
-                  </div>
-                </div>
-              </div>
-              <!-- Gumbi za premikanje -->
-              <button class="carousel-control-prev w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Nazaj</span>
-              </button>
-              <button class="carousel-control-next w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Naprej</span>
-              </button>
+          <div class="card-body p-3">
+            <div class="chart">
+              <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
             </div>
           </div>
         </div>
       </div>
-
-<div class="container-fluid mt-4">
-            <div class="row">
-                <!-- Explanation Section -->
-                <div class="col-md-10 mt-7 mb-4 mx-auto">
-                    <h2 class="mb-4">Razumevanje globalnih izpustov CO₂</h2>
-                    <p class="lead">
-                        Izpusti ogljikovega dioksida (CO2) so glavni vzrok podnebnih sprememb, saj povečujejo učinek tople grede in povzročajo globalno segrevanje. Glavni viri vključujejo kurjenje fosilnih goriv v elektrarnah (40 % izpustov), promet, kot so avtomobili in letala (30 %), ter industrijske procese, kot je proizvodnja cementa (20 %). Leta 2022 so globalni izpusti CO2 dosegli približno 36,8 milijarde ton, pri čemer regije, kot so Azija in Severna Amerika, vodijo zaradi visoke industrializacije.
-                    </p>
-                    <p>
-                        Naraščajoče ravni CO2 povzročajo višje globalne temperature, ekstremne vremenske pojave, dvig morske gladine in izgubo biotske raznovrstnosti. Za zmanjšanje izpustov so ključni mednarodni ukrepi, kot je Pariški sporazum, ki si prizadeva omejiti segrevanje pod 2 °C. Rešitve vključujejo prehod na obnovljive vire energije, kot so sončna in vetrna energija, tehnologije za zajemanje ogljika, pogozdovanje in trajnostno urbano načrtovanje. Posamezniki lahko prispevajo z energetsko učinkovitimi navadami in podporo okolju prijaznim politikam.
-                    </p>
+      <div class="col-lg-5">
+        <div class="card card-carousel overflow-hidden h-100 p-0">
+          <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
+            <div class="carousel-inner border-radius-lg h-100">
+              <!-- Globalni CO₂ -->
+              <div class="carousel-item h-100 active" style="background-image: url('/img/earth.jpg'); background-size: cover;">
+                <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                  <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                    <i class="ni ni-camera-compact text-dark opacity-10"></i>
+                  </div>
+                  <h5 class="text-white mb-1">Globalne emisije CO₂</h5>
+                  <p>Globalne emisije CO₂ so leta 2022 dosegle 36,8 gigaton, kar je 54 % več kot leta 2000.</p>
                 </div>
-                <!-- Navigation Section -->
-             <div class="container-fluid mt-3 mb-2">
-    
-            </div>
-        </div>
-
-
-
-
-
-
-      
-      
-    <div class="row">
-
-
-      <div class="row mt-4">
-        <div class="col-lg-7 mb-lg-0 mb-4">
-          <div class="card ">
-            <div class="card-header pb-0 p-3">
-              <div class="d-flex justify-content-between">
-                <h6 class="mb-2">Emisije CO₂ po državah (2022)</h6>
+              </div>
+              <!-- CO₂ v Sloveniji -->
+              <div class="carousel-item h-100" style="background-image: url('/img/slo2.jpg'); background-size: cover;">
+                <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                  <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                    <i class="ni ni-bulb-61 text-dark opacity-10"></i>
+                  </div>
+                  <h5 class="text-white mb-1">Emisije CO₂ v Sloveniji</h5>
+                  <p>Slovenija je leta 2022 izpustila 15,2 milijona ton CO₂, kar je rahlo povečanje v primerjavi z letom 2020.</p>
+                </div>
+              </div>
+              <!-- Pričakovanja za leto 2028 -->
+              <div class="carousel-item h-100" style="background-image: url('/img/fut5.jpg'); background-size: cover;">
+                <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                  <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                    <i class="ni ni-trophy text-dark opacity-10"></i>
+                  </div>
+                  <h5 class="text-white mb-1">Prihodnost emisij CO₂</h5>
+                  <p>Do leta 2028 Slovenija načrtuje zmanjšanje emisij za 20 % s prehodom na obnovljive vire energije in spodbujanjem trajnostne mobilnosti.</p>
+                </div>
               </div>
             </div>
-            <div class="table-responsive">
-              <table class="table align-items-center ">
-                <tbody>
-                  <tr>
-                    <td class="w-30">
-                      <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                          <img src="/img/icons/flags/china1.png" width="26px" height="26px" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                          <p class="text-xs font-weight-bold mb-0">Država:</p>
-                          <h6 class="text-sm mb-0">Kitajska</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
-                        <h6 class="text-sm mb-0">10,065</h6>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
-                        <h6 class="text-sm mb-0">7.1</h6>
-                      </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                      <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
-                        <h6 class="text-sm mb-0">30.0%</h6>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-30">
-                      <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                          <img src="/img/icons/flags/US.png" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                          <p class="text-xs font-weight-bold mb-0">Država:</p>
-                          <h6 class="text-sm mb-0">Združene države</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
-                        <h6 class="text-sm mb-0">5,416</h6>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
-                        <h6 class="text-sm mb-0">16.3</h6>
-                      </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                      <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
-                        <h6 class="text-sm mb-0">16.2%</h6>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-30">
-                      <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                          <img src="/img/icons/flags/india.png" width="26px" height="26px" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                          <p class="text-xs font-weight-bold mb-0">Država:</p>
-                          <h6 class="text-sm mb-0">Indija</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
-                        <h6 class="text-sm mb-0">2,654</h6>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
-                        <h6 class="text-sm mb-0">1.9</h6>
-                      </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                      <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
-                        <h6 class="text-sm mb-0">7.9%</h6>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="w-30">
-                      <div class="d-flex px-2 py-1 align-items-center">
-                        <div>
-                          <img src="/img/icons/flags/RUS.png" width="26px" height="26px" alt="Country flag">
-                        </div>
-                        <div class="ms-4">
-                          <p class="text-xs font-weight-bold mb-0">Država:</p>
-                          <h6 class="text-sm mb-0">Rusija</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
-                        <h6 class="text-sm mb-0">1,589</h6>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="text-center">
-                        <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
-                        <h6 class="text-sm mb-0">10.9</h6>
-                      </div>
-                    </td>
-                    <td class="align-middle text-sm">
-                      <div class="col text-center">
-                        <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
-                        <h6 class="text-sm mb-0">4.7%</h6>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <!-- Gumbi za premikanje -->
+            <button class="carousel-control-prev w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Nazaj</span>
+            </button>
+            <button class="carousel-control-next w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Naprej</span>
+            </button>
           </div>
         </div>
-        <div class="col-lg-5">
-          <div class="card">
-            <div class="card-header pb-0 p-3">
-              <h6 class="mb-0">Kategorije virov CO₂</h6>
-            </div>
-            <div class="card-body p-3">
-              <ul class="list-group">
-        
-                <!-- Sektor -->
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                      <!-- Emoji za sektor: tovarna 🏭 -->
-                      <span style="font-size: 20px;">🏭</span>
-                    </div>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Sektor (cement, raba zemljišč)</h6>
-                      <span class="text-xs">Viri: cement, raba zemljišč, skupno toplogredni plini</span>
-                    </div>
-                  </div>
-                  <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                      <i class="ni ni-bold-right" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </li>
-        
-                <!-- Nafta -->
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-info shadow text-center">
-                      <!-- Emoji za nafto: 🛢️ -->
-                      <span style="font-size: 20px;">🛢️</span>
-                    </div>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Nafta</h6>
-                      <span class="text-xs">Emisije CO₂ iz naftnih derivatov</span>
-                    </div>
-                  </div>
-                  <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                      <i class="ni ni-bold-right" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </li>
-        
-                <!-- Premog -->
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-warning shadow text-center">
-                      <!-- Emoji za premog: 🪨 (stone emoji kot simbol premoga) -->
-                      <span style="font-size: 20px;">🪨</span>
-                    </div>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Premog</h6>
-                      <span class="text-xs">Emisije CO₂ iz premoga</span>
-                    </div>
-                  </div>
-                  <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                      <i class="ni ni-bold-right" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </li>
-        
-                <!-- Plin -->
-                <li class="list-group-item border-0 d-flex justify-content-between ps-0 border-radius-lg">
-                  <div class="d-flex align-items-center">
-                    <div class="icon icon-shape icon-sm me-3 bg-gradient-success shadow text-center">
-                      <!-- Emoji za plin: 🔥 -->
-                      <span style="font-size: 20px;">🔥</span>
-                    </div>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-1 text-dark text-sm">Plin</h6>
-                      <span class="text-xs">Emisije CO₂ iz zemeljskega plina</span>
-                    </div>
-                  </div>
-                  <div class="d-flex">
-                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
-                      <i class="ni ni-bold-right" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </li>
-        
-              </ul>
-            </div>
-          </div>
-        </div>
-
-
-      <div class="row" id="country-comparison">
-                <div class="col-md-10 mt-7 mx-auto">
-                    <h2 class="mb-4">Interaktivna primerjava držav po emisijah CO₂</h2>
-                    <p class="lead">
-                       V spodnjem grafu lahko uporabnik primerja emisije CO₂ med različnimi državami po različnih metrikah.
-                        Orodje omogoča izbiro več držav hkrati, kar je idealno za analizo razlik med razvitimi in
-                            razvijajočimi se državami, pa tudi za spremljanje sprememb skozi čas.
-                    </p>
-                    <p class="text-dark fs-6">
-    Na voljo so štiri ključne metrike:
-  </p>
-  <ul class="fs-6 text-dark ps-4 mb-4">
-    <li><strong>Skupne emisije CO₂</strong> – absolutna vrednost emisij v milijonih ton.</li>
-    <li><strong>CO₂ na prebivalca</strong> – povprečna letna emisija posameznika v tonah.</li>
-    <li><strong>Delež v svetu</strong> – koliko odstotkov emisij prispeva posamezna država.</li>
-    <li><strong>Vpliv na temperaturo</strong> – ocenjeni prispevek emisij h globalnemu segrevanju.</li>
-  </ul>
-                </div>
       </div>
-
-
-
-<div class="container-fluid mt-4">
-   
-
-    <!-- Prva vrstica: Nadzor podatkov + Glavni graf -->
-    <div class="row mb-4">
-        <!-- Nadzor podatkov -->
-        <div class="col-lg-3">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5>Nadzor podatkov</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Države za primerjavo</label>
-                        <select id="countrySelect" multiple="multiple" style="width: 100%"></select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Metrična vrednost</label>
-                        <select id="metricSelect" class="form-select">
-                            <option value="co2">Skupne emisije CO₂</option>
-                            <option value="co2_per_capita">CO₂ na prebivalca</option>
-                            <option value="share_global_co2">Delež v svetu</option>
-                            <option value="temperature_change_from_co2">Vpliv na temperaturo</option>
-                        </select>
-                    </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <label class="form-label">Od leta</label>
-                            <input type="number" id="startYear" class="form-control" min="1850" max="2023" value="1990">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Do leta</label>
-                            <input type="number" id="endYear" class="form-control" min="1850" max="2023" value="2022">
-                        </div>
-                    </div>
-
-                    <button id="updateBtn" class="btn btn-primary mt-3 w-100">Posodobi grafe</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Glavni graf -->
-        <div class="col-lg-9">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 id="chartTitle">Emisije CO₂ skozi čas</h5>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container" style="position: relative; height:315px; width:100%">
-                        <canvas id="emissionsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-
-<div class="row">
-                <div class="col-md-10 mt-5 mx-auto">
-                    <h3 class="mb-4">Primerjava emisij CO₂ in učinkovitosti med državami</h3>
-                    <p class="lead">Ta interaktivni graf omogoča primerjavo med državami glede na količino emisij ogljikovega dioksida, izračunano po različnih metrikah. Namesto absolutnih številk, se tukaj osredotočamo na učinkovitost – koliko emisij in energije nastane v povezavi z gospodarsko dejavnostjo.
-                      
-                    </p>
-                 
-      </div>
-      </div>
-
-  
-
-    <!-- Primerjava držav -->
-    <div class="row mb-4" >
-        <div class="col-md-12">
-            <div class="card h-100">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Primerjava držav</h5>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-primary active" data-metric="co2">Skupni CO₂</button>
-                            <button class="btn btn-sm btn-outline-primary" data-metric="co2_per_capita">Na prebivalca</button>
-                            <button class="btn btn-sm btn-outline-primary" data-metric="co2_per_gdp">CO₂ glede na BDP</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="chart-container" style="position: relative; height:300px;">
-                                <canvas id="comparisonChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h6 class="text-center mb-3">Dodatne metrike</h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-hover" id="metricsTable">
-                                            <thead>
-                                                <tr>
-                                                    <th>Država</th>
-                                                    <th class="text-end">CO₂/BDP</th>
-                                                    <th class="text-end">Energija/BDP</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-                                    <div class="mt-3">
-                                        <small class="text-muted">Prikazano leto: <span id="currentYearDisplay">2022</span></small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-  
-                  </div>   
-                </div>
-            </div>
-        </div>
+   <!-- Tab Navigation -->
+<ul class="nav nav-tabs mt-4 justify-content-center" id="dashboardTabs" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview" role="tab">Pregled</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="comparison-tab" data-bs-toggle="tab" href="#comparison" role="tab">Interaktivna primerjava</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sectors-tab" data-bs-toggle="tab" href="#sectors" role="tab">Emisije po sektorjih</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="map-tab" data-bs-toggle="tab" href="#map" role="tab">Primerjava s zemljevidom</a>
+  </li>
+</ul>
+    <!-- Tab Content -->
+    <div class="tab-content mt-3" id="dashboardTabContent">
+      <!-- Tab 1: Overview -->
+      <div class="tab-pane fade show active" id="overview" role="tabpanel">
+  <div class="row">
+    <div class="col-md-10 mx-auto">
+      <h2 class="mb-4">Razumevanje globalnih izpustov CO₂</h2>
+      <p class="lead">
+        Izpusti ogljikovega dioksida (CO2) so glavni vzrok podnebnih sprememb, saj povečujejo učinek tople grede in povzročajo globalno segrevanje. Glavni viri vključujejo kurjenje fosilnih goriv v elektrarnah (40 % izpustov), promet, kot so avtomobili in letala (30 %), ter industrijske procese, kot je proizvodnja cementa (20 %). Leta 2022 so globalni izpusti CO2 dosegli približno 36,8 milijarde ton, pri čemer regije, kot so Azija in Severna Amerika, vodijo zaradi visoke industrializacije.
+      </p>
+      <p>
+        Naraščajoče ravni CO2 povzročajo višje globalne temperature, ekstremne vremenske pojave, dvig morske gladine in izgubo biotske raznovrstnosti. Za zmanjšanje izpustov so ključni mednarodni ukrepi, kot je Pariški sporazum, ki si prizadeva omejiti segrevanje pod 2 °C. Rešitve vključujejo prehod na obnovljive vire energije, kot so sončna in vetrna energija, tehnologije za zajemanje ogljika, pogozdovanje in trajnostno urbano načrtovanje. Posamezniki lahko prispevajo z energetsko učinkovitimi navadami in podporo okolju prijaznim politikam.
+      </p>
+      <p>
+        Naslednji grafi prikazujejo izpuste CO₂ in delež globalnih izpustov za deset največjih držav izpustov od leta 1750 do 2023. Te države—Kitajska, Združene države, Indija, Rusija, Japonska, Iran, Nemčija, Savdska Arabija, Indonezija in Južna Koreja—predstavljajo pomemben delež globalnih izpustov CO₂ zaradi svojih industrijskih dejavnosti, porabe energije in velikosti prebivalstva.
+      </p>
     </div>
+  </div>
 
-
-  <div class="row" id="emissions-trend">
-                <div class="col-md-10 mt-5 mx-auto">
-                    <h3 class="mb-4">Trend emisije skozi časa</h3>
-                    <p class="lead">Spodnji graf prikazuje dolgoročni trend svetovnih emisij ogljikovega dioksida od leta 1990 do 2022. To časovno obdobje zajema ključna desetletja hitre globalizacije, industrijskega razcveta v Aziji, tehnološkega napredka in uvedbe prvih podnebnih politik.
-                      
-                    </p>
-                 
+  <!-- Total Emissions Graph -->
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Skupni izpusti CO₂ največjih držav (1750–2023)</h5>
       </div>
+      <div class="card-body" style="min-height: 500px;">
+        <canvas id="totalEmissionsChart" style="max-height: 500px; height: 100%;"></canvas>
       </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+  <div class="card">
+    <div class="card-header">
+      <h5>Delež globalnih izpustov CO₂ (1750–2023)</h5>
+    </div>
+    <div class="card-body" style="min-height: 500px;">
+      <canvas id="globalShareChart" style="max-height: 500px; height: 80%;"></canvas>
+    </div>
+  </div>
+</div>
 </div>
 
-     <!-- Trendi emisij -->
-    <div class="row mt-3">
-      <div class="col-md-12">
-          <div class="card">
-              <div class="card-header">
-                  <h6 class="mb-0">Trend emisij (1990-2022)</h6>
-              </div>
-              <div class="card-body p-2">
-                  <div class="chart-container" style="position: relative; height:200px;">
-                      <canvas id="trendChart"></canvas>
+
+  <div class="row mt-4">
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header">
+          <h6>Emisije CO₂ po državah (2022)</h6>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table align-items-center">
+            <tbody>
+              <tr>
+                <td class="w-30">
+                  <div class="d-flex px-2 py-1 align-items-center">
+                    <img src="/img/icons/flags/china1.png" width="26px" height="26px" alt="Country flag">
+                    <div class="ms-4">
+                      <p class="text-xs font-weight-bold mb-0">Država:</p>
+                      <h6 class="text-sm mb-0">Kitajska</h6>
+                    </div>
                   </div>
-              </div>
-          </div>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
+                  <h6 class="text-sm mb-0">10,065</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
+                  <h6 class="text-sm mb-0">7.1</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
+                  <h6 class="text-sm mb-0">30.0%</h6>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-30">
+                  <div class="d-flex px-2 py-1 align-items-center">
+                    <img src="/img/icons/flags/US.png" width="26px" height="26px" alt="Country flag">
+                    <div class="ms-4">
+                      <p class="text-xs font-weight-bold mb-0">Država:</p>
+                      <h6 class="text-sm mb-0">Združene države</h6>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
+                  <h6 class="text-sm mb-0">5,416</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
+                  <h6 class="text-sm mb-0">16.3</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
+                  <h6 class="text-sm mb-0">16.2%</h6>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-30">
+                  <div class="d-flex px-2 py-1 align-items-center">
+                    <img src="/img/icons/flags/india.png" width="26px" height="26px" alt="Country flag">
+                    <div class="ms-4">
+                      <p class="text-xs font-weight-bold mb-0">Država:</p>
+                      <h6 class="text-sm mb-0">Indija</h6>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
+                  <h6 class="text-sm mb-0">2,654</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
+                  <h6 class="text-sm mb-0">1.9</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
+                  <h6 class="text-sm mb-0">7.9%</h6>
+                </td>
+              </tr>
+              <tr>
+                <td class="w-30">
+                  <div class="d-flex px-2 py-1 align-items-center">
+                    <img src="/img/icons/flags/RUS.png" width="26px" height="26px" alt="Country flag">
+                    <div class="ms-4">
+                      <p class="text-xs font-weight-bold mb-0">Država:</p>
+                      <h6 class="text-sm mb-0">Rusija</h6>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Skupaj (Mt CO₂):</p>
+                  <h6 class="text-sm mb-0">1,589</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Na prebivalca (t CO₂):</p>
+                  <h6 class="text-sm mb-0">10.9</h6>
+                </td>
+                <td class="text-center">
+                  <p class="text-xs font-weight-bold mb-0">Odstotek svetovnih emisij:</p>
+                  <h6 class="text-sm mb-0">4.7%</h6>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
- <div class="row" id="sector-analysis">
-                <div class="col-md-10 mt-7  mb-3 mx-auto">
-                    <h2 class="mb-4">Kako so emisije CO₂ razporejene med sektorji?</h2>
-                    <p class="lead">
-                       Leta <strong>2022</strong> so svetovne emisije CO₂ dosegle <strong>36,8 gigaton</strong>. Te emisije izvirajo iz različnih
-    sektorjev, od proizvodnje energije do prometa in industrije. Razumevanje, kateri sektorji prispevajo največ,
-    je ključno za oblikovanje učinkovitih podnebnih politik.
-                    </p>
-                    <p class="text-dark fs-6">
-   V nadaljevanju lahko podrobno raziščeš, kako so emisije CO₂ razporejene po sektorjih v izbranih državah.
-              Ta analiza razkriva specifične vzorce, ki pogosto odražajo stopnjo razvoja, gospodarsko strukturo
-              in energetske vire posamezne države.</p>
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header">
+          <h6>Kategorije virov CO₂</h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+              <div class="d-flex align-items-center">
+                <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow-lg text-center">
+                  <span style="font-size: 20px;">🏭</span>
                 </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">Sektor</h6>
+                  <span class="text-xs">Viri: cement, raba zemljišč, skupno toplogredni plini</span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                  <i class="ni ni-bold-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+              <div class="d-flex align-items-center">
+                <div class="icon icon-shape icon-sm me-3 bg-gradient-info shadow text-center">
+                  <span style="font-size: 20px;">🛢️</span>
+                </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">Nafta</h6>
+                  <span class="text-xs">Emisije iz naftnih derivatov</span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                  <i class="ni ni-bold-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+              <div class="d-flex align-items-center">
+                <div class="icon icon-shape icon-sm me-3 bg-gradient-warning shadow text-center">
+                  <span style="font-size: 20px;">🪨</span>
+                </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">Premog</h6>
+                  <span class="text-xs">Emisije iz premoga</span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                  <i class="ni ni-bold-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0">
+              <div class="d-flex align-items-center">
+                <div class="icon icon-shape icon-sm me-3 bg-gradient-success shadow text-center">
+                  <span style="font-size: 20px;">🔥</span>
+                </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">Plin</h6>
+                  <span class="text-xs">Emisije iz zemljskega plina</span>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto">
+                  <i class="ni ni-bold-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Animated Graph -->
+  <div class="row mt-4">
+    <div class="col-md-10 mx-auto">
+      <div class="card">
+        <div class="card-header">
+          <h5>Globalne emisije CO₂ skozi čas</h5>
+        </div>
+        <div class="card-body">
+          <div id="graphContainer" style="width: 100%; height: 60vh;">
+            <canvas id="co2Chart" style="max-height: 100%;"></canvas>
+          </div>
+          <div class="timeline-component" style="display: flex; align-items: center; background: #e0e0e0; border: 1px solid #ccc; border-radius: 8px; padding: 8px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <div class="ActionButton" style="padding: 0 8px; margin-top: 10px;">
+              <button id="playPauseButton" class="btn btn-sm icon-only" style="background: #8a9e8b; color: #fff; border: none; border-radius: 4px; padding: 6px 10px;" aria-label="Predvajaj časovni prikaz" type="button">
+                <i class="fas fa-play"></i>
+              </button>
+            </div>
+            <span style="color: #697769; font-weight: bold; padding: 0 8px;">1750</span>
+            <div class="slider clickable" style="position: relative; flex: 1; height: 8px; background: #f5f5f5; border-radius: 4px; margin: 0 8px;">
+              <div id="startHandle" class="handle startMarker" role="slider" tabindex="0" aria-valuemin="1750" aria-valuenow="1750" aria-valuemax="2023" aria-label="Začetno leto" style="position: absolute; left: 0%; width: 14px; height: 14px; background: #4CAF50; border-radius: 50%; top: -3px; cursor: pointer; z-index: 2;">
+                <div class="icon"></div>
+              </div>
+              <div id="interval" class="interval" style="position: absolute; left: 0%; right: 0%; height: 8px; background: #4CAF50; border-radius: 4px; pointer-events: none;"></div>
+              <div id="endHandle" class="handle endMarker" role="slider" tabindex="0" aria-valuemin="1750" aria-valuenow="2023" aria-valuemax="2023" aria-label="Končno leto" style="position: absolute; left: 100%; width: 14px; height: 14px; background: #4CAF50; border-radius: 50%; top: -3px; cursor: pointer; z-index: 2;">
+                <div class="icon"></div>
+              </div>
+              <div id="startTooltip" style="display: none; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 3; top: -25px; transform: translateX(-50%);"></div>
+              <div id="endTooltip" style="display: none; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 3; top: -25px; transform: translateX(-50%);"></div>
+            </div>
+            <span style="color: #697769; font-weight: bold; padding: 0 8px;">2023</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- Tab 2: Country Comparison -->
+      <div class="tab-pane fade" id="comparison" role="tabpanel">
+        <div class="row">
+          <div class="col-md-10 mx-auto">
+            <h2 class="mb-4">Interaktivna primerjava držav po emisijah CO₂</h2>
+            <p class="lead">
+              V spodnjem grafu lahko primerjate emisije CO₂ med državami po različnih metrikah. Orodje omogoča izbiro več držav hkrati, kar je idealno za analizo razlik med razvitimi in razvijajočimi se državami ter spremljanje sprememb skozi čas.
+            </p>
+            <p class="text-dark fs-6">
+              Na voljo so tri ključne metrike:
+            </p>
+            <ul class="fs-6 text-dark ps-4 mb-4">
+              <li><strong>Skupni CO₂</strong> – absolutna vrednost emisij v milijonih ton.</li>
+              <li><strong>CO₂ na prebivalca</strong> – povprečna letna emisija posameznika v tonah.</li>
+              <li><strong>CO₂ glede na BDP</strong> – emisije glede na gospodarsko dejavnost (kg/$).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="row mb-4">
+          <div class="col-lg-3">
+            <div class="card">
+              <div class="card-header">
+                <h5>Nadzor podatkov</h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label">Države za primerjavo</label>
+                  <select id="countrySelect" multiple="multiple" style="width: 100%"></select>
+                </div>
+                <div class="mb-0">
+                  <label class="form-label">Metrična vrednost</label>
+                  <select id="metricSelect" class="form-select">
+                    <option value="co2">Skupni CO₂</option>
+                    <option value="co2_per_capita">CO₂ na prebivalca</option>
+                    <option value="share_global_co2">Delež v svetu</option>
+                    <option value="temperature_change_from_co2">Vpliv na temperaturo</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <label class="form-label">Od leta</label>
+                    <input type="number" id="startYearInput" class="form-control" min="1850" max="2023" value="1990">
+                  </div>
+                  <div class="col">
+                    <label class="form-label">Do leta</label>
+                    <input type="number" id="endYearInput" class="form-control" min="1850" max="2023" value="2022">
+                  </div>
+                </div>
+                <button id="updateBtn" class="btn btn-primary mt-3 w-100">Posodobi grafe</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-9">
+            <div class="card">
+              <div class="card-header">
+                <h5 id="chartTitle">Emisije CO₂ skozi čas</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container" style="position: relative; height:300px;">
+                  <canvas id="emissionsChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-10 mx-auto">
+            <h3 class="mb-4">Primerjava emisij CO₂ in učinkovitosti med državami</h3>
+            <p class="lead">
+              Ta interaktivni graf omogoča primerjavo držav glede na emisije ogljikovega dioksida po različnih metrikah. Osredotoča se na učinkovitost – koliko emisij in energije nastane v povezavi z gospodarsko dejavnostjo.
+            </p>
+          </div>
+        </div>
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">Primerjava držav</h5>
+                  <div class="btn-group" id="metricButtons">
+                    <button class="btn btn-sm btn-outline-primary active" data-metric="co2">Skupni CO₂</button>
+                    <button class="btn btn-sm btn-outline-primary" data-metric="co2_per_capita">Na prebivalca</button>
+                    <button class="btn btn-sm btn-outline-primary" data-metric="co2_per_gdp">CO₂ glede na BDP</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-8">
+                    <div class="chart-container" style="position: relative; height:300px;">
+                      <canvas id="comparisonChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h6 class="text-center mb-3">Dodatne metrike</h6>
+                        <div class="table-responsive">
+                          <table class="table table-sm table-hover" id="metricsTable">
+                            <thead>
+                              <tr>
+                                <th>Država</th>
+                                <th class="text-end">CO₂/BDP</th>
+                                <th class="text-end">Energija/BDP</th>
+                              </tr>
+                            </thead>
+                            <tbody></tbody>
+                          </table>
+                        </div>
+                        <div class="mt-3">
+                          <small class="text-muted">Prikazano leto: <span id="currentYearDisplay">2022</span></small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-
-
-    <!-- Analiza po sektorjih za izbrano državo -->
-    <div class="row mb-5 sector-summary">
-        <div class="col-md-5  ms-5">
-            <h4 class="text-dark mb-3">Kateri sektorji najbolj prispevajo k emisijam v posameznih državah?</h4>
-
+      <!-- Tab 3: Sectoral Distribution -->
+      <div class="tab-pane fade" id="sectors" role="tabpanel">
+        <div class="row">
+          <div class="col-md-10 mx-auto mb-4">
+            <h2 class="mb-3">Emisije CO₂ po sektorjih</h2>
+            <p class="lead">
+              Leta 2022 so svetovne emisije CO₂ dosegle <strong>36,8 gigaton</strong>. Razumevanje, kateri sektorji – od proizvodnje energije do prometa in industrije – prispevajo največ, je ključno za oblikovanje učinkovitih podnebnih politik.
+            </p>
+            <p class="text-dark fs-6">
+              Spodnji grafi prikazujejo, kako so emisije CO₂ razporejene po sektorjih v različnih državah in globalno. Uporabite interaktivne grafikone za analizo posameznih držav ali preglejte fiksne grafikone za širši vpogled v svetovne trende.
+            </p>
+          </div>
+        </div>
+        <!-- Interactive Sector Line Chart -->
+        <div class="row mb-5">
+          <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+              <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Trendi emisij CO₂ po sektorjih za izbrano državo (1990–2022)</h5>
+                <select id="sectorLineCountrySelect" class="form-select w-25">
+                  <option value="">Izberi državo</option>
+                </select>
+              </div>
+              <div class="card-body">
+                <div class="chart-container" style="position: relative; height: 400px;">
+                  <canvas id="sectorLineChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Existing Pie Chart and Text -->
+        <div class="row mb-5 sector-align">
+          <div class="col-md-5 ms-5">
+            <h4 class="text-dark mb-3">Kateri sektorji najbolj prispevajo k emisijam vzeti državi?</h4>
             <p class="text-dark fs-6">
               V nadaljevanju lahko podrobno raziščeš, kako so emisije CO₂ razporejene po sektorjih v izbranih državah.
               Ta analiza razkriva specifične vzorce, ki pogosto odražajo stopnjo razvoja, gospodarsko strukturo
               in energetske vire posamezne države.
             </p>
-
             <ul class="fs-6 text-dark ps-4 mb-4">
-              <li><strong>Države v razvoju</strong> pogosto izstopajo po visoki porabi energije in emisijah iz industrije.</li>
+              <li><strong>Države v razvoju</strong> pogosto izstopajo po visokih emisijah iz industrije.</li>
               <li><strong>Razvite države</strong> imajo večji delež emisij iz prometa in gospodinjstev.</li>
               <li><strong>Države proizvajalke nafte</strong> imajo pogosto visoke emisije zaradi sežiganja plinov in ekstrakcije surovin.</li>
             </ul>
-
             <p class="text-dark fs-6">
-              Graf omogoča hitro vizualno primerjavo sektorjev z največjim prispevkom k emisijam za vsako državo posebej.
+              Grafikon omogoča hitro vizualno primerjavo sektorjev z največjim prispevkom k emisijam za vsako državo posebej.
               S klikom na spustni meni lahko izbereš državo in vidiš, kateri sektor je največji onesnaževalec.
             </p>
-
-        </div>
-        <div class="col-md-6">
+          </div>
+          <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header pb-2 border-0 bg-white">
-                    <div class="d-flex justify-content-end">
-                        <select id="detailCountrySelect" class="form-select w-50">
-                            <option value="">Izberi državo</option>
-                        </select>
-                    </div>
+              <div class="card-header pb-2 border-bottom">
+                <div class="d-flex justify-content-end">
+                  <select id="detailCountrySelect" class="form-select w-50">
+                    <option value="">Izberi državo</option>
+                  </select>
                 </div>
-                <div class="card-body pt-3">
-                    <div class="chart-container" style="position: relative; height:300px; width:100%">
-                        <canvas id="sectorChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-        
-      <footer class="footer pt-3  ">
-        <div class="container-fluid">
-          <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6 mb-lg-0 mb-4">
-              <div class="copyright text-center text-sm text-muted text-lg-start">
               </div>
-            </div>
-            <div class="col-lg-6">
+              <div class="card-body pt-3">
+                <div class="chart-container">
+                  <canvas id="sectorChart"></canvas>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </footer>
+      </div>
+
+      <!-- Tab 4: World Map -->
+<div class="tab-pane fade" id="map" role="tabpanel">
+  <div class="row">
+    <div class="col-md-12">
+      <h5>Globalne emisije CO₂ na prebivalca (2022)</h5>
+      <div class="card-body">
+        <div id="globeContainer" style="width: 100%; height: 85vh; position: relative; overflow: hidden;"></div>
+        <div id="legendContainer" style="margin-top: 10px; padding: 10px; background: rgba(142, 135, 135, 0.75); border-radius: 5px; position: sticky; bottom: 0; z-index: 10;">
+          <div id="legend" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+        </div>
+      </div>
     </div>
-  </main>
- 
+  </div>
+</div>
 
-   <!--   Kalkulator   -->
 
-   <div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
+
+</div>
+
+
+</div>
+    
+  <!-- Kalkulator -->
+  <div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -845,7 +898,6 @@
                   </button>
                 </div>
               </div>
-              
               <div class="results mt-4 p-3 bg-light rounded">
                 <h5>Rezultati</h5>
                 <div class="row">
@@ -858,7 +910,6 @@
                     <p id="co2Result">-</p>
                   </div>
                 </div>
-                
               </div>
             </div>
             <div class="col-md-7">
@@ -874,58 +925,8 @@
       </div>
     </div>
   </div>
-<!--POPUP-->
-  <div id="mapOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;"></div>
-  <div id="mapPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1000px; background: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1001; padding: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <h2 id="popupTitle" style="font-size: 24px; color: #333;">Globalne emisije CO₂ na prebivalca (2022)</h2>
-      <button id="closeMapPopup" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
-    </div>
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs" id="popupTabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#mapContent" type="button" role="tab" aria-controls="mapContent" aria-selected="true">🌍 Mapa</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="graph-tab" data-bs-toggle="tab" data-bs-target="#graphContent" type="button" role="tab" aria-controls="graphContent" aria-selected="false">📈 Graf</button>
-      </li>
-    </ul>
-    <!-- Tab Content -->
-    <div class="tab-content" id="popupTabContent">
-      <div class="tab-pane fade show active" id="mapContent" role="tabpanel" aria-labelledby="map-tab">
-        <div id="globeContainer" style="width: 100%; height: 60vh; position: relative;"></div>
-      </div>
-      <div class="tab-pane fade" id="graphContent" role="tabpanel" aria-labelledby="graph-tab">
-        <div id="graphContainer" style="width: 100%; height: 60vh;">
-          <canvas id="co2Chart" style="max-height: 100%;"></canvas>
-        </div>
-        <div class="timeline-component" style="display: flex; align-items: center; background: #e0e0e0; border: 1px solid #ccc; border-radius: 8px; padding: 8px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-          <div class="ActionButton" style="padding: 0 8px; margin-top: 10px;">
-            <button id="playPauseButton" class="btn btn-sm icon-only" style="background: #8a9e8b; color: #fff; border: none; border-radius: 4px; padding: 6px 10px;" aria-label="Predvajaj časovni prikaz" type="button">
-              <i class="fas fa-play"></i>
-            </button>
-          </div>
-          <span style="color: #697769; font-weight: bold; padding: 0 8px;">1750</span>
-          <div class="slider clickable" style="position: relative; flex: 1; height: 8px; background: #f5f5f5; border-radius: 4px; margin: 0 8px;">
-            <div id="startHandle" class="handle startMarker" role="slider" tabindex="0" aria-valuemin="1750" aria-valuenow="1750" aria-valuemax="2023" aria-label="Začetno leto" style="position: absolute; left: 0%; width: 14px; height: 14px; background: #4CAF50; border-radius: 50%; top: -3px; cursor: pointer; z-index: 2;">
-              <div class="icon"></div>
-            </div>
-            <div id="interval" class="interval" style="position: absolute; left: 0%; right: 0%; height: 8px; background: #4CAF50; border-radius: 4px; pointer-events: none;"></div>
-            <div id="endHandle" class="handle endMarker" role="slider" tabindex="0" aria-valuemin="1750" aria-valuenow="2023" aria-valuemax="2023" aria-label="Končno leto" style="position: absolute; left: 100%; width: 14px; height: 14px; background: #4CAF50; border-radius: 50%; top: -3px; cursor: pointer; z-index: 2;">
-              <div class="icon"></div>
-            </div>
-            <div id="startTooltip" style="display: none; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 3; top: -25px; transform: translateX(-50%);"></div>
-            <div id="endTooltip" style="display: none; position: absolute; background: #333; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 3; top: -25px; transform: translateX(-50%);"></div>
-          </div>
-          <span style="color: #697769; font-weight: bold; padding: 0 8px;">2023</span>
-        </div>
-      </div>
-    </div>
-    <div id="legendContainer" style="margin-top: 20px; padding: 10px; background: rgba(142, 135, 135, 0.75); border-radius: 5px; display: none;">
-      <div id="legend" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
-    </div>
-  </div>
-  <!--   Core JS Files   -->
+
+  <!-- Core JS Files -->
   <script src="/js/core/popper.min.js"></script>
   <script src="/js/core/bootstrap.min.js"></script>
   <script src="/js/plugins/perfect-scrollbar.min.js"></script>
@@ -1077,8 +1078,7 @@
         },
       },
     });
-
-</script>
+  </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
@@ -1090,15 +1090,14 @@
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
-  <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+  <!-- Control Center for Soft Dashboard -->
   <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
   <script src="/js/dashboard.js"></script>
   <script src="/js/kalkulator.js"></script>
   <script src="/js/globe.js"></script>
   <script src="/js/animatedgraph.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </body>
 
 </html>

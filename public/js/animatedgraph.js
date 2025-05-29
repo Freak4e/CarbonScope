@@ -1,13 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
     const playButton = document.getElementById('playPauseButton');
     const chartCanvas = document.getElementById('co2Chart');
-    const graphTab = document.getElementById('graph-tab');
     const startHandle = document.getElementById('startHandle');
     const endHandle = document.getElementById('endHandle');
     const interval = document.getElementById('interval');
     const startTooltip = document.getElementById('startTooltip');
     const endTooltip = document.getElementById('endTooltip');
-    const closeMapPopup = document.getElementById('closeMapPopup');
+    const overviewTab = document.getElementById('overview-tab');
+
+    // Validate DOM elements
+    if (!playButton || !chartCanvas || !startHandle || !endHandle || !interval || !startTooltip || !endTooltip || !overviewTab) {
+        console.error('Graph elements not found.');
+        if (chartCanvas) {
+            chartCanvas.parentElement.innerHTML = '<p style="color: red;">Napaka: Manjkajo elementi strani.</p>';
+        }
+        return;
+    }
+
     let chartInstance = null;
     let animationInterval = null;
     let isPlaying = false;
@@ -16,11 +25,30 @@ document.addEventListener('DOMContentLoaded', function () {
     let endYearIndex = 0;
     let chartData = [];
 
-    // Validate DOM elements
-    if (!playButton || !chartCanvas || !graphTab || !startHandle || !endHandle || !interval || !startTooltip || !endTooltip || !closeMapPopup) {
-        console.error('Graph elements not found.');
-        return;
-    }
+    // Fallback static data (derived from HTML chart-line and extended to 1750–2023)
+    const fallbackData = [
+        { year: 1750, co2: 0.01 },
+        { year: 1800, co2: 0.03 },
+        { year: 1850, co2: 0.20 },
+        { year: 1900, co2: 2.00 },
+        { year: 1950, co2: 6.00 },
+        { year: 1970, co2: 15.00 },
+        { year: 1980, co2: 19.40 },
+        { year: 1990, co2: 22.70 },
+        { year: 2000, co2: 25.10 },
+        { year: 2002, co2: 26.20 },
+        { year: 2004, co2: 28.10 },
+        { year: 2006, co2: 30.40 },
+        { year: 2008, co2: 31.70 },
+        { year: 2010, co2: 33.10 },
+        { year: 2012, co2: 34.50 },
+        { year: 2014, co2: 35.30 },
+        { year: 2016, co2: 35.80 },
+        { year: 2018, co2: 36.60 },
+        { year: 2020, co2: 34.80 },
+        { year: 2022, co2: 36.80 },
+        { year: 2023, co2: 37.40 }
+    ];
 
     async function fetchData() {
         try {
@@ -29,11 +57,13 @@ document.addEventListener('DOMContentLoaded', function () {
             chartData = await response.json();
             chartData.sort((a, b) => a.year - b.year);
             if (chartData.length === 0) throw new Error('No data received.');
-            endYearIndex = chartData.length - 1;
         } catch (error) {
             console.error('Error fetching animated graph data:', error);
-            chartCanvas.parentElement.innerHTML = '<p style="color: red;">Napaka pri nalaganju podatkov o CO₂.</p>';
+            // Use fallback data
+            chartData = fallbackData;
+            console.warn('Using fallback data for CO₂ emissions.');
         }
+        endYearIndex = chartData.length - 1;
     }
 
     function initializeChart() {
@@ -141,8 +171,8 @@ document.addEventListener('DOMContentLoaded', function () {
         interval.style.right = '0%';
         startTooltip.style.display = 'none';
         endTooltip.style.display = 'none';
-        startHandle.setAttribute('aria-valuenow', '1750');
-        endHandle.setAttribute('aria-valuenow', '2023');
+        startHandle.setAttribute('aria-valuenow', chartData[0].year);
+        endHandle.setAttribute('aria-valuenow', chartData[chartData.length - 1].year);
         if (chartInstance) {
             updateChart(0);
         }
@@ -199,13 +229,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function setupHandleDragging(handle, tooltip, isStart) {
         handle.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            console.log(`${isStart ? 'startHandle' : 'endHandle'} mousedown`);
             const onMouseMove = (e) => {
-                console.log(`${isStart ? 'startHandle' : 'endHandle'} mousemove`, e.clientX);
                 updateHandlePosition(e, handle, tooltip, isStart);
             };
             const onMouseUp = () => {
-                console.log(`${isStart ? 'startHandle' : 'endHandle'} mouseup`);
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
                 tooltip.style.display = 'none';
@@ -216,15 +243,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         handle.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            console.log(`${isStart ? 'startHandle' : 'endHandle'} touchstart`);
             const onTouchMove = (e) => {
                 if (e.touches.length > 0) {
-                    console.log(`${isStart ? 'startHandle' : 'endHandle'} touchmove`, e.touches[0].clientX);
                     updateHandlePosition(e.touches[0], handle, tooltip, isStart);
                 }
             };
             const onTouchEnd = () => {
-                console.log(`${isStart ? 'startHandle' : 'endHandle'} touchend`);
                 document.removeEventListener('touchmove', onTouchMove);
                 document.removeEventListener('touchend', onTouchEnd);
                 tooltip.style.display = 'none';
@@ -249,22 +273,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    graphTab.addEventListener('click', async () => {
-        resetGraphState();
-        if (!chartInstance && chartData.length === 0) {
+    async function initGraph() {
+        if (chartData.length === 0) {
             await fetchData();
             if (chartData.length > 0) {
                 initializeChart();
+                resetGraphState();
             }
         }
-        document.getElementById('legendContainer').style.display = 'none';
-    });
+    }
 
-    closeMapPopup.addEventListener('click', () => {
-        resetGraphState();
-    });
-
-    document.getElementById('map-tab').addEventListener('click', () => {
-        document.getElementById('legendContainer').style.display = 'block';
-    });
+    // Initialize graph when overview tab is shown (active by default)
+    overviewTab.addEventListener('shown.bs.tab', initGraph);
+    // Trigger initialization on page load since overview is active
+    if (overviewTab.classList.contains('active')) {
+        initGraph();
+    }
 });
