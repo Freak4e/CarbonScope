@@ -1,166 +1,521 @@
-<h2 class="text-dark mb-3">🔥 CO₂ emisije po tipu goriva v Sloveniji (2000–2022)</h2>
+<div class="container-fluid py-4">
+  <!-- Main Header with decorative lines -->
+  <div class="text-center my-5">
+    <h1 class="text-dark mb-3 position-relative">
+      <span class="d-inline-block position-relative">
+        <span class="d-inline-block mx-2" style="width: 30px;"></span>
+        Emisije CO₂ po vrsti goriva v Sloveniji
+        <span class="d-inline-block mx-2" style="width: 30px;"></span>
+      </span>
+    </h1>
+  </div>
 
-<p class="text-dark fs-6">
-  Ta interaktivni graf prikazuje emisije ogljikovega dioksida po glavnih virih goriva: premog, nafta in zemeljski plin.
-</p>
+  <!-- Introduction Section -->
+  <div class="mt-3 mb-4 px-6 text-start">
+    <p class="text-dark fs-7 mb-3">
+      Emisije CO₂ na prebivalca po vrsti goriva razkrivajo, kako različni viri energije prispevajo k skupnim emisijam v Sloveniji. Med leti 2000 in 2022 so fosilna goriva, kot so nafta, premog in plin, ostala glavni vir emisij, vendar se delež obnovljivih virov povečuje. Razumevanje teh trendov je ključno za oblikovanje politik za zmanjšanje ogljičnega odtisa.
+    </p>
+    <p class="text-dark fs-7 mb-3">
+      Leta 2022 je nafta predstavljala največji delež emisij CO₂ na prebivalca v Sloveniji, sledijo premog in plin. Emisije iz cementa in drugih virov so manjše, a še vedno pomembne. Zmanjšanje odvisnosti od fosilnih goriv je ključni cilj za doseganje podnebne nevtralnosti do leta 2050.
+    </p>
+    <p class="text-dark fs-7 mb-3">
+      Spodnji grafi prikazujejo trende emisij na prebivalca po vrsti goriva, njihovo porazdelitev in spremembe skozi čas. Raziščite, kako se je raba goriv spreminjala in kakšne so priložnosti za nadaljnje zmanjšanje emisij!
+    </p>
+  </div>
 
-<div style="max-width: 900px; height: 450px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
-  <canvas id="co2ByFuelChart"></canvas>
+  <!-- Key Metrics -->
+  <div class="row mb-4 justify-content-between text-start">
+    <div class="col-12 col-md-6 col-lg custom-col mb-3">
+      <div class="card border-0 shadow-sm bg-light-primary transition-hover">
+        <div class="card-body p-3 d-flex align-items-center">
+          <div class="me-2">
+            <span class="metric-icon-circle bg-primary text-white rounded-circle">
+              <i class="fas fa-burn fa-sm"></i>
+            </span>
+          </div>
+          <div>
+            <p class="text-sm text-uppercase text-muted mb-1">Skupne emisije</p>
+            <h5 class="font-weight-bolder mb-1">327.45 Mt</h5>
+            <p class="fs-7 mb-0">2000–2022 (Mt CO₂)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg custom-col mb-3">
+      <div class="card border-0 shadow-sm bg-light-primary transition-hover">
+        <div class="card-body p-3 d-flex align-items-center">
+          <div class="me-2">
+            <span class="metric-icon-circle bg-primary text-white rounded-circle">
+              <i class="fas fa-gas-pump fa-sm"></i>
+            </span>
+          </div>
+          <div>
+            <p class="text-sm text-uppercase text-muted mb-1">Dominantno gorivo</p>
+            <h5 class="font-weight-bolder mb-1" id="dominantFuel">-</h5>
+            <p class="fs-7 mb-0">2022 (na prebivalca)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg custom-col mb-3">
+      <div class="card border-0 shadow-sm bg-light-primary transition-hover">
+        <div class="card-body p-3 d-flex align-items-center">
+          <div class="me-2">
+            <span class="metric-icon-circle bg-primary text-white rounded-circle">
+              <i class="fas fa-sync-alt fa-sm"></i>
+            </span>
+          </div>
+          <div>
+            <p class="text-sm text-uppercase text-muted mb-1">Sprememba emisij</p>
+            <h5 class="font-weight-bolder mb-1" id="changeEmissions">-</h5>
+            <p class="fs-7 mb-0">2000 vs. 2022 (na prebivalca)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg custom-col mb-3">
+      <div class="card border-0 shadow-sm bg-light-primary transition-hover">
+        <div class="card-body p-3 d-flex align-items-center">
+          <div class="me-2">
+            <span class="metric-icon-circle bg-primary text-white rounded-circle">
+              <i class="fas fa-layer-group fa-sm"></i>
+            </span>
+          </div>
+          <div>
+            <p class="text-sm text-uppercase text-muted mb-1">Delež nafte</p>
+            <h5 class="font-weight-bolder mb-1" id="oilShare">-</h5>
+            <p class="fs-7 mb-0">2022 (na prebivalca)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div id="loadingIndicator" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+    <p class="mt-2 text-dark fs-7">Nalaganje podatkov...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div id="contentContainer" style="display: none;">
+    <!-- Subheader: Trend of Emissions by Fuel -->
+    <div class="text-center my-5">
+      <h3 class="text-dark mb-3 position-relative">
+        <span class="d-inline-block position-relative">
+          <span class="d-inline-block mx-2" style="width: 30px;"></span>
+          Trendi emisij po vrsti goriva
+          <span class="d-inline-block mx-2" style="width: 30px;"></span>
+        </span>
+      </h3>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-lg-5 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-header pb-0 pt-3 bg-transparent">
+            <p class="text-dark fs-7">
+              Graf prikazuje, kako so različna goriva prispevala k emisijam CO₂ na prebivalca v Sloveniji od leta 1991. Nafta je dosledno največji vir, sledijo premog in plin. Emisije iz cementa in drugih virov so manjše, a opazne.
+              <br><br>
+              Zmanjšanje emisij iz premoga in povečanje deleža plina odražata prehod k čistejšim virom energije, vendar nafta ostaja prevladujoča zaradi prometa in industrije.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn chart-container">
+          <div class="card-header bg-gradient-primary text-white pb-0 border-0">
+            <h5 class="font-weight-bold text-white">Emisije CO₂ na prebivalca po gorivih skozi čas 📈</h5>
+            <p class="text-white opacity-8 fs-7">Letne emisije CO₂ na prebivalca po vrsti goriva (v tonah/osebo) za Slovenijo od 1991</p>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart-wrapper">
+              <canvas id="stackedAreaChart" height="250" aria-label="Graf emisij CO₂ na prebivalca po vrsti goriva v Sloveniji"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subheader: Fuel Share in 2022 -->
+    <div class="text-center my-5">
+      <h3 class="text-dark mb-3 mt-4 position-relative">
+        <span class="d-inline-block position-relative">
+          <span class="d-inline-block mx-2" style="width: 30px;"></span>
+          Delež emisij po gorivih (2022)
+          <span class="d-inline-block mx-2" style="width: 30px;"></span>
+        </span>
+      </h3>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-lg-5 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-header pb-0 pt-3 bg-transparent">
+            <p class="text-dark fs-7">
+              Leta 2022 je nafta predstavljala največji delež emisij CO₂ na prebivalca, sledijo premog, plin in cement. Ta porazdelitev odraža odvisnost Slovenije od nafte v prometu in industriji.
+              <br><br>
+              Zmanjšanje emisij iz premoga in povečanje uporabe plina kažeta na postopen prehod k manj emisijsko intenzivnim gorivom, a izzivi ostajajo.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn chart-container">
+          <div class="card-header bg-gradient-primary text-white pb-0 border-0">
+            <h5 class="font-weight-bold text-white">Porazdelitev emisij na prebivalca po gorivih</h5>
+            <p class="text-white opacity-8 fs-7">Delež emisij CO₂ na prebivalca po vrsti goriva v letu 2022</p>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart-wrapper">
+              <canvas id="donutChart" height="250" aria-label="Delež emisij CO₂ na prebivalca po vrsti goriva v letu 2022"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <!-- Subheader: Emissions Human Body Visualization -->
+<div class="text-center my-5">
+  <h3 class="text-dark mb-3 mt-4 position-relative">
+    <span class="d-inline-block position-relative">
+      <span class="d-inline-block mx-2" style="width: 30px;"></span>
+      Primerjava emisij na prebivalca po gorivih
+      <span class="d-inline-block mx-2" style="width: 30px;"></span>
+    </span>
+  </h3>
 </div>
 
+<div class="row mt-4">
+  <div class="col-lg-5 mb-lg-0 mb-4">
+    <div class="card z-index-2 h-100">
+      <div class="card-header pb-0 pt-3 bg-transparent">
+        <p class="text-dark fs-7">
+          Vizualizacija prikazuje emisije CO₂ na prebivalca po vrsti goriva za Slovenijo, EU in svet v izbranem letu. Vsak del človeške silhuete (glava, trup, roke, noge) je obarvan glede na delež posameznega goriva. Izberite leto, da raziščete razlike med regijami.
+          <br><br>
+          Nafta prevladuje v Sloveniji in EU, medtem ko premog in plin pomembno prispevata globalno. Raziščite, kako se deleži spreminjajo skozi čas!
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
+      <div class="card-header bg-gradient-primary text-white pb-0 border-0">
+        <h5 class="font-weight-bold text-white">Emisije CO₂ na prebivalca po gorivih👤</h5>
+        <p class="text-white opacity-8 fs-7">Primerjava emisij po gorivih za Slovenijo, EU in Svet v izbranem letu</p>
+      </div>
+      <div class="card-body p-3">
+        <div class="dropdown mb-3 text-center">
+          <label for="humanYearSelect" class="fs-7 text-dark me-2">Izberi leto:</label>
+          <select id="humanYearSelect" class="form-select d-inline-block" style="max-width: 150px;">
+            
+          </select>
+        </div>
+        <div class="d-flex justify-content-around flex-wrap">
+          <div class="text-center">
+            <h6 class="text-dark">Slovenija</h6>
+            <svg id="sloveniaSvg" width="100" height="200" aria-label="Človeška silhueta za emisije CO₂ v Sloveniji"></svg>
+          </div>
+          <div class="text-center">
+            <h6 class="text-dark">EU</h6>
+            <svg id="euSvg" width="100" height="200" aria-label="Človeška silhueta za emisije CO₂ v EU"></svg>
+          </div>
+          <div class="text-center">
+            <h6 class="text-dark">Svet</h6>
+            <svg id="worldSvg" width="100" height="200" aria-label="Človeška silhueta za emisije CO₂ v svetu"></svg>
+          </div>
+        </div>
+        
+        <div id="humanBodyLegend" class="d-flex justify-content-center flex-wrap mt-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="row mt-4">
+      <div class="col-lg-5 mb-lg-0 mb-4">
+        <div class="card z-index-2 h-100">
+          <div class="card-header pb-0 pt-3 bg-transparent">
+            <p class="text-dark fs-7">
+              Stolpični graf omogoča primerjavo emisij CO₂ na prebivalca po vrsti goriva za izbrano leto za Slovenijo. Izberite leto z dropdown menijem, da vidite, kako se prispevki goriv razlikujejo.
+              <br><br>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn chart-container">
+          <div class="card-header bg-gradient-primary text-white pb-0 border-0">
+            <h5 class="font-weight-bold text-white">Primerjava emisij na prebivalca po gorivih 📊</h5>
+            <p class="text-white opacity-8 fs-7">Emisije CO₂ na prebivalca po vrsti goriva za izbrano leto za Slovenijo</p>
+          </div>
+          <div class="card-body p-3">
+            <div class="chart-wrapper">
+              <div class="dropdown mb-3">
+                <select id="yearSelect" class="form-select">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <canvas id="fuelComparisonBarChart" height="250" aria-label="Primerjava emisij CO₂ na prebivalca po gorivih za izbrano leto"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Cards -->
+    <div class="row mt-5">
+      <div class="col-md-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center">
+            <div class="icon-circle bg-primary text-white mb-3 mx-auto">
+              <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+            <h5 class="card-title">Skupni pregled</h5>
+            <p class="card-text text-muted">Celoten pregled emisij CO₂</p>
+            <a href="/slovenia?tab=overview.html" class="btn btn-sm btn-outline-primary mt-2">Preberi več</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center">
+            <div class="icon-circle bg-success text-white mb-3 mx-auto">
+              <i class="fas fa-gas-pump fa-lg"></i>
+            </div>
+            <h5 class="card-title">Po vrsti goriva ⛽</h5>
+            <p class="card-text text-muted">Emisije po virih energije</p>
+            <a href="/slovenia?tab=fuel.html" class="btn btn-sm btn-outline-primary mt-2">Preberi več</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center">
+            <div class="icon-circle bg-warning text-white mb-3 mx-auto">
+              <i class="fas fa-industry fa-lg"></i>
+            </div>
+            <h5 class="card-title">Po sektorju 🏭</h5>
+            <p class="card-text text-muted">Emisije po gospodarskih sektorjih</p>
+            <a href="/slovenia?tab=sector.html" class="btn btn-sm btn-outline-primary mt-2">Preberi več</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="card h-100 border-0 shadow-sm hover-effect">
+          <div class="card-body text-center">
+            <div class="icon-circle bg-info text-white mb-3 mx-auto">
+              <i class="fas fa-map-marked-alt fa-lg"></i>
+            </div>
+            <h5 class="card-title">Po regiji 🗺️</h5>
+            <p class="card-text text-muted">Regionalna porazdelitev emisij</p>
+            <a href="/slovenia?tab=region.html" class="btn btn-sm btn-outline-primary mt-2">Preberi več</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="/js/load-tabs.js"></script>
+<script src="/js/fuel.js"></script>
 
-<script>
-  (async () => {
-    const ctx = document.getElementById('co2ByFuelChart').getContext('2d');
-    const container = ctx.canvas.parentNode;
-    container.insertAdjacentHTML('beforebegin', '<p id="loadingText" class="text-muted text-center">Nalaganje podatkov ...</p>');
+<!-- Optional Animation Library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
-    try {
-      const response = await fetch('/api/emissions-by-fuel');
-      if (!response.ok) throw new Error('Network response was not OK');
-      const data = await response.json();
+<!-- Custom CSS -->
+<style>
+.row.mb-4 .custom-col .card {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+}
 
-      if (!data.length) {
-        document.getElementById('loadingText').textContent = 'Ni na voljo podatkov.';
-        return;
-      }
+.row.mb-4 .custom-col .card-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
 
-      document.getElementById('loadingText').remove();
+.transition-hover {
+  transition: all 0.3s ease;
+}
 
-      // Group data by fuel type
-      const fuels = [...new Set(data.map(d => d.fuel))];
-      const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+.transition-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+}
 
-      // Prepare datasets for Chart.js
-      const colors = {
-        'Coal': '#6f42c1',
-        'Oil': '#d6336c',
-        'Natural gas': '#0d6efd',
-      };
+.bg-gradient-primary {
+  background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+}
 
-      const datasets = fuels.map(fuel => ({
-        label: fuel,
-        data: years.map(year => {
-          const entry = data.find(d => d.fuel === fuel && d.year === year);
-          return entry ? entry.value : null;
-        }),
-        borderColor: colors[fuel] || '#888',
-        backgroundColor: (colors[fuel] || '#888') + '55',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      }));
+.bg-gradient-info {
+  background: linear-gradient(90deg, #17a2b8 0%, #117a8b 100%);
+}
 
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: years,
-          datasets
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'top' },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.parsed.y.toFixed(2)} ${data[0].unit}`
-              }
-            }
-          },
-          scales: {
-            y: {
-              title: { display: true, text: 'Mt CO₂' },
-              beginAtZero: true
-            },
-            x: {
-              title: { display: true, text: 'Leto' }
-            }
-          }
-        }
-      });
+.bg-gradient-warning {
+  background: linear-gradient(90deg, #ffc107 0%, #e0a800 100%);
+}
 
-    } catch (error) {
-      const loadingText = document.getElementById('loadingText');
-      loadingText.textContent = 'Napaka pri nalaganju podatkov.';
-      console.error('Fetch error:', error);
-    }
-  })();
-</script>
+.bg-light-primary {
+  background: #e6f0ff;
+}
 
+.btn-link {
+  text-decoration: none;
+}
 
+.btn-link:hover {
+  text-decoration: underline;
+}
 
-<h2 class="text-dark mb-3">📊 Sestava CO₂ emisij po tipu goriva (2000–2022)</h2>
+.border-3 {
+  border-width: 3px !important;
+}
 
-<p class="text-dark fs-6">
-  Ta graf prikazuje prispevek posameznih vrst goriv (premog, olje, zemeljski plin) k skupnim CO₂ emisijam vsako leto.
-</p>
+.metric-icon-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  font-size: 16px;
+}
 
-<div style="max-width: 800px; height: 450px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgb(0 0 0 / 0.1);">
-  <canvas id="stackedFuelChart"></canvas>
-</div>
+/* Decorative lines for headers */
+h1.position-relative > span.position-relative,
+h3.position-relative > span.position-relative {
+  position: relative;
+  display: inline-block;
+}
 
-<script>
-(async () => {
-  const ctx = document.getElementById('stackedFuelChart').getContext('2d');
-  const container = ctx.canvas.parentNode;
-  container.insertAdjacentHTML('beforebegin', '<p id="loadingStackedFuel" class="text-muted text-center">Nalaganje podatkov za goriva ...</p>');
+h1.position-relative > span.position-relative::before,
+h1.position-relative > span.position-relative::after,
+h3.position-relative > span.position-relative::before,
+h3.position-relative > span.position-relative::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 150px;
+  height: 2px;
+  background-color: #a4c0de;
+}
 
-  try {
-    const res = await fetch('/api/emissions-by-fuel');
-    if (!res.ok) throw new Error('Failed to fetch fuel data');
-    const data = await res.json();
+h1.position-relative > span.position-relative::before,
+h3.position-relative > span.position-relative::before {
+  right: 100%;
+  margin-right: 15px;
+}
 
-    if (!data.length) {
-      document.getElementById('loadingStackedFuel').textContent = 'Ni podatkov za goriva.';
-      return;
-    }
+h1.position-relative > span.position-relative::after,
+h3.position-relative > span.position-relative::after {
+  left: 100%;
+  margin-left: 15px;
+}
 
-    document.getElementById('loadingStackedFuel').remove();
-
-    const fuels = ['Coal', 'Oil', 'Natural gas'];
-    const years = [...new Set(data.map(d => d.year))].sort((a,b) => a - b);
-
-    const datasets = fuels.map((fuel, i) => ({
-      label: fuel,
-      data: years.map(year => {
-        const entry = data.find(d => d.fuel === fuel && d.year === year);
-        return entry ? entry.value : 0;
-      }),
-      backgroundColor: i === 0 ? '#6c757d' : i === 1 ? '#fd7e14' : '#0d6efd',
-      borderColor: '#fff',
-      borderWidth: 1,
-    }));
-
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels: years, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'top' },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} Mt CO₂`
-            }
-          },
-        },
-        scales: {
-          x: { stacked: true, title: { display: true, text: 'Leto' } },
-          y: { stacked: true, title: { display: true, text: 'Mt CO₂' }, beginAtZero: true }
-        }
-      }
-    });
-
-  } catch (error) {
-    const loadingStackedFuel = document.getElementById('loadingStackedFuel');
-    loadingStackedFuel.textContent = 'Napaka pri nalaganju podatkov za goriva.';
-    console.error(error);
+/* Responsive adjustments for headers */
+@media (max-width: 768px) {
+  h1.position-relative > span.position-relative::before,
+  h1.position-relative > span.position-relative::after,
+  h3.position-relative > span.position-relative::before,
+  h3.position-relative > span.position-relative::after {
+    width: 20px;
   }
-})();
-</script>
+  
+  h1.position-relative > span.position-relative::before,
+  h3.position-relative > span.position-relative::before {
+    margin-right: 10px;
+  }
+  
+  h1.position-relative > span.position-relative::after,
+  h3.position-relative > span.position-relative::after {
+    margin-left: 10px;
+  }
+}
+
+/* Style for navigation cards */
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Chart container styles */
+.chart-container {
+  max-height: 350px;
+  overflow: hidden;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+.chart-wrapper canvas {
+  max-height: 200px !important;
+  width: 100%;
+}
+
+/* Slider styles */
+.slider-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.slider {
+  width: 80%;
+  margin: 0 auto;
+}
+
+/* Dropdown styles */
+.form-select {
+  max-width: 200px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chart-container {
+    max-height: 300px;
+  }
+
+  .chart-wrapper {
+    height: 220px;
+  }
+
+  .chart-wrapper canvas {
+    max-height: 180px !important;
+  }
+
+  .slider {
+    width: 90%;
+  }
+}
+</style>

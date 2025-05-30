@@ -429,14 +429,17 @@
   font-size: 16px;
 }
 
-/* Improved decorative headers */
-.position-relative {
+/* Decorative lines for headers only */
+h1.position-relative > span.position-relative,
+h3.position-relative > span.position-relative {
   position: relative;
   display: inline-block;
 }
 
-.position-relative::before,
-.position-relative::after {
+h1.position-relative > span.position-relative::before,
+h1.position-relative > span.position-relative::after,
+h3.position-relative > span.position-relative::before,
+h3.position-relative > span.position-relative::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -445,14 +448,36 @@
   background-color: #a4c0de;
 }
 
-.position-relative::before {
+h1.position-relative > span.position-relative::before,
+h3.position-relative > span.position-relative::before {
   right: 100%;
   margin-right: 15px;
 }
 
-.position-relative::after {
+h1.position-relative > span.position-relative::after,
+h3.position-relative > span.position-relative::after {
   left: 100%;
   margin-left: 15px;
+}
+
+/* Responsive adjustments for headers */
+@media (max-width: 768px) {
+  h1.position-relative > span.position-relative::before,
+  h1.position-relative > span.position-relative::after,
+  h3.position-relative > span.position-relative::before,
+  h3.position-relative > span.position-relative::after {
+    width: 20px;
+  }
+  
+  h1.position-relative > span.position-relative::before,
+  h3.position-relative > span.position-relative::before {
+    margin-right: 10px;
+  }
+  
+  h1.position-relative > span.position-relative::after,
+  h3.position-relative > span.position-relative::after {
+    margin-left: 10px;
+  }
 }
 
 /* Style for navigation cards */

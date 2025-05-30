@@ -455,6 +455,81 @@ router.get("/api/animated-graph", (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/api/emissions-by-fuel-extended", (req, res) => {
+  try {
+    const country = "Slovenia";
+    const fuelColumns = {
+      coal_co2: "Premog",
+      oil_co2: "Nafta",
+      gas_co2: "Zemeljski plin",
+      cement_co2: "Cement",
+      flaring_co2: "Sežiganje",
+      other_co2: "Drugo"
+    };
+
+    const data = emissionsData
+      .filter(item => item.country === country && item.year)
+      .flatMap(item =>
+        Object.entries(fuelColumns).map(([column, fuelName]) => ({
+          fuel: fuelName,
+          year: parseInt(item.year),
+          value: item[column] !== undefined && item[column] !== "" ? parseFloat(item[column]) : 0,
+          unit: "Mt CO2"
+        }))
+      )
+      .filter(item => !isNaN(item.value) && item.year >= 1991 && item.year <= 2022)
+      .sort((a, b) => a.year - b.year || a.fuel.localeCompare(b.fuel));
+
+    if (!data.length) {
+      return res.status(404).json({ error: "No fuel emissions data found for Slovenia" });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching extended fuel emissions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get('/api/emissions-by-fuel-comparison', (req, res) => {
+  try {
+        const regions = ['Slovenia', 'European Union (27)', 'World'];
+        const fuelMap = {
+            'coal_co2': 'Premog',
+            'oil_co2': 'Nafta',
+            'gas_co2': 'Zemeljski plin',
+            'cement_co2': 'Cement',
+            'flaring_co2': 'Sežiganje',
+            'other_co2': 'Drugo'
+        };
+
+        const data = regions.flatMap(region => {
+            return emissionsData
+                .filter(item => item.country === region && item.year && item.population)
+                .flatMap(item => {
+                    return Object.entries(fuelMap).map(([column, fuelLabel]) => ({
+                        region: region,
+                        fuel: fuelLabel,
+                        year: parseInt(item.year),
+                        value: item[column]? parseFloat(item[column]) : 0,
+                        perCapita: item[column] && item.population ? parseFloat(item[column]) / item.population * 1e6 : 0, // Mt to t per person
+                        unit: 't CO₂/osebo'
+                    }));
+                });
+        })
+        .filter(item => !isNaN(item.value) && item.year >= 1991 && item.year <= 2022)
+        .sort((a, b) => a.year - b.year || a.region.localeCompare(b.region) || a.fuel.localeCompare(b.fuel));
+
+        if (!data.length) {
+            return res.status(404).json({ error: 'No fuel emissions data found' });
+        }
+
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching fuel comparison data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 router.get("/api/emissions-by-sector", (req, res) => {
   try {
