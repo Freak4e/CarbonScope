@@ -97,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let countryData = {};
     let isMapInitialized = false;
+    let chartInstances = {}; // Cache for Chart.js instances
 
     async function initMap() {
         if (isMapInitialized) return;
@@ -155,8 +156,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function createMapVisualization() {
-let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
-  let height = globeContainer.clientHeight * 0.9; // Use 90% of container height for larger map
+        let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
+        let height = globeContainer.clientHeight * 0.9; // Use 90% of container height for larger map
         const svg = d3.select(globeContainer)
             .append('svg')
             .attr('width', width)
@@ -177,14 +178,16 @@ let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
             .append('div')
             .attr('id', 'countryTooltip')
             .style('position', 'absolute')
-            .style('background', 'rgba(0, 0, 0, 0.8)')
-            .style('color', '#fff')
+            .style('background', 'rgba(255, 255, 255, 0.95)')
+            .style('color', '#2d3748')
             .style('padding', '8px')
             .style('border-radius', '4px')
             .style('font-size', '12px')
             .style('pointer-events', 'none')
             .style('display', 'none')
-            .style('z-index', '10');
+            .style('z-index', '10')
+            .style('box-shadow', '0 2px 8px rgba(0,0,0,0.1)')
+            .style('max-width', '250px');
 
         const projection = d3.geoMercator()
             .scale(width / 2.5 / Math.PI) // Larger scale for bigger map
@@ -256,6 +259,11 @@ let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
                         }
                         d3.select(this).attr('fill', colorScale(countryData[alpha3Code].value || 0));
                         tooltip.style('display', 'none');
+                        // Destroy chart instance if it exists
+                        if (chartInstances[alpha3Code]) {
+                            chartInstances[alpha3Code].destroy();
+                            delete chartInstances[alpha3Code];
+                        }
                     })
                     .filter(d => !path(d))
                     .remove();
@@ -325,15 +333,34 @@ let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
             .text(d => d.toFixed(1));
     }
 
-    function updateCountryInfo(data, event, tooltip, projection, path, country) {
+    async function updateCountryInfo(data, event, tooltip, projection, path, country) {
         if (!data || !data.value) {
             tooltip.style('display', 'none');
             return;
         }
 
+        // Create a unique ID for the chart canvas
+        const chartId = `co2-chart-${data.iso_code || data.name.replace(/\s/g, '-')}`;
+        
+        // Fetch historical CO₂ data
+        let historicalData = [];
+        try {
+            const response = await fetch(`/api/emissions?country=${encodeURIComponent(data.name)}&metric=co2&startYear=2000&endYear=2022`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            historicalData = await response.json();
+        } catch (error) {
+            console.error(`Error fetching historical CO₂ data for ${data.name}:`, error);
+            historicalData = []; // Fallback to empty data
+        }
+
+        // Prepare chart data
+        const years = historicalData.map(d => d.year);
+        const co2Values = historicalData.map(d => d.value);
+
+        // Tooltip content with chart canvas
         const content = `
-            <h5 style="margin: 0 0 5px; font-size: 14px; color: #fff;">${data.name}</h5>
-            <table style="font-size: 12px; color: #fff;">
+            <h5 style="margin: 0 0 5px; font-size: 14px; color: #2d3748; font-weight: 700;">${data.name}</h5>
+            <table style="font-size: 12px; color: #2d3748; margin-bottom: 8px;">
                 <tr>
                     <td>CO₂ per capita:</td>
                     <td style="padding-left: 8px;">${data.value ? data.value.toFixed(2) : 'N/A'} tons</td>
@@ -347,9 +374,13 @@ let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
                     <td style="padding-left: 8px;">${data.population ? data.population.toLocaleString() : 'N/A'}</td>
                 </tr>
             </table>
+            <div style="margin-top: 8px;">
+                <canvas id="${chartId}" style="width: 200px; height: 100px;"></canvas>
+            </div>
         `;
         tooltip.html(content);
 
+        // Position tooltip
         const centroid = path.centroid(country);
         if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) {
             tooltip.style('display', 'none');
@@ -364,6 +395,67 @@ let width = Math.max(globeContainer.clientWidth, 800); // Enforce minimum width
             .style('left', `${x - tooltipWidth / 2}px`)
             .style('top', `${y - tooltipHeight - 10}px`)
             .style('display', 'block');
+
+        // Create or update chart
+        const ctx = document.getElementById(chartId)?.getContext('2d');
+        if (ctx) {
+            // Destroy existing chart if it exists
+            if (chartInstances[data.iso_code]) {
+                chartInstances[data.iso_code].destroy();
+            }
+
+            // Create new chart
+            chartInstances[data.iso_code] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Total CO₂ (million tons)',
+                        data: co2Values,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            ticks: {
+                                maxTicksLimit: 5,
+                                color: '#2d3748',
+                                font: { size: 10 }
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            display: true,
+                            ticks: {
+                                maxTicksLimit: 4,
+                                color: '#2d3748',
+                                font: { size: 10 },
+                                callback: function(value) {
+                                    return value.toFixed(0);
+                                }
+                            },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     function activateMapTab() {

@@ -11,7 +11,74 @@
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
  
-
+.text-dark {
+      color: #2d3748 !important;
+    }
+    .fs-6 {
+      font-size: 1rem !important;
+    }
+    .fs-7 {
+      font-size: 0.875rem !important;
+    }
+    .font-weight-bolder {
+      font-weight: 700 !important;
+    }
+    .bg-gradient-primary {
+      background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+    }
+    .bg-light-primary {
+      background: #e6f0ff;
+    }
+    .transition-hover {
+      transition: all 0.3s ease;
+    }
+    .transition-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+    .metric-icon-circle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      font-size: 16px;
+    }
+h1, h2 {
+    position: relative;
+    display: inline-block;
+}
+h1::before, h2::before,
+h1::after, h2::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 150px;
+    height: 2px;
+    background-color: #a4c0de;
+}
+h1::before, h2::before {
+    right: 100%;
+    margin-right: 15px;
+}
+h1::after, h2::after {
+    left: 100%;
+    margin-left: 15px;
+}
+@media (max-width: 768px) {
+    h1::before, h2::before,
+    h1::after, h2::after {
+        width: 20px;
+    }
+    h1::before, h2::before {
+        margin-right: 10px;
+    }
+    h1::after, h2::after {
+        margin-left: 10px;
+    }
+}
 
 #globeContainer {
   min-width: 800px; /* Set a minimum width to match the desired map size (adjust as needed) */
@@ -384,45 +451,53 @@ nav.navbar-main > .container-fluid {
     <!-- Tab Content -->
     <div class="tab-content mt-3" id="dashboardTabContent">
       <!-- Tab 1: Overview -->
-      <div class="tab-pane fade show active" id="overview" role="tabpanel">
-  <div class="row">
-    <div class="col-md-10 mx-auto">
-      <h2 class="mb-4">Razumevanje globalnih izpustov CO₂</h2>
-      <p class="lead">
-        Izpusti ogljikovega dioksida (CO2) so glavni vzrok podnebnih sprememb, saj povečujejo učinek tople grede in povzročajo globalno segrevanje. Glavni viri vključujejo kurjenje fosilnih goriv v elektrarnah (40 % izpustov), promet, kot so avtomobili in letala (30 %), ter industrijske procese, kot je proizvodnja cementa (20 %). Leta 2022 so globalni izpusti CO2 dosegli približno 36,8 milijarde ton, pri čemer regije, kot so Azija in Severna Amerika, vodijo zaradi visoke industrializacije.
-      </p>
-      <p>
-        Naraščajoče ravni CO2 povzročajo višje globalne temperature, ekstremne vremenske pojave, dvig morske gladine in izgubo biotske raznovrstnosti. Za zmanjšanje izpustov so ključni mednarodni ukrepi, kot je Pariški sporazum, ki si prizadeva omejiti segrevanje pod 2 °C. Rešitve vključujejo prehod na obnovljive vire energije, kot so sončna in vetrna energija, tehnologije za zajemanje ogljika, pogozdovanje in trajnostno urbano načrtovanje. Posamezniki lahko prispevajo z energetsko učinkovitimi navadami in podporo okolju prijaznim politikam.
-      </p>
-      <p>
-        Naslednji grafi prikazujejo izpuste CO₂ in delež globalnih izpustov za deset največjih držav izpustov od leta 1750 do 2023. Te države—Kitajska, Združene države, Indija, Rusija, Japonska, Iran, Nemčija, Savdska Arabija, Indonezija in Južna Koreja—predstavljajo pomemben delež globalnih izpustov CO₂ zaradi svojih industrijskih dejavnosti, porabe energije in velikosti prebivalstva.
-      </p>
-    </div>
-  </div>
+         <div class="tab-pane fade show active" id="overview" role="tabpanel">
 
+<div class="row">
+      <div class="col-md-10 mx-auto">
+        <div class="text-center my-5">
+          <h2 class="text-dark mb-3 position-relative">
+            <span class="d-inline-block position-relative">
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+              Razumevanje globalnih izpustov CO₂
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+            </span>
+          </h2>
+        </div>
+        <p class="text-dark fs-6 mb-3">
+          Izpusti ogljikovega dioksida (CO₂) so glavni vzrok podnebnih sprememb, saj povečujejo učinek tople grede in povzročajo globalno segrevanje. Glavni viri vključujejo kurjenje fosilnih goriv v elektrarnah (40 % izpustov), promet, kot so avtomobili in letala (30 %), ter industrijske procese, kot je proizvodnja cementa (20 %). Leta 2022 so globalni izpusti CO₂ dosegli približno 36,8 milijarde ton, pri čemer regije, kot so Azija in Severna Amerika, vodijo zaradi visoke industrializacije.
+        </p>
+        <p class="text-dark fs-6 mb-3">
+          Naraščajoče ravni CO₂ povzročajo višje globalne temperature, ekstremne vremenske pojave, dvig morske gladine in izgubo biotske raznovrstnosti. Za zmanjšanje izpustov so ključni mednarodni ukrepi, kot je Pariški sporazum, ki si prizadeva omejiti segrevanje pod 2 °C. Rešitve vključujejo prehod na obnovljive vire energije, kot so sončna in vetrna energija, tehnologije za zajemanje ogljika, pogozdovanje in trajnostno urbano načrtovanje. Posamezniki lahko prispevajo z energetsko učinkovitimi navadami in podporo okolju prijaznim politikam.
+        </p>
+        <p class="text-dark fs-6 mb-3">
+          Naslednji grafi prikazujejo izpuste CO₂ in delež globalnih izpustov za deset največjih držav izpustov od leta 1750 do 2023. Te države—Kitajska, Združene države, Indija, Rusija, Japonska, Iran, Nemčija, Savdska Arabija, Indonezija in Južna Koreja—predstavljajo pomemben delež globalnih izpustov CO₂ zaradi svojih industrijskih dejavnosti, porabe energije in velikosti prebivalstva.
+        </p>
+      </div>
+    </div>
   <!-- Total Emissions Graph -->
-<div class="row mt-4">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5>Skupni izpusti CO₂ največjih držav (1750–2023)</h5>
+ <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-gradient-primary text-white pb-0 border-0">
+            <h5 class="font-weight-bolder text-white">Skupni izpusti CO₂ največjih držav (1750–2023)</h5>
+          </div>
+          <div class="card-body p-3" style="min-height: 500px;">
+            <canvas id="totalEmissionsChart" style="max-height: 500px; height: 100%;"></canvas>
+          </div>
+        </div>
       </div>
-      <div class="card-body" style="min-height: 500px;">
-        <canvas id="totalEmissionsChart" style="max-height: 500px; height: 100%;"></canvas>
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-gradient-primary text-white pb-0 border-0">
+            <h5 class="font-weight-bolder text-white">Delež globalnih izpustov CO₂ (1750–2023)</h5>
+          </div>
+          <div class="card-body p-3" style="min-height: 500px;">
+            <canvas id="globalShareChart" style="max-height: 500px; height: 80%;"></canvas>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-md-6">
-  <div class="card">
-    <div class="card-header">
-      <h5>Delež globalnih izpustov CO₂ (1750–2023)</h5>
-    </div>
-    <div class="card-body" style="min-height: 500px;">
-      <canvas id="globalShareChart" style="max-height: 500px; height: 80%;"></canvas>
-    </div>
-  </div>
-</div>
-</div>
 
 
   <div class="row mt-4">
@@ -648,11 +723,20 @@ nav.navbar-main > .container-fluid {
       <div class="tab-pane fade" id="comparison" role="tabpanel">
         <div class="row">
           <div class="col-md-10 mx-auto">
-            <h2 class="mb-4">Interaktivna primerjava držav po emisijah CO₂</h2>
-            <p class="lead">
+             <div class="text-center my-5">
+          <h2 class="text-dark mb-3 position-relative">
+            <span class="d-inline-block position-relative">
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+              Interaktivna primerjava držav
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+            </span>
+          </h2>
+        </div>
+
+<p class="text-dark fs-6 mb-3">
               V spodnjem grafu lahko primerjate emisije CO₂ med državami po različnih metrikah. Orodje omogoča izbiro več držav hkrati, kar je idealno za analizo razlik med razvitimi in razvijajočimi se državami ter spremljanje sprememb skozi čas.
             </p>
-            <p class="text-dark fs-6">
+<p class="text-dark fs-6 mb-3">
               Na voljo so tri ključne metrike:
             </p>
             <ul class="fs-6 text-dark ps-4 mb-4">
@@ -711,8 +795,16 @@ nav.navbar-main > .container-fluid {
         </div>
         <div class="row">
           <div class="col-md-10 mx-auto">
-            <h3 class="mb-4">Primerjava emisij CO₂ in učinkovitosti med državami</h3>
-            <p class="lead">
+  <div class="text-center my-5">
+          <h3 class="text-dark mb-3 position-relative">
+            <span class="d-inline-block position-relative">
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+              Primerjava emisij CO₂ in učinkovitosti med državami
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+            </span>
+          </h3>
+        </div>
+        <p class="text-dark fs-6 mb-3">
               Ta interaktivni graf omogoča primerjavo držav glede na emisije ogljikovega dioksida po različnih metrikah. Osredotoča se na učinkovitost – koliko emisij in energije nastane v povezavi z gospodarsko dejavnostjo.
             </p>
           </div>
@@ -767,73 +859,108 @@ nav.navbar-main > .container-fluid {
       </div>
 
       <!-- Tab 3: Sectoral Distribution -->
-      <div class="tab-pane fade" id="sectors" role="tabpanel">
-        <div class="row">
-          <div class="col-md-10 mx-auto mb-4">
-            <h2 class="mb-3">Emisije CO₂ po sektorjih</h2>
-            <p class="lead">
-              Leta 2022 so svetovne emisije CO₂ dosegle <strong>36,8 gigaton</strong>. Razumevanje, kateri sektorji – od proizvodnje energije do prometa in industrije – prispevajo največ, je ključno za oblikovanje učinkovitih podnebnih politik.
-            </p>
-            <p class="text-dark fs-6">
-              Spodnji grafi prikazujejo, kako so emisije CO₂ razporejene po sektorjih v različnih državah in globalno. Uporabite interaktivne grafikone za analizo posameznih držav ali preglejte fiksne grafikone za širši vpogled v svetovne trende.
-            </p>
-          </div>
-        </div>
-        <!-- Interactive Sector Line Chart -->
-        <div class="row mb-5">
-          <div class="col-md-10 mx-auto">
-            <div class="card shadow-sm">
-              <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Trendi emisij CO₂ po sektorjih za izbrano državo (1990–2022)</h5>
-                <select id="sectorLineCountrySelect" class="form-select w-25">
-                  <option value="">Izberi državo</option>
-                </select>
-              </div>
-              <div class="card-body">
-                <div class="chart-container" style="position: relative; height: 400px;">
-                  <canvas id="sectorLineChart"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Existing Pie Chart and Text -->
-        <div class="row mb-5 sector-align">
-          <div class="col-md-5 ms-5">
-            <h4 class="text-dark mb-3">Kateri sektorji najbolj prispevajo k emisijam vzeti državi?</h4>
-            <p class="text-dark fs-6">
-              V nadaljevanju lahko podrobno raziščeš, kako so emisije CO₂ razporejene po sektorjih v izbranih državah.
-              Ta analiza razkriva specifične vzorce, ki pogosto odražajo stopnjo razvoja, gospodarsko strukturo
-              in energetske vire posamezne države.
-            </p>
-            <ul class="fs-6 text-dark ps-4 mb-4">
-              <li><strong>Države v razvoju</strong> pogosto izstopajo po visokih emisijah iz industrije.</li>
-              <li><strong>Razvite države</strong> imajo večji delež emisij iz prometa in gospodinjstev.</li>
-              <li><strong>Države proizvajalke nafte</strong> imajo pogosto visoke emisije zaradi sežiganja plinov in ekstrakcije surovin.</li>
-            </ul>
-            <p class="text-dark fs-6">
-              Grafikon omogoča hitro vizualno primerjavo sektorjev z največjim prispevkom k emisijam za vsako državo posebej.
-              S klikom na spustni meni lahko izbereš državo in vidiš, kateri sektor je največji onesnaževalec.
-            </p>
-          </div>
-          <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-              <div class="card-header pb-2 border-bottom">
-                <div class="d-flex justify-content-end">
-                  <select id="detailCountrySelect" class="form-select w-50">
-                    <option value="">Izberi državo</option>
-                  </select>
-                </div>
-              </div>
-              <div class="card-body pt-3">
-                <div class="chart-container">
-                  <canvas id="sectorChart"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
+<div class="tab-pane fade" id="sectors" role="tabpanel">
+  <div class="row">
+    <div class="col-md-10 mx-auto mb-4">
+    <div class="text-center my-5">
+          <h2 class="text-dark mb-3 position-relative">
+            <span class="d-inline-block position-relative">
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+              Emisije CO₂ po sektorjih
+              <span class="d-inline-block mx-2" style="width: 30px;"></span>
+            </span>
+          </h2>
+        </div>      <p class="lead">
+        Leta 2022 so svetovne emisije CO₂ dosegle <strong>36,8 gigaton</strong>. Razumevanje, kateri sektorji – od proizvodnje energije do prometa in industrije – prispevajo največ, je ključno za oblikovanje učinkovitih podnebnih politik.
+      </p>
+      <p class="text-dark fs-6">
+        Spodnji grafi prikazujejo, kako so emisije CO₂ razporejene po sektorjih v različnih državah in globalno. Uporabite interaktivne grafikone za analizo posameznih držav ali preglejte fiksne grafikone za širši vpogled v svetovne trende.
+      </p>
+      <div class="mb-4">
+        <select id="unifiedCountrySelect" class="form-select w-25">
+          <option value="">Izberi državo</option>
+        </select>
+      </div>
+    </div>
+  </div>
+<!-- Global CO2 Emissions by Economic Sectors -->
+<div class="row mb-5">
+  <div class="col-md-10 mx-auto">
+    <h4 class="mb-3">Emisije CO₂ po gospodarskih sektorjih</h4>
+    <p class="mb-4 text-dark">
+      Analiza prikazuje razporeditev emisij po glavnih gospodarskih panogah. V večini držav izstopajo 
+      <strong>elektrarne in toplotarne</strong> kot največji vir emisij, sledijo pa jim 
+      <strong>industrija</strong> in <strong>promet</strong>. Nekatere države imajo značilno visoke emisije iz 
+      <strong>sprememb rabe zemljišč</strong>, predvsem zaradi krčenja gozdov.
+    </p>
+    
+    <div class="card shadow-sm">
+      <div class="card-header bg-transparent">
+        <h5 class="mb-0">Globalne emisije CO₂ po sektorjih (1990–2021)</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 400px;">
+          <canvas id="globalSectorChart"></canvas>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- CO2 Emissions by Fuel Types -->
+<div class="row mb-5">
+  <div class="col-md-10 mx-auto">
+    <h4 class="mb-3">Emisije CO₂ po vrsti goriva</h4>
+    <p class="mb-4 text-dark">
+      Razčlenitev emisij glede na vrsto uporabljenega fosilnega goriva razkriva energetske vzorce države. 
+      <strong>Premog</strong> običajno povzroča največ emisij na enoto energije, medtem ko 
+      <strong>plin</strong> velja za najmanj onesnaževalno fosilno gorivo. Nekatere države z velikimi 
+      naftnimi viri imajo visoke emisije iz <strong>sežiganja odvečnih plinov</strong>.
+    </p>
+    
+    <div class="card shadow-sm">
+      <div class="card-header bg-transparent">
+        <h5 class="mb-0">Trendi emisij CO₂ po vrstah goriva (1990–2022)</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 400px;">
+          <canvas id="sectorLineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Pie Chart and Text -->
+<div class="row mb-5 sector-align">
+  <div class="col-md-5 ms-5">
+    <!-- Your existing text content remains the same -->
+    <h4 class="text-dark mb-3">Kateri sektorji najbolj prispevajo k emisijam vzeti državi?</h4>
+    <p class="text-dark fs-6">
+      V nadaljevanju lahko podrobno raziščeš, kako so emisije CO₂ razporejene po sektorjih v izbranih državah.
+      Ta analiza razkriva specifične vzorce, ki pogosto odražajo stopnjo razvoja, gospodarsko strukturo
+      in energetske vire posamezne države.
+    </p>
+    <ul class="fs-6 text-dark ps-4 mb-4">
+      <li><strong>Države v razvoju</strong> pogosto izstopajo po visokih emisijah iz industrije.</li>
+      <li><strong>Razvite države</strong> imajo večji delež emisij iz prometa in gospodinjstev.</li>
+      <li><strong>Države proizvajalke nafte</strong> imajo pogosto visoke emisije zaradi sežiganja plinov in ekstrakcije surovin.</li>
+    </ul>
+    <p class="text-dark fs-6">
+      Grafikon omogoča hitro vizualno primerjavo sektorjev z največjim prispevkom k emisijam za vsako državo posebej.
+      S klikom na spustni meni lahko izbereš državo in vidiš, kateri sektor je največji onesnaževalec.
+    </p>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body pt-3">
+        <div class="chart-container" style="position: relative; height: 400px;"> <!-- Added fixed height -->
+          <canvas id="sectorChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 
       <!-- Tab 4: World Map -->
 <div class="tab-pane fade" id="map" role="tabpanel">
@@ -1094,6 +1221,7 @@ nav.navbar-main > .container-fluid {
   <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
   <script src="/js/dashboard.js"></script>
   <script src="/js/kalkulator.js"></script>
+  <script src="/js/sectorsSvet.js"></script>
   <script src="/js/globe.js"></script>
   <script src="/js/animatedgraph.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

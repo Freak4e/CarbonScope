@@ -12,6 +12,8 @@ const csvPath = path.join(__dirname, "../../data/co2-data.csv");
 const animatedGraphCsvPath = path.join(__dirname, "../../data/animatedgraph.csv");
 const sectorCsvPath = path.join(__dirname, "../../data/co2-sectors.csv");
 const fuelCsvPath = path.join(__dirname, "../../data/co2-fuel.csv");
+const economicSectorsCsvPath = path.join(__dirname, "../../data/co-emissions-by-sector.csv");
+
 // Add at the top of your routes file
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -627,4 +629,58 @@ router.get("/api/top_countries", (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
+router.get('/api/sector-emissions', (req, res) => {
+  const { entity, year } = req.query;
+  const records = [];
+
+  // Parse year range if provided (format: "startYear:endYear")
+  let yearRange = {};
+  if (year && year.includes(':')) {
+    const [startYear, endYear] = year.split(':').map(y => parseInt(y));
+    if (!isNaN(startYear) && !isNaN(endYear)) {
+      yearRange = { start: startYear, end: endYear };
+    }
+  }
+
+  fs.createReadStream(economicSectorsCsvPath)
+    .pipe(csv({ columns: true, skip_empty_lines: true }))
+    .on('data', (data) => {
+      const recordYear = parseInt(data.Year);
+      
+      // Apply entity filter
+      const entityMatch = !entity || 
+                         data.Entity.toLowerCase() === entity.toLowerCase();
+      
+      // Apply year filter
+      let yearMatch = true;
+      if (year) {
+        if (yearRange.start) {
+          // Check if year is within range
+          yearMatch = recordYear >= yearRange.start && recordYear <= yearRange.end;
+        } else {
+          // Check exact year match
+          yearMatch = recordYear === parseInt(year);
+        }
+      }
+
+      if (entityMatch && yearMatch) {
+        records.push(data);
+      }
+    })
+    .on('end', () => {
+      if (records.length === 0) {
+        console.warn(`No records found for entity: ${entity || 'any'}, year: ${year || 'any'}`);
+        return res.status(404).json({ error: 'No data found for the specified filters' });
+      }
+      console.log(`Returning ${records.length} records for entity: ${entity || 'any'}, year: ${year || 'any'}`);
+      res.json(records);
+    })
+    .on('error', (err) => {
+      console.error('Error reading CSV file:', err.message);
+      res.status(500).json({ error: 'Failed to read CSV file', details: err.message });
+    });
+});
+
 module.exports = router;
