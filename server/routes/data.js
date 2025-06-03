@@ -13,6 +13,7 @@ const animatedGraphCsvPath = path.join(__dirname, "../../data/animatedgraph.csv"
 const sectorCsvPath = path.join(__dirname, "../../data/co2-sectors.csv");
 const fuelCsvPath = path.join(__dirname, "../../data/co2-fuel.csv");
 const economicSectorsCsvPath = path.join(__dirname, "../../data/co-emissions-by-sector.csv");
+const geojsonPath = path.join(__dirname, "../../data/slovenia.geojson");
 
 // Add at the top of your routes file
 router.use((req, res, next) => {
@@ -67,6 +68,17 @@ fs.createReadStream(fuelCsvPath)
   .on('end', () => {
     console.log('Fuel emissions CSV loaded, total rows:', fuelEmissionsData.length);
   });
+
+  router.get('/api/slovenia-geojson', (req, res) => {
+  fs.readFile(geojsonPath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading GeoJSON:', err);
+      return res.status(500).json({ error: 'Failed to load GeoJSON' });
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  });
+});
 
 // Get available metrics
 router.get("/api/metrics", (req, res) => {
