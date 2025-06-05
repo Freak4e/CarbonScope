@@ -2,43 +2,49 @@ document.addEventListener('DOMContentLoaded', function() {
   // Chart instances
   let emissionsChart, comparisonChart, totalEmissionsChart, globalShareChart;
 
-  // DOM elements
-  const countrySelect = $('#countrySelect');
-  const metricSelect = document.getElementById('metricSelect');
-  const startYearInput = document.getElementById('startYearInput');
-  const endYearInput = document.getElementById('endYearInput');
-  const updateBtn = document.getElementById('updateBtn');
-  const chartTitle = document.getElementById('chartTitle');
-  let currentYear = 2022; // Default to 2022
+  // Initialize dashboard when tab content is loaded
+  function initDashboard() {
+    // DOM elements
+    const countrySelect = $('#countrySelect');
+    const metricSelect = document.getElementById('metricSelect');
+    const startYearInput = document.getElementById('startYearInput');
+    const endYearInput = document.getElementById('endYearInput');
+    const updateBtn = document.getElementById('updateBtn');
+    const chartTitle = document.getElementById('chartTitle');
+    let currentYear = 2022;
 
-  // Initialize the dashboard
-  initDashboard();
+    // Check if required elements exist
+    if (!countrySelect.length && !document.getElementById('totalEmissionsChart')) {
+      console.log('No dashboard elements found, skipping initialization');
+      return;
+    }
 
-  // Event listeners
-  if (updateBtn) {
-    updateBtn.addEventListener('click', updateAllCharts);
-  } else {
-    console.warn('Update button not found');
-  }
-
-  async function initDashboard() {
     // Initialize Select2 dropdown for countrySelect
-    if (countrySelect) {
-      countrySelect.select2({
-        placeholder: "Izberi države za primerjavo...",
-        allowClear: true,
-        width: '100%',
-        closeOnSelect: false
-      });
+    if (countrySelect.length) {
+      try {
+        countrySelect.select2({
+          placeholder: "Izberi države za primerjavo...",
+          allowClear: true,
+          width: '100%',
+          closeOnSelect: false
+        });
+      } catch (error) {
+        console.error('Error initializing Select2:', error);
+      }
     }
 
     // Load countries
-    await loadCountries();
+    loadCountries();
 
     // Initialize charts
     initCharts();
     initTopCountriesCharts();
     updateTopCountriesCharts();
+
+    // Event listeners
+    if (updateBtn) {
+      updateBtn.addEventListener('click', updateAllCharts);
+    }
 
     // Add metric button event listeners
     document.querySelectorAll('#metricButtons [data-metric]').forEach(btn => {
@@ -46,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('#metricButtons [data-metric]').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         const metric = this.dataset.metric;
-        updateComparisonChart(countrySelect.val(), metric, endYearInput?.value || 2022);
+        updateComparisonChart(countrySelect.val() || [], metric, endYearInput?.value || 2022);
       });
     });
   }
@@ -54,9 +60,11 @@ document.addEventListener('DOMContentLoaded', function() {
   async function loadCountries() {
     try {
       const response = await fetch('/api/countries');
+      if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
       const countries = await response.json();
 
-      if (countrySelect) {
+      const countrySelect = $('#countrySelect');
+      if (countrySelect.length) {
         countrySelect.empty();
         countrySelect.append(new Option("Izberi državo", ""));
         countries.forEach(country => {
@@ -277,22 +285,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+
   async function updateAllCharts() {
-    const selectedCountries = countrySelect.val() || [];
+    const selectedCountries = $('#countrySelect').val() || [];
     const metric = metricSelect ? metricSelect.value : 'co2';
     const startYear = startYearInput ? startYearInput.value : 1990;
     const endYear = endYearInput ? endYearInput.value : 2022;
-    currentYear = endYear;
 
-    if (emissionsChart) {
-      await updateEmissionsChart(selectedCountries, metric, startYear, endYear);
-    }
-    if (comparisonChart) {
-      await updateComparisonChart(selectedCountries, metric, endYear);
-    }
-    if (totalEmissionsChart && globalShareChart) {
-      await updateTopCountriesCharts();
-    }
+    if (emissionsChart) await updateEmissionsChart(selectedCountries, metric, startYear, endYear);
+    if (comparisonChart) await updateComparisonChart(selectedCountries, metric, endYear);
+    if (totalEmissionsChart && globalShareChart) await updateTopCountriesCharts();
   }
 
   async function updateEmissionsChart(countries, metric, startYear, endYear) {
@@ -304,17 +306,14 @@ document.addEventListener('DOMContentLoaded', function() {
     for (const country of countries) {
       try {
         const response = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&metric=${metric}&startYear=${startYear}&endYear=${endYear}`);
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
         const data = await response.json();
 
         if (data && data.length > 0) {
-          if (labels.length === 0) {
-            labels = data.map(d => d.year);
-          }
-
+          if (labels.length === 0) labels = data.map(d => d.year);
           datasets.push({
             label: country,
-            data: data.map(d => d.value),
+            data: data.map(d => d.value || 0),
             borderColor: getRandomColor(),
             backgroundColor: 'transparent',
             borderWidth: 2,
@@ -331,12 +330,11 @@ document.addEventListener('DOMContentLoaded', function() {
       emissionsChart.data.labels = labels;
       emissionsChart.data.datasets = datasets;
       emissionsChart.options.scales.y.title.text = getAxisLabel(metric);
-      if (chartTitle) {
-        chartTitle.textContent = `${getMetricName(metric)} za ${countries.join(', ')} (${startYear}-${endYear})`;
+      if (document.getElementById('chartTitle')) {
+        document.getElementById('chartTitle').textContent = `${getMetricName(metric)} za ${countries.join(', ')} (${startYear}-${endYear})`;
       }
       emissionsChart.update();
     } else {
-      console.warn('No emissions data available for the selected parameters');
       emissionsChart.data.labels = [];
       emissionsChart.data.datasets = [];
       emissionsChart.update();
@@ -344,14 +342,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function updateComparisonChart(countries, metric = 'co2', year = 2022) {
-    if (!comparisonChart) {
-      console.warn('Comparison chart not initialized');
-      return;
-    }
+    if (!comparisonChart) return;
 
     try {
       if (!countries || countries.length === 0) {
-        console.log('No countries selected, clearing comparison chart');
         comparisonChart.data.labels = [];
         comparisonChart.data.datasets = [];
         comparisonChart.update();
@@ -363,16 +357,9 @@ document.addEventListener('DOMContentLoaded', function() {
         countries.map(async country => {
           try {
             const response = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&metric=${metric}&startYear=${year}&endYear=${year}`);
-            if (!response.ok) {
-              console.warn(`API error for ${country}, metric ${metric}: ${response.status}`);
-              return { country, value: 0 };
-            }
+            if (!response.ok) return { country, value: 0 };
             const data = await response.json();
-            if (!data || data.length === 0) {
-              console.warn(`No data for ${country}, metric ${metric}, year ${year}`);
-              return { country, value: 0 };
-            }
-            return { country, value: data[0].value || 0 };
+            return { country, value: data[0]?.value || 0 };
           } catch (error) {
             console.error(`Error fetching comparison data for ${country}:`, error);
             return { country, value: 0 };
@@ -381,16 +368,8 @@ document.addEventListener('DOMContentLoaded', function() {
       );
 
       const validDataPoints = dataPoints.filter(d => d.value !== 0);
-      if (validDataPoints.length === 0) {
-        console.warn(`No valid data for metric ${metric}, falling back to co2`);
-        if (metric !== 'co2') {
-          return updateComparisonChart(countries, 'co2', year);
-        }
-        comparisonChart.data.labels = [];
-        comparisonChart.data.datasets = [];
-        comparisonChart.options.plugins.title.text = `Ni podatkov za ${getMetricName(metric)} (${year})`;
-        comparisonChart.update();
-        return;
+      if (validDataPoints.length === 0 && metric !== 'co2') {
+        return updateComparisonChart(countries, 'co2', year);
       }
 
       validDataPoints.sort((a, b) => b.value - a.value);
@@ -403,11 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
         borderWidth: 1
       }];
 
-      comparisonChart.options.scales.y.title = {
-        display: true,
-        text: getAxisLabel(metric)
-      };
-
+      comparisonChart.options.scales.y.title = { display: true, text: getAxisLabel(metric) };
       comparisonChart.options.plugins.title.text = `Primerjava: ${getMetricName(metric)} (${year})`;
       comparisonChart.update();
 
@@ -499,5 +474,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function getRandomColor() {
     return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+  }
+
+  // Listen for tab content loaded event
+  document.getElementById('tabContent')?.addEventListener('tabContentLoaded', function(e) {
+    if (e.detail.tab === 'overview-svet.html' || e.detail.tab === 'comparison.html') {
+      initDashboard();
+    }
+  });
+
+  // Initialize if already on a relevant tab
+  if (document.getElementById('totalEmissionsChart') || document.getElementById('emissionsChart')) {
+    initDashboard();
   }
 });

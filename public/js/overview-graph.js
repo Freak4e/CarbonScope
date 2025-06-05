@@ -475,7 +475,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     } catch (error) {
       console.error('Error creating population CO2 chart:', error);
-      showError('Napaka pri ustvarjanju grafa primerjave.');
     }
   }
 

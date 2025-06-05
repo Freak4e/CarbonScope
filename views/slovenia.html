@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="/img/co2.png">
   <title>CO2 odtis - Slovenija</title>
-  <!-- Fonts and Icons -->
+  <link rel="stylesheet" href="/css/sidebar.css">
+
+  <link rel="stylesheet" href="/css/sidebar.css"> 
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <link href="/css/nucleo-icons.css" rel="stylesheet" />
   <link href="/css/nucleo-svg.css" rel="stylesheet" />
@@ -27,44 +29,75 @@
 </head>
 <body class="g-sidenav-show bg-gray-100">
   <div class="min-height-300 bg-dark position-absolute w-100"></div>
-  <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-2" id="sidenav-main">
-    <div class="sidenav-header">
-      <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
-      <a class="navbar-brand m-0" href="/">
-        <img src="/img/co2.png" width="30px" height="30px" class="navbar-brand-img h-100" alt="main_logo">
-        <span class="ms-1 font-weight-bold">OgljikOVO</span>
-      </a>
-    </div>
-    <hr class="horizontal dark mt-0">
-    <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fas fa-globe text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Svet</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="/slovenia">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fas fa-map-marker-alt text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">Slovenija</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/future">
-            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="fas fa-chart-line text-dark text-sm opacity-10"></i>
-            </div>
-            <span class="nav-link-text ms-1">V Prihodnosti</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </aside>
+<aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-2" id="sidenav-main">
+  <div class="sidenav-header">
+    <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+    <a class="navbar-brand m-0" href="/">
+      <img src="/img/co2.png" width="30px" height="30px" class="navbar-brand-img h-100" alt="main_logo">
+      <span class="ms-1 font-weight-bold">OgljikOVO</span>
+    </a>
+  </div>
+  <hr class="horizontal dark mt-0">
+  <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/" data-toggle="collapse" data-target="#svetSubmenu" aria-expanded="true" aria-controls="svetSubmenu">
+          <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="fas fa-globe text-dark text-sm opacity-10"></i>
+          </div>
+          <span class="nav-link-text ms-1">Svet</span>
+        </a>
+        <ul class="collapse show" id="svetSubmenu">
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/" data-tab="overview-svet.html"><span class="nav-link-text ms-4">Pregled</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/?tab=comparison.html" data-tab="comparison.html"><span class="nav-link-text ms-4">Interaktivna Primerjava</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/?tab=sectors.html" data-tab="sectors.html"><span class="nav-link-text ms-4">Emisije po Sektorjih</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/?tab=map.html" data-tab="map.html"><span class="nav-link-text ms-4">Primerjava z Zemljevidom</span></a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/slovenia" data-toggle="collapse" data-target="#slovenijaSubmenu" aria-expanded="true" aria-controls="slovenijaSubmenu">
+          <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="fas fa-map-marker-alt text-dark text-sm opacity-10"></i>
+          </div>
+          <span class="nav-link-text ms-1">Slovenija</span>
+        </a>
+        <ul class="collapse show" id="slovenijaSubmenu">
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/slovenia?tab=overview.html" data-tab="overview.html"><span class="nav-link-text ms-4">Pregled</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/slovenia?tab=capita.html" data-tab="capita.html"><span class="nav-link-text ms-4">Na Osebo</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/slovenia?tab=fuel.html" data-tab="fuel.html"><span class="nav-link-text ms-4">Po Vrsti Goriva</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/slovenia?tab=sector.html" data-tab="sector.html"><span class="nav-link-text ms-4">Po Sektorju</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link subtab" href="/slovenia?tab=region.html" data-tab="region.html"><span class="nav-link-text ms-4">Po Regiji</span></a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/future">
+          <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="fas fa-chart-line text-dark text-sm opacity-10"></i>
+          </div>
+          <span class="nav-link-text ms-1">V Prihodnosti</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</aside>
   <main class="main-content position-relative border-radius-lg">
     <!-- Navbar -->
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
@@ -348,5 +381,76 @@
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
+    const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+
+    // Handle Slovenija subtabs
+    slovenijaSubLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const tabName = this.getAttribute('data-tab');
+        const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
+
+        // Update sidebar active states
+        svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
+        slovenijaSubLinks.forEach(sublink => sublink.classList.remove('active'));
+        this.classList.add('active');
+
+        // Update navbar active tab
+        tabButtons.forEach(button => {
+          button.classList.remove('active');
+          if (button.getAttribute('data-tab') === tabName) {
+            button.classList.add('active');
+          }
+        });
+
+        // Update URL
+        const href = this.getAttribute('href');
+        history.pushState(null, '', href);
+
+        // Trigger tab content load
+        const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tabName}"]`);
+        if (targetTabButton) {
+          const clickEvent = new Event('click', { bubbles: true });
+          targetTabButton.dispatchEvent(clickEvent);
+        }
+      });
+    });
+
+    // Handle Svet subtabs
+    svetSubLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const href = this.getAttribute('href');
+        try {
+          window.location.assign(href);
+        } catch (error) {
+          console.error('Navigation failed:', error);
+        }
+      });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab') || 'overview.html';
+    svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
+    slovenijaSubLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('data-tab') === tab) {
+        link.classList.add('active');
+      }
+    });
+    const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
+    tabButtons.forEach(button => {
+      button.classList.remove('active');
+      if (button.getAttribute('data-tab') === tab) {
+        button.classList.add('active');
+        const clickEvent = new Event('click', { bubbles: true });
+        button.dispatchEvent(clickEvent);
+      }
+    });
+  });
+</script>
 </body>
 </html>

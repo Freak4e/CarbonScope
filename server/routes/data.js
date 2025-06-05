@@ -14,8 +14,7 @@ const sectorCsvPath = path.join(__dirname, "../../data/co2-sectors.csv");
 const fuelCsvPath = path.join(__dirname, "../../data/co2-fuel.csv");
 const economicSectorsCsvPath = path.join(__dirname, "../../data/co-emissions-by-sector.csv");
 const geojsonPath = path.join(__dirname, "../../data/slovenia.geojson");
-
-// Add at the top of your routes file
+const predictionsCsvPath = path.join(__dirname, "../../data/predictions.csv"); 
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -769,5 +768,80 @@ router.get('/api/sector-emissions', (req, res) => {
       res.status(500).json({ error: 'Failed to read CSV file', details: err.message });
     });
 });
+
+let predictionsData = []; // Initialize predictionsData array
+
+// Add after existing CSV loading blocks
+fs.createReadStream(predictionsCsvPath)
+  .pipe(csv())
+  .on("data", (row) => {
+    const processedRow = {};
+    for (const [key, value] of Object.entries(row)) {
+      processedRow[key] = isNaN(value) || value === '' ? value : parseFloat(value);
+    }
+    predictionsData.push(processedRow);
+  })
+  .on("end", () => {
+    console.log("predictions.csv loaded with", predictionsData.length, "records");
+  })
+  .on("error", (err) => {
+    console.error("Error reading predictions.csv:", err);
+  });
+
+// Add API endpoints after existing endpoints
+router.get("/api/global-emissions", (req, res) => {
+  try {
+    const { startYear, endYear } = req.query;
+    let globalData = predictionsData
+      .filter(row => row.country === 'World' && row.year >= 2000)
+      .map(row => ({
+        year: parseInt(row.year),
+        co2: parseFloat(row.co2), // Already in Gt for World
+        upper_bound: parseFloat(row.upper_bound),
+        lower_bound: parseFloat(row.lower_bound)
+      }));
+
+    if (startYear) {
+      globalData = globalData.filter(item => item.year >= parseInt(startYear));
+    }
+    if (endYear) {
+      globalData = globalData.filter(item => item.year <= parseInt(endYear));
+    }
+
+    globalData.sort((a, b) => a.year - b.year);
+    res.json(globalData);
+  } catch (error) {
+    console.error('Error in global-emissions endpoint:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/api/slovenia-emissions", (req, res) => {
+  try {
+    const { startYear, endYear } = req.query;
+    let sloveniaData = predictionsData
+      .filter(row => row.country === 'Slovenia' && row.year >= 2000)
+      .map(row => ({
+        year: parseInt(row.year),
+        co2: parseFloat(row.co2) / 1000, // Convert Mt to Gt for consistency
+        upper_bound: parseFloat(row.upper_bound) / 1000,
+        lower_bound: parseFloat(row.lower_bound) / 1000
+      }));
+
+    if (startYear) {
+      sloveniaData = sloveniaData.filter(item => item.year >= parseInt(startYear));
+    }
+    if (endYear) {
+      sloveniaData = sloveniaData.filter(item => item.year <= parseInt(endYear));
+    }
+
+    sloveniaData.sort((a, b) => a.year - b.year);
+    res.json(sloveniaData);
+  } catch (error) {
+    console.error('Error in slovenia-emissions endpoint:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 module.exports = router;

@@ -1,0 +1,50 @@
+.sidenav::-webkit-scrollbar {
+  display: none;
+}
+
+.sidenav-header {
+  padding: 10px;
+  background-color: #f8f9fa;
+}
+
+.navbar-collapse {
+  padding: 1rem 0;
+  height: auto !important;
+}
+
+.nav-item {
+  margin-bottom: 0;
+}
+
+#svetSubmenu, #slovenijaSubmenu {
+  padding-left: 1.5rem;
+  list-style-type: none;
+}
+
+#svetSubmenu .nav-link.subtab,
+#slovenijaSubmenu .nav-link.subtab {
+  color: #2d3748; 
+  transition: color 0.3s ease;
+}
+
+#svetSubmenu .nav-link.subtab.active,
+#slovenijaSubmenu .nav-link.subtab.active {
+  color: #005bbc; 
+  background: none !important; 
+  font-weight: 800; 
+}
+
+#svetSubmenu .nav-link.subtab:hover,
+#slovenijaSubmenu .nav-link.subtab:hover {
+  color: #00448e; 
+}
+
+
+@media (max-width: 767.98px) {
+  .sidenav {
+    width: 100%;
+    height: auto;
+    position: relative;
+    margin: 0;
+  }
+}

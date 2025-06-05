@@ -1,0 +1,115 @@
+<div class="row">
+  <div class="col-md-10 mx-auto mb-4">
+    <div class="text-center my-5">
+      <h2 class="text-dark mb-3 position-relative">
+        <span class="d-inline-block position-relative">
+          <span class="d-inline-block mx-2" style="width: 30px;"></span>
+          Emisije CO₂ po sektorjih
+          <span class="d-inline-block mx-2" style="width: 30px;"></span>
+        </span>
+      </h2>
+    </div>
+    <p class="lead">
+      Leta 2022 so svetovne emisije CO₂ dosegle <strong>36,8 gigaton</strong>. Razumevanje, kateri sektorji – od proizvodnje energije do prometa in industrije – prispevajo največ, je ključno za oblikovanje učinkovitih podnebnih politik.
+    </p>
+    <p class="text-dark fs-6">
+      Spodnji grafi prikazujejo, kako so emisije CO₂ razporejene po sektorjih v različnih državah in globalno. Uporabite interaktivne grafikone za analizo posameznih držav ali preglejte fiksne grafikone za širši vpogled v svetovne trende.
+    </p>
+    <div class="mb-4">
+      <select id="unifiedCountrySelect" class="form-select w-25">
+        <option value="">Izberi državo</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="row mb-5">
+  <div class="col-md-10 mx-auto">
+    <h4 class="mb-3">Emisije CO₂ po gospodarskih sektorjih</h4>
+    <p class="mb-4 text-dark">
+      Analiza prikazuje razporeditev emisij po glavnih gospodarskih panogah. V večini držav izstopajo 
+      <strong>elektrarne in toplotarne</strong> kot največji vir emisij, sledijo pa jim 
+      <strong>industrija</strong> in <strong>promet</strong>. Nekatere države imajo značilno visoke emisije iz 
+      <strong>sprememb rabe zemljišč</strong>, predvsem zaradi krčenja gozdov.
+    </p>
+    <div class="card shadow-sm">
+      <div class="card-header bg-transparent">
+        <h5 class="mb-0">Globalne emisije CO₂ po sektorjih (1990–2021)</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 400px;">
+          <canvas id="globalSectorChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mb-5">
+  <div class="col-md-10 mx-auto">
+    <h4 class="mb-3">Emisije CO₂ po vrsti goriva</h4>
+    <p class="mb-4 text-dark">
+      Razčlenitev emisij glede na vrsto uporabljenega fosilnega goriva razkriva energetske vzorce države. 
+      <strong>Premog</strong> običajno povzroča največ emisij na enoto energije, medtem ko 
+      <strong>plin</strong> velja za najmanj onesnaževalno fosilno gorivo. Nekatere države z velikimi 
+      naftnimi viri imajo visoke emisije iz <strong>sežiganja odvečnih plinov</strong>.
+    </p>
+    <div class="card shadow-sm">
+      <div class="card-header bg-transparent">
+        <h5 class="mb-0">Trendi emisij CO₂ po vrstah goriva (1990–2022)</h5>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 400px;">
+          <canvas id="sectorLineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mb-5 sector-align">
+  <div class="col-md-5 ms-5">
+    <h4 class="text-dark mb-3">Kateri sektorji najbolj prispevajo k emisijam vzeti državi?</h4>
+    <p class="text-dark fs-6">
+      V nadaljevanju lahko podrobno raziščeš, kako so emisije CO₂ razporejene po sektorjih v izbranih državah.
+      Ta analiza razkriva specifične vzorce, ki pogosto odražajo stopnjo razvoja, gospodarsko strukturo
+      in energetske vire posamezne države.
+    </p>
+    <ul class="fs-6 text-dark ps-4 mb-4">
+      <li><strong>Države v razvoju</strong> pogosto izstopajo po visokih emisijah iz industrije.</li>
+      <li><strong>Razvite države</strong> imajo večji delež emisij iz prometa in gospodinjstev.</li>
+      <li><strong>Države proizvajalke nafte</strong> imajo pogosto visoke emisije zaradi sežiganja plinov in ekstrakcije surovin.</li>
+    </ul>
+    <p class="text-dark fs-6">
+      Grafikon omogoča hitro vizualno primerjavo sektorjev z največjim prispevkom k emisijam za vsako državo posebej.
+      S klikom na spustni meni lahko izbereš državo in vidiš, kateri sektor je največji onesnaževalec.
+    </p>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body pt-3">
+        <div class="chart-container" style="position: relative; height: 400px;">
+          <canvas id="sectorChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <script src="/js/core/popper.min.js"></script>
+  <script src="/js/core/bootstrap.min.js"></script>
+  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/js/plugins/chartjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/kalkulator.js"></script>
+  <script src="/js/sectorsSvet.js"></script>
+  <script src="/js/globe.js"></script>
+  <script src="/js/animatedgraph.js"></script>
+  <script src="/js/load-tabs-world.js"></script>
+  <script src="/js/sidebar.js"></script>
+  
