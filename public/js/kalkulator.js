@@ -2,13 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Get the calculator icon
   const calculatorIcon = document.querySelector('.fa-calculator').closest('a');
   
-  // Show modal on click
-  calculatorIcon.addEventListener('click', function() {
-    const modal = new bootstrap.Modal(document.getElementById('co2CalculatorModal'));
-    modal.show();
-    initMap();
-  });
-  
   // Map variables
   let map;
   let routeLayer;
@@ -41,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "Hoja je odlična za vaše zdravje in planet! Nadaljujte tako! 💚"
       ],
       cycling: [
-        "Kolesarjenje je odličen izbor! Brez emisij in dobro za zdravje. �",
+        "Kolesarjenje je odličen izbor! Brez emisij in dobro za zdravje. 🚴",
         "Bravo za kolesarjenje! Še vedno najboljši način za kratke razdalje. 👍"
       ],
       driving: [
@@ -74,15 +67,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize map
   function initMap() {
     if (!map) {
-      map = L.map('routeMap').setView([46.1512, 14.9955], 8); // Center on Slovenia
+      map = L.map('routeMap', {
+        zoomControl: true,
+        attributionControl: true
+      }).setView([46.1512, 14.9955], 8); // Center on Slovenia
+      
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
       }).addTo(map);
-    } else {
-      map.invalidateSize();
     }
     
-    clearMap();
+    // Ensure map size is recalculated
+    setTimeout(() => {
+      map.invalidateSize();
+      clearMap();
+    }, 0);
   }
   
   // Clear map elements
@@ -91,7 +91,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (startMarker) map.removeLayer(startMarker);
     if (endMarker) map.removeLayer(endMarker);
     if (routingControl) map.removeControl(routingControl);
+    routeLayer = null;
+    startMarker = null;
+    endMarker = null;
+    routingControl = null;
   }
+  
+  // Show modal and initialize map when fully shown
+  calculatorIcon.addEventListener('click', function() {
+    const modal = new bootstrap.Modal(document.getElementById('co2CalculatorModal'));
+    modal.show();
+  });
+
+  // Initialize map when modal is fully shown
+  document.getElementById('co2CalculatorModal').addEventListener('shown.bs.modal', function() {
+    initMap();
+  });
   
   // Transport mode selection
   const transportModes = document.querySelectorAll('.transport-mode');
@@ -99,9 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
     mode.addEventListener('click', function() {
       transportModes.forEach(m => m.classList.remove('active'));
       this.classList.add('active');
-      if (document.getElementById('startPoint').value && document.getElementById('endPoint').value) {
-        calculateRoute();
-      }
     });
   });
   
@@ -127,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Routing using OSRM
   async function getRoute(start, end, profile) {
     try {
-      // Use public OSRM demo server (for production, consider setting up your own)
       const response = await fetch(`https://router.project-osrm.org/route/v1/${profile}/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`);
       const data = await response.json();
       
@@ -152,6 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const startInput = document.getElementById('startPoint').value;
     const endInput = document.getElementById('endPoint').value;
     const selectedMode = document.querySelector('.transport-mode.active')?.dataset.mode;
+    const overlay = document.getElementById('calculationOverlay');
     
     if (!startInput || !endInput) {
       alert('Prosim vnesite obe lokaciji');
@@ -164,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     document.getElementById('calculateBtn').disabled = true;
-    document.getElementById('calculateBtn').textContent = 'Računam...';
+    overlay.style.display = 'flex';
     
     try {
       // Geocode both locations
@@ -209,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert(error.message);
     } finally {
       document.getElementById('calculateBtn').disabled = false;
-      document.getElementById('calculateBtn').textContent = 'Izračunaj';
+      overlay.style.display = 'none';
     }
   }
   
@@ -217,13 +229,27 @@ document.addEventListener('DOMContentLoaded', function() {
   function displayRoute(start, end, geometry) {
     clearMap();
     
+    // Helper function to extract the most relevant name (street or place)
+    function getLocationName(displayName) {
+      const parts = displayName.split(',');
+      // Typically, the street or place name is the first or second part
+      // Skip numeric parts (like house numbers) and return the first non-numeric part
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i].trim();
+        if (!/^\d/.test(part) && part.length > 0) {
+          return part;
+        }
+      }
+      return parts[0].trim(); // Fallback to first part if no suitable name found
+    }
+    
     // Add markers
     startMarker = L.marker([start.lat, start.lon]).addTo(map)
-      .bindPopup(`<b>Začetek:</b> ${start.displayName.split(',')[0]}`)
+      .bindPopup(`<b>Začetek:</b> ${getLocationName(start.displayName)}`)
       .openPopup();
     
     endMarker = L.marker([end.lat, end.lon]).addTo(map)
-      .bindPopup(`<b>Konec:</b> ${end.displayName.split(',')[0]}`);
+      .bindPopup(`<b>Konec:</b> ${getLocationName(end.displayName)}`);
     
     // Add route
     routeLayer = L.geoJSON(geometry, {
@@ -259,31 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
   }
-  
-  // Debounce function for input events
-  function debounce(func, wait) {
-    let timeout;
-    return function() {
-      const context = this, args = arguments;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        func.apply(context, args);
-      }, wait);
-    };
-  }
-  
-  // Add input event listeners with debounce
-  document.getElementById('startPoint').addEventListener('input', debounce(function() {
-    if (document.getElementById('endPoint').value && document.querySelector('.transport-mode.active')) {
-      calculateRoute();
-    }
-  }, 1000));
-  
-  document.getElementById('endPoint').addEventListener('input', debounce(function() {
-    if (document.getElementById('startPoint').value && document.querySelector('.transport-mode.active')) {
-      calculateRoute();
-    }
-  }, 1000));
 
   // Reset modal when closed
   document.getElementById('co2CalculatorModal').addEventListener('hidden.bs.modal', function() {

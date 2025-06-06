@@ -113,7 +113,7 @@
       <ul class="navbar-nav ms-auto justify-content-end">
         <li class="nav-item d-flex align-items-center me-4">
           <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="calculatorButton">
-            <i class="fa fa-calculator fs-4"></i>
+            <i class="fa fa-calculator fs-6"></i>
           </a>
         </li>
         <li class="nav-item d-xl-none ps-3 d-flex align-items-center me-4">
@@ -127,7 +127,7 @@
         </li>
         <li class="nav-item d-flex align-items-center me-4">
           <a href="/?tab=map.html" class="nav-link text-white font-weight-bold px-0 subtab" data-tab="map.html" id="globeButton">
-            <i class="fas fa-globe fs-4"></i>
+            <i class="fas fa-globe fs-6"></i>
           </a>
         </li>
       </ul>
@@ -371,74 +371,85 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
-    const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+  const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
+  const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+  const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
 
-    // Handle Slovenija subtabs
-    slovenijaSubLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const tabName = this.getAttribute('data-tab');
-        const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
-
-        // Update sidebar active states
-        svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
-        slovenijaSubLinks.forEach(sublink => sublink.classList.remove('active'));
-        this.classList.add('active');
-
-        // Update navbar active tab
-        tabButtons.forEach(button => {
-          button.classList.remove('active');
-          if (button.getAttribute('data-tab') === tabName) {
-            button.classList.add('active');
-          }
-        });
-
-        // Update URL
-        const href = this.getAttribute('href');
-        history.pushState(null, '', href);
-
-        // Trigger tab content load
-        const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tabName}"]`);
-        if (targetTabButton) {
-          const clickEvent = new Event('click', { bubbles: true });
-          targetTabButton.dispatchEvent(clickEvent);
-        }
-      });
-    });
-
-    // Handle Svet subtabs
-    svetSubLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const href = this.getAttribute('href');
-        try {
-          window.location.assign(href);
-        } catch (error) {
-          console.error('Navigation failed:', error);
-        }
-      });
-    });
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab') || 'overview.html';
+  // Function to update active states
+  function updateActiveStates(tabName) {
+    // Update sidebar active states
     svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
-    slovenijaSubLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('data-tab') === tab) {
-        link.classList.add('active');
-      }
+    slovenijaSubLinks.forEach(sublink => {
+      sublink.classList.toggle('active', sublink.getAttribute('data-tab') === tabName);
     });
-    const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
+
+    // Update navbar active states
     tabButtons.forEach(button => {
-      button.classList.remove('active');
-      if (button.getAttribute('data-tab') === tab) {
-        button.classList.add('active');
+      button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
+    });
+
+    // Update URL
+    history.pushState(null, '', `/slovenia?tab=${tabName}`);
+
+    // Scroll to tabs (optional, as tabs are already in view in slovenia.html)
+    const tabsElement = document.querySelector('#emissionTabs');
+    if (tabsElement) {
+      setTimeout(() => {
+        tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
+  // Handle Slovenija subtabs (sidebar)
+  slovenijaSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      updateActiveStates(tabName);
+
+      // Trigger tab content load
+      const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tabName}"]`);
+      if (targetTabButton) {
         const clickEvent = new Event('click', { bubbles: true });
-        button.dispatchEvent(clickEvent);
+        targetTabButton.dispatchEvent(clickEvent);
       }
     });
   });
+
+  // Handle navbar tabs
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      updateActiveStates(tabName);
+    });
+  });
+
+  // Handle Svet subtabs
+  svetSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const href = this.getAttribute('href');
+      try {
+        window.location.assign(href);
+      } catch (error) {
+        console.error('Navigation failed:', error);
+      }
+    });
+  });
+
+  // Handle initial page load for Slovenija
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab') || 'overview.html';
+  updateActiveStates(tab);
+
+  // Trigger tab content load on page load
+  const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tab}"]`);
+  if (targetTabButton) {
+    const clickEvent = new Event('click', { bubbles: true });
+    targetTabButton.dispatchEvent(clickEvent);
+  }
+});
 </script>
 </body>
 </html>
