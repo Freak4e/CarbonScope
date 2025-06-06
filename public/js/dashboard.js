@@ -1,113 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Chart instances
-  let emissionsChart, comparisonChart, totalEmissionsChart, globalShareChart;
+  let totalEmissionsChart, globalShareChart;
+  // Store data for CSV downloads
+  let topCountriesData = [];
 
   // Initialize dashboard when tab content is loaded
   function initDashboard() {
-    // DOM elements
-    const countrySelect = $('#countrySelect');
-    const metricSelect = document.getElementById('metricSelect');
-    const startYearInput = document.getElementById('startYearInput');
-    const endYearInput = document.getElementById('endYearInput');
-    const updateBtn = document.getElementById('updateBtn');
-    const chartTitle = document.getElementById('chartTitle');
-    let currentYear = 2022;
-
     // Check if required elements exist
-    if (!countrySelect.length && !document.getElementById('totalEmissionsChart')) {
-      console.log('No dashboard elements found, skipping initialization');
+    if (!document.getElementById('totalEmissionsChart') && !document.getElementById('globalShareChart')) {
+      console.log('No overview dashboard elements found, skipping initialization');
       return;
     }
 
-    // Initialize Select2 dropdown for countrySelect
-    if (countrySelect.length) {
-      try {
-        countrySelect.select2({
-          placeholder: "Izberi države za primerjavo...",
-          allowClear: true,
-          width: '100%',
-          closeOnSelect: false
-        });
-      } catch (error) {
-        console.error('Error initializing Select2:', error);
-      }
-    }
-
-    // Load countries
-    loadCountries();
-
     // Initialize charts
-    initCharts();
     initTopCountriesCharts();
     updateTopCountriesCharts();
-
-    // Event listeners
-    if (updateBtn) {
-      updateBtn.addEventListener('click', updateAllCharts);
-    }
-
-    // Add metric button event listeners
-    document.querySelectorAll('#metricButtons [data-metric]').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('#metricButtons [data-metric]').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        const metric = this.dataset.metric;
-        updateComparisonChart(countrySelect.val() || [], metric, endYearInput?.value || 2022);
-      });
-    });
-  }
-
-  async function loadCountries() {
-    try {
-      const response = await fetch('/api/countries');
-      if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
-      const countries = await response.json();
-
-      const countrySelect = $('#countrySelect');
-      if (countrySelect.length) {
-        countrySelect.empty();
-        countrySelect.append(new Option("Izberi državo", ""));
-        countries.forEach(country => {
-          if (!['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'].includes(country)) {
-            const option = new Option(country, country);
-            countrySelect.append(option);
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error loading countries:', error);
-    }
-  }
-
-  function initCharts() {
-    const emissionsCanvas = document.getElementById('emissionsChart');
-    if (emissionsCanvas) {
-      const emissionsCtx = emissionsCanvas.getContext('2d');
-      emissionsChart = new Chart(emissionsCtx, {
-        type: 'line',
-        data: { labels: [], datasets: [] },
-        options: getChartOptions('CO₂ Emissions (million tonnes)')
-      });
-    } else {
-      console.warn('Emissions chart canvas not found');
-    }
-
-    const comparisonCanvas = document.getElementById('comparisonChart');
-    if (comparisonCanvas) {
-      const comparisonCtx = comparisonCanvas.getContext('2d');
-      comparisonChart = new Chart(comparisonCtx, {
-        type: 'bar',
-        data: { labels: [], datasets: [] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false }, title: { display: true } },
-          scales: { y: { beginAtZero: true } }
-        }
-      });
-    } else {
-      console.warn('Comparison chart canvas not found');
-    }
   }
 
   function initTopCountriesCharts() {
@@ -142,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   const x = lastPoint.x + 5;
                   const y = lastPoint.y;
                   ctx.save();
-                  ctx.font = '12px Open Sans';
+                  ctx.font = '12px Arial';
                   ctx.fillStyle = dataset.borderColor;
                   ctx.fillText(dataset.label, x, y);
                   ctx.restore();
@@ -192,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   const x = lastPoint.x + 5;
                   const y = lastPoint.y;
                   ctx.save();
-                  ctx.font = '12px Open Sans';
+                  ctx.font = '12px Arial';
                   ctx.fillStyle = dataset.borderColor;
                   ctx.fillText(dataset.label, x, y);
                   ctx.restore();
@@ -219,6 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
       const { data, countries } = await response.json();
       console.log('Data fetched:', { data, countries });
+
+      // Store data for CSV downloads, filtering out invalid entries
+      topCountriesData = data.filter(row => row.year != null && row.country != null && (row.co2 != null || row.share_global_co2 != null));
 
       const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
       const totalEmissionsDatasets = countries.map(country => {
@@ -285,192 +195,61 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Function to generate and download CSV
+  function downloadCSV(data, filename, headers, rowFormatter) {
+    // Log data for debugging
+    console.log('Generating CSV for:', filename, 'Data:', data);
 
-  async function updateAllCharts() {
-    const selectedCountries = $('#countrySelect').val() || [];
-    const metric = metricSelect ? metricSelect.value : 'co2';
-    const startYear = startYearInput ? startYearInput.value : 1990;
-    const endYear = endYearInput ? endYearInput.value : 2022;
-
-    if (emissionsChart) await updateEmissionsChart(selectedCountries, metric, startYear, endYear);
-    if (comparisonChart) await updateComparisonChart(selectedCountries, metric, endYear);
-    if (totalEmissionsChart && globalShareChart) await updateTopCountriesCharts();
-  }
-
-  async function updateEmissionsChart(countries, metric, startYear, endYear) {
-    if (!emissionsChart) return;
-
-    const datasets = [];
-    let labels = [];
-
-    for (const country of countries) {
+    // Convert data to CSV format
+    let csvContent = headers.join(',') + '\n';
+    data.forEach(row => {
       try {
-        const response = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&metric=${metric}&startYear=${startYear}&endYear=${endYear}`);
-        if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
-        const data = await response.json();
-
-        if (data && data.length > 0) {
-          if (labels.length === 0) labels = data.map(d => d.year);
-          datasets.push({
-            label: country,
-            data: data.map(d => d.value || 0),
-            borderColor: getRandomColor(),
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            fill: false,
-            tension: 0.1
-          });
-        }
+        csvContent += rowFormatter(row) + '\n';
       } catch (error) {
-        console.error(`Error fetching emissions data for ${country}:`, error);
+        console.warn('Skipping invalid row:', row, 'Error:', error);
       }
+    });
+
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link element to trigger download
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Download handlers for top countries charts
+  window.downloadTotalEmissionsCSV = function() {
+    if (topCountriesData.length === 0) {
+      alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
+      return;
     }
+    downloadCSV(
+      topCountriesData,
+      'total_co2_emissions.csv',
+      ['Year', 'Country', 'CO2_Emissions_Billion_Tonnes'],
+      row => `${row.year},${row.country},${row.co2 != null ? row.co2.toFixed(4) : '0.0000'}`
+    );
+  };
 
-    if (datasets.length > 0) {
-      emissionsChart.data.labels = labels;
-      emissionsChart.data.datasets = datasets;
-      emissionsChart.options.scales.y.title.text = getAxisLabel(metric);
-      if (document.getElementById('chartTitle')) {
-        document.getElementById('chartTitle').textContent = `${getMetricName(metric)} za ${countries.join(', ')} (${startYear}-${endYear})`;
-      }
-      emissionsChart.update();
-    } else {
-      emissionsChart.data.labels = [];
-      emissionsChart.data.datasets = [];
-      emissionsChart.update();
+  window.downloadGlobalShareCSV = function() {
+    if (topCountriesData.length === 0) {
+      alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
+      return;
     }
-  }
-
-  async function updateComparisonChart(countries, metric = 'co2', year = 2022) {
-    if (!comparisonChart) return;
-
-    try {
-      if (!countries || countries.length === 0) {
-        comparisonChart.data.labels = [];
-        comparisonChart.data.datasets = [];
-        comparisonChart.update();
-        document.querySelector('#metricsTable tbody').innerHTML = '';
-        return;
-      }
-
-      const dataPoints = await Promise.all(
-        countries.map(async country => {
-          try {
-            const response = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&metric=${metric}&startYear=${year}&endYear=${year}`);
-            if (!response.ok) return { country, value: 0 };
-            const data = await response.json();
-            return { country, value: data[0]?.value || 0 };
-          } catch (error) {
-            console.error(`Error fetching comparison data for ${country}:`, error);
-            return { country, value: 0 };
-          }
-        })
-      );
-
-      const validDataPoints = dataPoints.filter(d => d.value !== 0);
-      if (validDataPoints.length === 0 && metric !== 'co2') {
-        return updateComparisonChart(countries, 'co2', year);
-      }
-
-      validDataPoints.sort((a, b) => b.value - a.value);
-
-      comparisonChart.data.labels = validDataPoints.map(d => d.country);
-      comparisonChart.data.datasets = [{
-        data: validDataPoints.map(d => d.value),
-        backgroundColor: validDataPoints.map(() => getRandomColor()),
-        borderColor: '#fff',
-        borderWidth: 1
-      }];
-
-      comparisonChart.options.scales.y.title = { display: true, text: getAxisLabel(metric) };
-      comparisonChart.options.plugins.title.text = `Primerjava: ${getMetricName(metric)} (${year})`;
-      comparisonChart.update();
-
-      await updateComparisonDashboard(countries, year);
-    } catch (error) {
-      console.error('Error in updateComparisonChart:', error);
-      comparisonChart.data.labels = [];
-      comparisonChart.data.datasets = [];
-      comparisonChart.options.plugins.title.text = 'Napaka pri nalaganju podatkov';
-      comparisonChart.update();
-    }
-  }
-
-  async function updateComparisonDashboard(selectedCountries, year = 2022) {
-    if (!selectedCountries || selectedCountries.length === 0) return;
-
-    try {
-      document.getElementById('currentYearDisplay').textContent = year;
-
-      const countryData = await Promise.all(
-        selectedCountries.map(async country => {
-          const res = await fetch(`/api/emissions?country=${encodeURIComponent(country)}&startYear=${year}&endYear=${year}`);
-          const data = await res.json();
-          return data[0] || null;
-        })
-      ).then(results => results.filter(Boolean));
-
-      const tableBody = document.querySelector('#metricsTable tbody');
-      tableBody.innerHTML = countryData.map(country => `
-        <tr>
-          <td><span class="country-name">${country.country}</span></td>
-          <td class="text-end">${country.co2_per_gdp ? country.co2_per_gdp.toFixed(2) + ' kg/$' : 'N/A'}</td>
-          <td class="text-end">${country.energy_per_gdp ? (country.energy_per_gdp * 1000).toFixed(0) + ' Wh/$' : 'N/A'}</td>
-        </tr>
-      `).join('');
-    } catch (error) {
-      console.error('Error updating comparison dashboard:', error);
-    }
-  }
-
-  function getChartOptions(yAxisTitle) {
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top' },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              let label = context.dataset.label || '';
-              if (label) label += ': ';
-              label += context.parsed.y.toLocaleString();
-              if (yAxisTitle.includes('tonnes')) label += ' tonnes';
-              if (yAxisTitle.includes('million')) label += ' million';
-              if (yAxisTitle.includes('%')) label += '%';
-              return label;
-            }
-          }
-        }
-      },
-      scales: {
-        y: { title: { display: true, text: yAxisTitle }, beginAtZero: false },
-        x: { title: { display: true, text: 'Leto' } }
-      }
-    };
-  }
-
-  function getAxisLabel(metric) {
-    const labels = {
-      'co2': 'CO₂ emisije (milijon ton)',
-      'co2_per_capita': 'CO₂ emisije (tone na osebo)',
-      'share_global_co2': 'Delež globalnih emisij (%)',
-      'temperature_change_from_co2': 'Vpliv na temperaturo (°C)',
-      'co2_per_gdp': 'Intenzivnost CO₂ (kg na $)'
-    };
-    return labels[metric] || 'Vrednost';
-  }
-
-  function getMetricName(metric) {
-    const names = {
-      'co2': 'Skupni CO₂',
-      'co2_per_capita': 'CO₂ na prebivalca',
-      'share_global_co2': 'Delež v svetu',
-      'temperature_change_from_co2': 'Vpliv na temperaturo',
-      'co2_per_gdp': 'CO₂ glede na BDP'
-    };
-    return names[metric] || metric;
-  }
+    downloadCSV(
+      topCountriesData,
+      'global_share_co2_emissions.csv',
+      ['Year', 'Country', 'Share_Global_CO2_Percent'],
+      row => `${row.year},${row.country},${row.share_global_co2 != null ? row.share_global_co2.toFixed(2) : '0.00'}`
+    );
+  };
 
   function getRandomColor() {
     return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
@@ -478,13 +257,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Listen for tab content loaded event
   document.getElementById('tabContent')?.addEventListener('tabContentLoaded', function(e) {
-    if (e.detail.tab === 'overview-svet.html' || e.detail.tab === 'comparison.html') {
+    if (e.detail.tab === 'overview-svet.html') {
       initDashboard();
     }
   });
 
-  // Initialize if already on a relevant tab
-  if (document.getElementById('totalEmissionsChart') || document.getElementById('emissionsChart')) {
+  // Initialize if already on the overview tab
+  if (document.getElementById('totalEmissionsChart') || document.getElementById('globalShareChart')) {
     initDashboard();
   }
 });

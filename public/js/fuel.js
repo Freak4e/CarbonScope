@@ -446,6 +446,59 @@ newElement.addEventListener('click', (e) => {
         } else {
             console.error('Cannot find canvas for bar chart');
         }
+
+         function downloadCSV(data, filename, headers, rowFormatter) {
+            console.log('Generating CSV for:', filename, 'Data length:', data.length);
+            let csvContent = headers.join(',') + '\n';
+            data.forEach(row => {
+                try {
+                    csvContent += rowFormatter(row) + '\n';
+                } catch (error) {
+                    console.warn('Skipping invalid row:', row, error);
+                }
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Download handler for stackedAreaChart
+        window.downloadStackedAreaChartCSV = function() {
+            if (!sloGroupedByYear || !sloYears || sloYears.length === 0) {
+                alert('Ni podatkov za prenos. Prosimo, poskusite znova.');
+                return;
+            }
+
+            const headers = ['Leto', ...fuelTypes.map(fuel => fuel.replace(/\s/g, '_'))];
+            const data = sloYears.map(year => {
+                const yearData = sloGroupedByYear[year] || [];
+                const row = { year };
+                fuelTypes.forEach(fuel => {
+                    const record = yearData.find(d => d.fuel === fuel);
+                    row[fuel] = record ? (record.perCapita || 0) : 0;
+                });
+                return row;
+            });
+
+            const rowFormatter = row => [
+                row.year,
+                ...fuelTypes.map(fuel => row[fuel].toFixed(2))
+            ].join(',');
+
+            downloadCSV(
+                data,
+                'slovenia_co2_per_capita_by_fuel_1991-2022.csv',
+                headers,
+                rowFormatter
+            );
+        };
     } catch (error) {
         loadingIndicator.innerHTML = `
             <div class="alert alert-danger">

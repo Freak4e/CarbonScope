@@ -121,31 +121,33 @@
       </span>
     </h3>
   </div>
-
-  <div class="row mt-4" id="co2-slovenia">
-    <div class="col-lg-5 mb-lg-0 mb-4">
-      <div class="card z-index-2 h-100">
-        <div class="card-header pb-0 pt-3 bg-transparent">
-          <p class="text-dark fs-7">
-            Graf prikazuje gibanje skupnih letnih emisij ogljikovega dioksida (CO₂) v Sloveniji od leta 1990 do 2023. Vidimo lahko, da so emisije v tem obdobju precej nihale, z opaznim vrhom okoli leta <strong>2008</strong> in večjimi padci v določenih letih. Najnižjo vrednost emisij beležimo v <strong>2023</strong>, kar kaže na splošen dolgoročen trend upadanja.
-            <br><br>
-            Čeprav se v posameznih letih emisije povečajo ali zmanjšajo, podatki nakazujejo postopno zmanjševanje emisij skozi desetletja. To je lahko posledica kombinacije okoljskih politik, sprememb v energetski strukturi, gospodarskih dejavnikov in večje okoljske ozaveščenosti.
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-7">
-      <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
-        <div class="card-header bg-gradient-primary text-white pb-0 border-0">
-          <h5 class="font-weight-bold text-white">Emisije CO₂ skozi čas 📈</h5>
-          <p class="text-white opacity-8 fs-7">Letne emisije CO₂ v milijonih ton za Slovenijo</p>
-        </div>
-        <div class="card-body p-3">
-          <canvas id="trendChart" height="300" aria-label="Graf letnih emisij CO₂ v Sloveniji od 1990"></canvas>
-        </div>
+<div class="row mt-4" id="co2-slovenia">
+  <div class="col-lg-5 mb-lg-0 mb-4">
+    <div class="card z-index-2 h-100">
+      <div class="card-header pb-0 pt-3 bg-transparent">
+        <p class="text-dark fs-7">
+          Graf prikazuje gibanje skupnih letnih emisij ogljikovega dioksida (CO₂) v Sloveniji od leta 1990 do 2023. Vidimo lahko, da so emisije v tem obdobju precej nihale, z opaznim vrhom okoli leta <strong>2008</strong> in večjimi padci v določenih letih. Najnižjo vrednost emisij beležimo v <strong>2023</strong>, kar kaže na splošen dolgoročen trend upadanja.
+          <br><br>
+          Čeprav se v posameznih letih emisije povečajo ali zmanjšajo, podatki nakazujejo postopno zmanjševanje emisij skozi desetletja. To je lahko posledica kombinacije okoljskih politik, sprememb v energetski strukturi, gospodarskih dejavnikov in večje okoljske ozaveščenosti.
+        </p>
       </div>
     </div>
   </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
+      <div class="card-header bg-gradient-primary text-white pb-0 border-0 position-relative">
+        <h5 class="font-weight-bold text-white">Emisije CO₂ skozi čas 📈</h5>
+        <p class="text-white opacity-8 fs-7">Letne emisije CO₂ v milijonih ton za Slovenijo</p>
+        <button class="download-icon-btn" type="button" onclick="downloadTrendChartCSV()" aria-label="Prenesi CSV podatke za emisije CO₂ skozi čas">
+          <i class="fas fa-download"></i>
+        </button>
+      </div>
+      <div class="card-body p-3">
+        <canvas id="trendChart" height="300" aria-label="Graf letnih emisij CO₂ v Sloveniji od 1990"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Subheader with decorative lines -->
   <div class="text-center my-5">
@@ -250,19 +252,22 @@
     </h3>
   </div>
 
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card shadow-sm border-0 h-100 animate__animated animate__fadeIn">
-        <div class="card-header bg-gradient-primary text-white pb-0 border-0">
-          <h5 class="font-weight-bold text-white">Rast prebivalstva in emisij CO₂ (1991–2023) 🌍</h5>
-          <p class="text-white opacity-8 fs-7">Primerjava prebivalstva (v milijonih) in emisij CO₂ (Slovenija: Mt, EU/Svet: milijarde ton)</p>
-        </div>
-        <div class="card-body p-3">
-          <canvas id="populationCo2Chart" height="400" aria-label="Primerjava rasti prebivalstva in emisij CO₂ med Slovenijo, Evropo in svetom"></canvas>
-        </div>
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card shadow-sm border-0 h-100 animate__animated animate__fadeIn">
+      <div class="card-header bg-gradient-primary text-white pb-0 border-0 position-relative">
+        <h5 class="font-weight-bold text-white">Rast prebivalstva in emisij CO₂ (1991–2023) 🌍</h5>
+        <p class="text-white opacity-8 fs-7">Primerjava prebivalstva (v milijonih) in emisij CO₂ (Slovenija: Mt, EU/Svet: milijarde ton)</p>
+        <button class="download-icon-btn" type="button" onclick="downloadPopulationCo2ChartCSV()" aria-label="Prenesi CSV podatke za rast prebivalstva in emisij CO₂">
+          <i class="fas fa-download"></i>
+        </button>
+      </div>
+      <div class="card-body p-3">
+        <canvas id="populationCo2Chart" height="400" aria-label="Primerjava rasti prebivalstva in emisij CO₂ med Slovenijo, Evropo in svetom"></canvas>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Navigation Cards -->
 <div class="row mt-5">

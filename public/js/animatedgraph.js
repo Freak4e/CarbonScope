@@ -266,6 +266,42 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
+    // Function to generate and download CSV
+    function downloadCSV(data, filename, headers, rowFormatter) {
+      // Convert data to CSV format
+      let csvContent = headers.join(',') + '\n';
+      data.forEach(row => {
+        csvContent += rowFormatter(row) + '\n';
+      });
+
+      // Create a Blob with the CSV content
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+
+      // Create a temporary link element to trigger download
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    // Download handler for animated graph
+    window.downloadAnimatedGraphCSV = function() {
+      if (chartData.length === 0) {
+        alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
+        return;
+      }
+      downloadCSV(
+        chartData,
+        'global_co2_emissions_over_time.csv',
+        ['Year', 'CO2_Emissions_Billion_Tonnes'],
+        row => `${row.year},${row.co2.toFixed(2)}`
+      );
+    };
+
     setupHandleDragging(startHandle, startTooltip, true);
     setupHandleDragging(endHandle, endTooltip, false);
 

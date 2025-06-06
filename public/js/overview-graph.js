@@ -517,6 +517,12 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchData('/api/emissions?country=Slovenia&metric=co2&startYear=2008&endYear=2009'),
         fetchData('/api/emissions?country=Slovenia&metric=co2&startYear=2019&endYear=2020')
       ]);
+      window.sloCo2Data = sloCo2Data;
+      window.euCo2Data = euCo2Data;
+      window.worldCo2Data = worldCo2Data;
+      window.sloPopData = sloPopData;
+      window.euPopData = euPopData;
+      window.worldPopData = worldPopData;
 
       // Update UI with data
       updateSummaryCards(summary, sectors);
@@ -538,4 +544,105 @@ document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('trendChart')) {
     initializeCharts();
   }
+
+
+
+  // Utility to download CSV
+function downloadCSV(data, filename, headers, rowFormatter) {
+  console.log('Generating CSV for:', filename, 'Data length:', data.length);
+  let csvContent = headers.join(',') + '\n';
+  data.forEach(row => {
+    try {
+      csvContent += rowFormatter(row) + '\n';
+    } catch (error) {
+      console.warn('Skipping invalid row:', row, error);
+    }
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Download handler for trendChart
+window.downloadTrendChartCSV = function() {
+  if (!window.sloCo2Data || window.sloCo2Data.length === 0) {
+    alert('Ni podatkov za prenos. Prosimo, poskusite znova.');
+    return;
+  }
+
+  const headers = ['Leto', 'CO2_Emisije_Mt'];
+  const rowFormatter = row => `${row.year},${row.value.toFixed(2)}`;
+
+  downloadCSV(
+    window.sloCo2Data,
+    'slovenia_co2_emissions_1990-2023.csv',
+    headers,
+    rowFormatter
+  );
+};
+
+// Download handler for populationCo2Chart
+window.downloadPopulationCo2ChartCSV = function() {
+  if (!window.sloCo2Data || !window.euCo2Data || !window.worldCo2Data ||
+      !window.sloPopData || !window.euPopData || !window.worldPopData ||
+      window.sloCo2Data.length === 0) {
+    alert('Ni podatkov za prenos. Prosimo, poskusite znova.');
+    return;
+  }
+
+  const headers = [
+    'Leto',
+    'Slovenija_Prebivalstvo_milijoni',
+    'Evropa_Prebivalstvo_milijoni',
+    'Svet_Prebivalstvo_milijoni',
+    'Slovenija_CO2_Emisije_Mt',
+    'Evropa_CO2_Emisije_milijarde_t',
+    'Svet_CO2_Emisije_milijarde_t'
+  ];
+
+  const years = window.sloCo2Data.map(d => d.year);
+  const data = years.map(year => {
+    const sloCo2 = window.sloCo2Data.find(d => d.year === year)?.value || 0;
+    const euCo2 = window.euCo2Data.find(d => d.year === year)?.value / 1_000 || 0;
+    const worldCo2 = window.worldCo2Data.find(d => d.year === year)?.value / 1_000 || 0;
+    const sloPop = window.sloPopData.find(d => d.year === year)?.value / 1_000_000 || 0;
+    const euPop = window.euPopData.find(d => d.year === year)?.value / 1_000_000 || 0;
+    const worldPop = window.worldPopData.find(d => d.year === year)?.value / 1_000_000 || 0;
+
+    return {
+      year,
+      sloPop,
+      euPop,
+      worldPop,
+      sloCo2,
+      euCo2,
+      worldCo2
+    };
+  });
+
+  const rowFormatter = row => [
+    row.year,
+    row.sloPop.toFixed(2),
+    row.euPop.toFixed(2),
+    row.worldPop.toFixed(2),
+    row.sloCo2.toFixed(2),
+    row.euCo2.toFixed(2),
+    row.worldCo2.toFixed(2)
+  ].join(',');
+
+  downloadCSV(
+    data,
+    'slovenia_eu_world_population_co2_1991-2023.csv',
+    headers,
+    rowFormatter
+  );
+};
+
 });

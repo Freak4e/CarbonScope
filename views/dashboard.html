@@ -54,7 +54,33 @@
   align-items: center;
   z-index: 1050;
 }
-
+.download-icon-btn  {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #fff; 
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
+.download-icon-btn1 {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #000000;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
+.download-icon-btn:hover,.download-icon-btn1:hover {
+  color: #d1e7ff; 
+}
 
   </style>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -421,6 +447,8 @@
   <script src="/js/sectorsSvet.js"></script>
   <script src="/js/globe.js"></script>
   <script src="/js/animatedgraph.js"></script>
+  <script src="/js/comparison.js"></script>  <script src="/js/kalkulator.js"></script>
+
   <script src="/js/load-tabs-world.js"></script>
   <script>
     var ctx1 = document.getElementById("chart-line").getContext("2d");

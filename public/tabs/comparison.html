@@ -56,18 +56,27 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-9">
-    <div class="card">
-      <div class="card-header">
-        <h5 id="chartTitle">Emisije CO₂ skozi čas</h5>
+<div class="col-lg-9">
+  <div class="card">
+    <div class="card-header position-relative">
+      <h5 id="chartTitle">Emisije CO₂ skozi čas</h5>
+      <div class="dropdown">
+        <button class="download-icon-btn1" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Prenesi CSV podatke za emisije CO₂ skozi čas">
+          <i class="fas fa-download"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="downloadDropdown">
+          <li><a class="dropdown-item" href="#" onclick="downloadEmissionsCSV('all')">Prenesi celotne podatke</a></li>
+          <li><a class="dropdown-item" href="#" onclick="downloadEmissionsCSV('displayed')">Prenesi prikazane podatke</a></li>
+        </ul>
       </div>
-      <div class="card-body">
-        <div class="chart-container" style="position: relative; height:300px;">
-          <canvas id="emissionsChart"></canvas>
-        </div>
+    </div>
+    <div class="card-body">
+      <div class="chart-container" style="position: relative; height:300px;">
+        <canvas id="emissionsChart"></canvas>
       </div>
     </div>
   </div>
+</div>
 </div>
 <div class="row">
   <div class="col-md-10 mx-auto">
@@ -132,23 +141,7 @@
     </div>
   </div>
 </div>
-  <script src="/js/core/popper.min.js"></script>
-  <script src="/js/core/bootstrap.min.js"></script>
-  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
-  <script src="/js/plugins/chartjs.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://unpkg.com/topojson-client@3"></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
-  <script src="/js/dashboard.js"></script>
-  <script src="/js/kalkulator.js"></script>
-  <script src="/js/sectorsSvet.js"></script>
+
+<script src="/js/comparison.js"></script>  <script src="/js/kalkulator.js"></script>
   <script src="/js/globe.js"></script>
-  <script src="/js/animatedgraph.js"></script>
   <script src="/js/load-tabs-world.js"></script>
-  <script src="/js/sidebar.js"></script>
