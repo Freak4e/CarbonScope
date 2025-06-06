@@ -1,4 +1,35 @@
-# Opsi-CO2
+# CO2 Odtis
+
+## Opis in vizija projekta
+
+CO2 Odtis je interaktivna spletna aplikacija, namenjena poglobljeni analizi in vizualizaciji emisij CO₂ tako za Slovenijo kot za svet. Z uporabo zanesljivih podatkovnih virov, naprednih vizualizacij in napovednih modelov omogoča uporabnikom celosten vpogled v razvoj emisij skozi čas, primerjavo med državami, sektorji in regijami ter izračun ogljičnega odtisa na različnih nivojih.
+
+**Vizija projekta** je prispevati k boljši ozaveščenosti o podnebnih spremembah in podpreti trajnostne odločitve posameznikov, organizacij in oblikovalcev politik z enostavno dostopnimi in vizualno privlačnimi orodji za spremljanje in napovedovanje emisij CO₂.
+
+Z vključitvijo napovednih modelov in interaktivnih kalkulatorjev potovanj želimo uporabnikom pokazati, kako njihove odločitve vplivajo na okolje ter jih spodbuditi k bolj trajnostnim načinom življenja.
+
+
+## Vsebina
+
+- [CO2 Odtis](#co2-odtis)
+- [Opis in vizija projekta](#opis-in-vizija-projekta)
+- [Funkcionalnosti](#funkcionalnosti)
+  - [🌍 Svetovni pogled](#-svetovni-pogled)
+  - [🚶‍♂️ Kalkulator emisij glede na način prevoza](#-kalkulator-emisij-glede-na-način-prevoza)
+  - [🇸🇮 Analiza emisij za Slovenijo](#-analiza-emisij-za-slovenijo)
+- [Tehnološki sklad](#tehnološki-sklad)
+  - [🔧 Frontend](#-frontend)
+  - [🗂️ Podatkovni viri](#️-podatkovni-viri)
+  - [📈 Vizualizacija](#-vizualizacija)
+  - [🤖 Modeli in napovedi](#-modeli-in-napovedi)
+- [Namestitev in nadaljnji razvoj](#namestitev-in-nadaljnji-razvoj)
+  - [🔧 Lokalna namestitev](#-lokalna-namestitev)
+  - [🔮 Nadaljnji razvoj](#-nadaljnji-razvoj)
+- [Podatkovni viri](#podatkovni-viri)
+- [Napovedni modeli (Jupyter Notebook)](#napovedni-modeli-jupyter-notebook)
+- [Avtorji](#avtorji)
+- [Licenca](#licenca)
+
 ## Funkcionalnosti
 
 ### 🌍 Svetovni pogled
@@ -30,7 +61,7 @@
 
 ## Tehnološki sklad
 
-Pri razvoju projekta OPSI-CO2 so uporabljene naslednje tehnologije in podatkovne oblike:
+Pri razvoju projekta CO2 Odtis so uporabljene naslednje tehnologije in podatkovne oblike:
 
 ### 🔧 Frontend
 
@@ -60,7 +91,7 @@ Pri razvoju projekta OPSI-CO2 so uporabljene naslednje tehnologije in podatkovne
 
 ### 🔧 Lokalna namestitev
 
-Za lokalni zagon projekta OPSI-CO2 sledite naslednjim korakom:
+Za lokalni zagon projekta CO2-Odtis sledite naslednjim korakom:
 
 1. Klonirajte repozitorij:
    ```bash
@@ -104,25 +135,37 @@ Možnosti za nadgradnjo in razširitev projekta vključujejo:
 
 ## Podatkovni viri
 
-Pri izdelavi projekta OPSI-CO2 so bili uporabljeni naslednji viri podatkov:
+Pri izdelavi projekta CO2 Odtis so bili uporabljeni naslednji viri podatkov:
 
 ### 🌍 Svetovni podatki o emisijah CO₂
 
-- [Our World in Data – CO₂ Emissions Dataset](https://ourworldindata.org/co2-emissions)
-- [IEA – International Energy Agency](https://www.iea.org/reports/global-energy-co2-status-report-2023)
-- [Global Carbon Atlas](http://www.globalcarbonatlas.org/)
-- [UN Data – Carbon Dioxide Emissions](http://data.un.org/)
+- [Our World in Data – CO₂ Emissions Dataset](https://ourworldindata.org/co2-emissions)  
+  Obsežen in ažuren nabor podatkov o emisijah CO₂ za skoraj vse države sveta, z dolgo zgodovino meritev.
+- [IEA – International Energy Agency](https://www.iea.org/reports/global-energy-co2-status-report-2023)  
+  Uradni podatki o energetski porabi in emisijah s strani mednarodne agencije.
+- [Global Carbon Atlas](http://www.globalcarbonatlas.org/)  
+  Interaktivni atlas za spremljanje globalnih in regionalnih emisij ogljika.
+- [UN Data – Carbon Dioxide Emissions](http://data.un.org/)  
+  Podatki Združenih narodov o izpustih ogljikovega dioksida po državah.
 
 ### 🇸🇮 Slovenski podatki
 
-- [Statistični urad Republike Slovenije (SURS)](https://www.stat.si/)
-- [Agencija RS za okolje (ARSO)](https://www.arso.gov.si/)
+- [Statistični urad Republike Slovenije (SURS)](https://www.stat.si/)  
+  Uradni statistični podatki o različnih okoljskih in energetskih kazalnikih za Slovenijo.
+- [Agencija RS za okolje (ARSO)](https://www.arso.gov.si/)  
+  Okoljski podatki in poročila za Slovenijo, vključno z emisijami in stanjem okolja.
 
 ### 📈 Napovedi emisij
 
-- [Climate Action Tracker – Emission Projections](https://climateactiontracker.org/)
-- [IEA – Global Energy and Climate Model](https://www.iea.org/reports/world-energy-model)
-- [EDGAR – Emissions Database for Global Atmospheric Research](https://edgar.jrc.ec.europa.eu/)
+- [Climate Action Tracker – Emission Projections](https://climateactiontracker.org/)  
+  Neodvisna analiza in projekcije emisij glede na podnebne cilje in politike držav.
+- [IEA – Global Energy and Climate Model](https://www.iea.org/reports/world-energy-model)  
+  Modeli in napovedi za globalno energetsko porabo in emisije CO₂.
+- [EDGAR – Emissions Database for Global Atmospheric Research](https://edgar.jrc.ec.europa.eu/)  
+  Podrobna baza emisijskih podatkov, ki podpira znanstvene študije in politike.
+- [IPCC Data Distribution Centre](https://www.ipcc-data.org/)  
+  Podpora dostopu do podnebnih napovedi in modelov, ki so osnova za globalne emisijske scenarije.
+
 
 ### 💻 Uporabljeni GitHub repozitorij za podatke
 
@@ -144,7 +187,7 @@ Notebook omogoča hitro testiranje in primerjavo metod za napoved emisij do leta
 
 ## Avtorji
 
-Projekt OPSI-CO2 so razvili študenti:
+Projekt CO2 Odtis so razvili študenti:
 
 - **Konstantin Mihajlov**
 - **Anastasija Todorov**

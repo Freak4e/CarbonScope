@@ -236,13 +236,13 @@ function renderMap(regions) {
 
     // Factory markers
     const biggestFactories = [
-        { name: "TEŠ (Thermal Power Plant Šoštanj)", coords: [15.1167, 46.3650], emoji: "🏭" },
-        { name: "Krško Nuclear Power Plant", coords: [15.5050, 45.9490], emoji: "⚛️" },
-        { name: "Salonit Anhovo Cement Plant", coords: [13.6819, 46.1531], emoji: "🏗️" },
-        { name: "Lafarge Cement Plant Trbovlje", coords: [15.0478, 46.1535], emoji: "🏗️" },
-        { name: "Pivka Steelworks", coords: [14.1300, 45.7383], emoji: "🏭" },
-        { name: "Si.mobil (Telekom Slovenia - HQ)", coords: [14.5054, 46.0569], emoji: "🏢" },
-        { name: "Impol Steelworks", coords: [15.4833, 46.5675], emoji: "🏭" }
+    { name: "TEŠ (Thermal Power Plant Šoštanj)", coords: [15.1167, 46.3650], emoji: "🏭", emissions: "3.2 Mt CO₂" },
+    { name: "Krško Nuclear Power Plant", coords: [15.5050, 45.9490], emoji: "⚛️", emissions: "0.1 Mt CO₂" },
+    { name: "Salonit Anhovo Cement Plant", coords: [13.6819, 46.1531], emoji: "🏗️", emissions: "0.9 Mt CO₂" },
+    { name: "Lafarge Cement Plant Trbovlje", coords: [15.0478, 46.1535], emoji: "🏗️", emissions: "0.7 Mt CO₂" },
+    { name: "Pivka Steelworks", coords: [14.1300, 45.7383], emoji: "🏭", emissions: "0.5 Mt CO₂" },
+    { name: "Si.mobil (Telekom Slovenia - HQ)", coords: [14.5054, 46.0569], emoji: "🏢", emissions: "nepomembne emisije" },
+    { name: "Impol Steelworks", coords: [15.4833, 46.5675], emoji: "🏭", emissions: "0.6 Mt CO₂" }
     ];
 
     const factoryGroup = g.append('g').attr('class', 'factory-markers');
@@ -260,18 +260,19 @@ function renderMap(regions) {
         .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'middle')
         .on('click', (event, d) => {
-            event.stopPropagation();
-            if (activeFactory === d.name) {
-                tooltip.style('display', 'none');
-                activeFactory = null;
-            } else {
-                activeFactory = d.name;
-                tooltip.style('display', 'block')
-                    .html(`<strong>${d.name}</strong>`)
-                    .style('left', `${event.pageX + 10}px`)
-                    .style('top', `${event.pageY + 10}px`);
-            }
-        });
+    event.stopPropagation();
+    if (activeFactory === d.name) {
+        tooltip.style('display', 'none');
+        activeFactory = null;
+    } else {
+        activeFactory = d.name;
+        tooltip.style('display', 'block')
+            .html(`<strong>${d.name}</strong><br><span>Letne emisije: ${d.emissions}</span>`)
+            .style('left', `${event.pageX + 10}px`)
+            .style('top', `${event.pageY + 10}px`);
+    }
+});
+
 
     // Clicking elsewhere hides factory tooltip
     d3.select('body').on('click', () => {
