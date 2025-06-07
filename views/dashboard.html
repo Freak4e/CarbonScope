@@ -40,6 +40,48 @@
     .nav-link-pop:hover { transform: scale(1.05); }
     .col-md-8.mx-auto { padding-left: 0; padding-right: 0; }
     #globeContainer svg { width: 100%; height: 100%; }
+
+.calculation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+.download-icon-btn  {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #fff; 
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
+.download-icon-btn1 {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #000000;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease;
+}
+.download-icon-btn:hover,.download-icon-btn1:hover {
+  color: #d1e7ff; 
+}
+
   </style>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <link href="https://demos.creative-tim.com/argon-dashboard-pro/assets/css/nucleo-icons.css" rel="stylesheet" />
@@ -136,7 +178,7 @@
       <ul class="navbar-nav ms-auto justify-content-end">
         <li class="nav-item d-flex align-items-center me-4">
           <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="calculatorButton">
-            <i class="fa fa-calculator fs-4"></i>
+            <i class="fa fa-calculator fs-6"></i>
           </a>
         </li>
         <li class="nav-item d-xl-none ps-3 d-flex align-items-center me-4">
@@ -150,7 +192,7 @@
         </li>
         <li class="nav-item d-flex align-items-center me-4">
           <a href="/?tab=map.html" class="nav-link text-white font-weight-bold px-0 subtab" data-tab="map.html" id="mapTabButton">
-            <i class="fas fa-globe fs-4"></i>
+            <i class="fas fa-globe fs-6"></i>
           </a>
         </li>
       </ul>
@@ -240,65 +282,66 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="row mt-4" id="co2-overview">
-      <div class="col-lg-7 mb-lg-0 mb-4">
-        <div class="card z-index-2 h-100">
-          <div class="card-header pb-0 pt-3 bg-transparent">
-            <h6 class="text-capitalize">CO2 Pregled</h6>
-            <p class="text-sm mb-0"><i class="fa fa-arrow-up text-danger"></i><span class="font-weight-bold">37.4 Gt</span> v letu 2023</p>
+      <div class="row mt-4" id="co2-overview">
+        <div class="col-lg-7 mb-lg-0 mb-4">
+          <div class="card z-index-2 h-100">
+            <div class="card-header pb-0 pt-3 bg-transparent">
+              <h6 class="text-capitalize">CO2 Pregled</h6>
+              <p class="text-sm mb-0"><i class="fa fa-arrow-up text-danger"></i><span class="font-weight-bold">37.4 Gt</span> v letu 2023</p>
+            </div>
+            <div class="card-body p-3">
+              <div class="chart">
+                <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+              </div>
+            </div>
           </div>
-          <div class="card-body p-3">
-            <div class="chart">
-              <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
+        </div>
+        <div class="col-lg-5">
+          <div class="card card-carousel overflow-hidden h-100 p-0">
+            <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
+              <div class="carousel-inner border-radius-lg h-100">
+                <div class="carousel-item h-100 active" style="background-image: url('/img/earth.jpg'); background-size: cover;">
+                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                      <i class="ni ni-camera-compact text-dark opacity-10"></i>
+                    </div>
+                    <h5 class="text-white mb-1">Globalne emisije CO₂</h5>
+                    <p>Globalne emisije CO₂ so leta 2022 dosegle 36,8 gigaton, kar je 54 % več kot leta 2000.</p>
+                  </div>
+                </div>
+                <div class="carousel-item h-100" style="background-image: url('/img/slo2.jpg'); background-size: cover;">
+                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                      <i class="ni ni-bulb-61 text-dark opacity-10"></i>
+                    </div>
+                    <h5 class="text-white mb-1">Emisije CO₂ v Sloveniji</h5>
+                    <p>Slovenija je leta 2022 izpustila 15,2 milijona ton CO₂, kar je rahlo povečanje v primerjavi z letom 2020.</p>
+                  </div>
+                </div>
+                <div class="carousel-item h-100" style="background-image: url('/img/fut5.jpg'); background-size: cover;">
+                  <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                    <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
+                      <i class="ni ni-trophy text-dark opacity-10"></i>
+                    </div>
+                    <h5 class="text-white mb-1">Prihodnost emisij CO₂</h5>
+                    <p>Do leta 2028 Slovenija načrtuje zmanjšanje emisij za 20 % s prehodom na obnovljive vire energije in spodbujanjem trajnostne mobilnosti.</p>
+                  </div>
+                </div>
+              </div>
+              <button class="carousel-control-prev w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Nazaj</span>
+              </button>
+              <button class="carousel-control-next w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Naprej</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-lg-5">
-        <div class="card card-carousel overflow-hidden h-100 p-0">
-          <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
-            <div class="carousel-inner border-radius-lg h-100">
-              <div class="carousel-item h-100 active" style="background-image: url('/img/earth.jpg'); background-size: cover;">
-                <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                  <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                    <i class="ni ni-camera-compact text-dark opacity-10"></i>
-                  </div>
-                  <h5 class="text-white mb-1">Globalne emisije CO₂</h5>
-                  <p>Globalne emisije CO₂ so leta 2022 dosegle 36,8 gigaton, kar je 54 % več kot leta 2000.</p>
-                </div>
-              </div>
-              <div class="carousel-item h-100" style="background-image: url('/img/slo2.jpg'); background-size: cover;">
-                <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                  <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                    <i class="ni ni-bulb-61 text-dark opacity-10"></i>
-                  </div>
-                  <h5 class="text-white mb-1">Emisije CO₂ v Sloveniji</h5>
-                  <p>Slovenija je leta 2022 izpustila 15,2 milijona ton CO₂, kar je rahlo povečanje v primerjavi z letom 2020.</p>
-                </div>
-              </div>
-              <div class="carousel-item h-100" style="background-image: url('/img/fut5.jpg'); background-size: cover;">
-                <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
-                  <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
-                    <i class="ni ni-trophy text-dark opacity-10"></i>
-                  </div>
-                  <h5 class="text-white mb-1">Prihodnost emisij CO₂</h5>
-                  <p>Do leta 2028 Slovenija načrtuje zmanjšanje emisij za 20 % s prehodom na obnovljive vire energije in spodbujanjem trajnostne mobilnosti.</p>
-                </div>
-              </div>
-            </div>
-            <button class="carousel-control-prev w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Nazaj</span>
-            </button>
-            <button class="carousel-control-next w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Naprej</span>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
+   
     <ul class="nav nav-tabs mt-4 justify-content-center" id="dashboardTabs" role="tablist">
       <li class="nav-item">
         <button class="nav-link active" data-tab="overview-svet.html">Pregled</button>
@@ -341,7 +384,7 @@
                     <button type="button" class="btn btn-outline-primary transport-mode" data-mode="cycling" style="padding: 5px 8px; min-width: 40px;">
                       <i class="fas fa-bicycle" style="font-size: 1.2rem;"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
+                    <button type="button" class="btn btn-outline-primary transport-mode active" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
                       <i class="fas fa-car" style="font-size: 1.2rem;"></i>
                     </button>
                   </div>
@@ -349,7 +392,7 @@
                     <button type="button" class="btn btn-outline-primary transport-mode" data-mode="bus" style="padding: 5px 8px; min-width: 40px;">
                       <i class="fas fa-bus" style="font-size: 1.2rem;"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40px;">
+                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40 |px;">
                       <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
                     </button>
                   </div>
@@ -371,9 +414,13 @@
               <div class="col-md-7">
                 <div id="routeMap" style="height: 400px; width: 100%; border-radius: 15px;"></div>
                 <div class="mt-2" id="co2Comparison"></div>
-              </div>
-            </div>
-          </div>
+                <div class="calculation-overlay" id="calculationOverlay" style="display: none;">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Nalagam...</span>
+                  </div>
+                  <p class="mt-2">Računam...</p>
+                </div>
+              </div>    
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
             <button type="button" class="btn btn-primary" id="calculateBtn">Izračunaj</button>
@@ -400,6 +447,8 @@
   <script src="/js/sectorsSvet.js"></script>
   <script src="/js/globe.js"></script>
   <script src="/js/animatedgraph.js"></script>
+  <script src="/js/comparison.js"></script>  <script src="/js/kalkulator.js"></script>
+
   <script src="/js/load-tabs-world.js"></script>
   <script>
     var ctx1 = document.getElementById("chart-line").getContext("2d");
@@ -462,86 +511,79 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
-    const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+  const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
+  const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+  const tabButtons = document.querySelectorAll('#dashboardTabs .nav-link');
 
-    // Handle Svet subtabs
-    svetSubLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const tabName = this.getAttribute('data-tab');
-        const tabButtons = document.querySelectorAll('#dashboardTabs .nav-link');
-
-        // Update sidebar active states
-        svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
-        slovenijaSubLinks.forEach(sublink => sublink.classList.remove('active'));
-        this.classList.add('active');
-
-        // Update navbar active tab
-        tabButtons.forEach(button => {
-          button.classList.remove('active');
-          if (button.getAttribute('data-tab') === tabName) {
-            button.classList.add('active');
-          }
-        });
-
-        // Update URL
-        const href = this.getAttribute('href');
-        history.pushState(null, '', href);
-
-        // Trigger tab content load
-        const targetTabButton = document.querySelector(`#dashboardTabs .nav-link[data-tab="${tabName}"]`);
-        if (targetTabButton) {
-          targetTabButton.click();
-        }
-
-        // Scroll to tabs
-        const tabsElement = document.querySelector('#dashboardTabs');
-        if (tabsElement) {
-          setTimeout(() => {
-            tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 100);
-        }
-      });
-    });
-
-    // Handle Slovenija subtabs
-    slovenijaSubLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const href = this.getAttribute('href');
-        window.location.href = href; // Navigate to slovenia.html
-      });
-    });
-
-    // Handle initial page load for Svet
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab') || 'overview-svet.html';
-    svetSubLinks.forEach(link => {
-      if (link.getAttribute('data-tab') === tab) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
+  // Function to update active states
+  function updateActiveStates(tabName) {
+    // Update sidebar active states
+    svetSubLinks.forEach(sublink => {
+      sublink.classList.toggle('active', sublink.getAttribute('data-tab') === tabName);
     });
     slovenijaSubLinks.forEach(sublink => sublink.classList.remove('active'));
-    const tabButtons = document.querySelectorAll('#dashboardTabs .nav-link');
+
+    // Update navbar active states
     tabButtons.forEach(button => {
-      button.classList.remove('active');
-      if (button.getAttribute('data-tab') === tab) {
-        button.classList.add('active');
-        button.click();
-      }
+      button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
     });
-    if (tab !== 'overview-svet.html') {
+
+    // Update URL
+    history.pushState(null, '', `/?tab=${tabName}`);
+
+    // Scroll to tabs
+    const tabsElement = document.querySelector('#dashboardTabs');
+    if (tabsElement) {
       setTimeout(() => {
-        const tabsElement = document.querySelector('#dashboardTabs');
-        if (tabsElement) {
-          tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
+  }
+
+  // Handle Svet subtabs (sidebar)
+  svetSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      updateActiveStates(tabName);
+
+      // Trigger tab content load
+      const targetTabButton = document.querySelector(`#dashboardTabs .nav-link[data-tab="${tabName}"]`);
+      if (targetTabButton) {
+        targetTabButton.click();
+      }
+    });
   });
+
+  // Handle navbar tabs
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      updateActiveStates(tabName);
+    });
+  });
+
+  // Handle Slovenija subtabs
+  slovenijaSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const href = this.getAttribute('href');
+      window.location.href = href; // Navigate to slovenia.html
+    });
+  });
+
+  // Handle initial page load for Svet
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab') || 'overview-svet.html';
+  updateActiveStates(tab);
+
+  // Trigger tab content load on page load
+  const targetTabButton = document.querySelector(`#dashboardTabs .nav-link[data-tab="${tab}"]`);
+  if (targetTabButton) {
+    targetTabButton.click();
+  }
+});
 </script>
 </body>
 </html>

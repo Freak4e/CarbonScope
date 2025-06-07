@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
   let sectorChart, sectorLineChart, globalSectorChart;
+  let globalSectorData = [];
+  let sectorLineData = [];
+  let sectorData = [];
 
   window.initSectorsTab = async function() {
     const unifiedCountrySelect = $('#unifiedCountrySelect');
@@ -86,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
           plugins: {
             legend: { position: 'top', labels: { boxWidth: 12, padding: 20 } },
             tooltip: { callbacks: { label: context => `${context.dataset.label}: ${context.raw.toFixed(2)} milijonov ton` } },
-            title: { display: true, text: 'Trendi emisij CO₂ po vrsti goriva (1990–2022)', font: { size: 16 } }
+            title: { display: true, text: 'Trendi emisij CO₂ po vrsti goriva (1990-2022)', font: { size: 16 } }
           },
           scales: { y: { title: { display: true, text: 'CO₂ emisije (milijoni ton)' }, beginAtZero: true }, x: { title: { display: true, text: 'Leto' } } },
           interaction: { intersect: false, mode: 'index' }
@@ -115,6 +118,256 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Utility to download CSV
+  function downloadCSV(data, filename, headers, rowFormatter) {
+    console.log('Generating CSV for:', filename, 'Data length:', data.length);
+    let csvContent = headers.join(',') + '\n';
+    data.forEach(row => {
+      try {
+        csvContent += rowFormatter(row) + '\n';
+      } catch (error) {
+        console.warn('Skipping invalid row:', row, error);
+      }
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Download handler for global sector chart
+  window.downloadGlobalSectorCSV = async function(dataType = 'displayed') {
+    const country = $('#unifiedCountrySelect').val() || 'World';
+
+    if (dataType === 'all') {
+      try {
+        const countriesResponse = await fetch('/api/countries');
+        if (!countriesResponse.ok) throw new Error(`Network response: ${countriesResponse.status}`);
+        const allCountries = (await countriesResponse.json()).filter(
+          c => !['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'].includes(c)
+        );
+
+        const allDataPromises = allCountries.map(async c => {
+          try {
+            const response = await fetch(`/api/sector-emissions?entity=${encodeURIComponent(c)}&year=1990:2021`);
+            if (!response.ok) {
+              console.warn(`Failed to fetch data for ${c}: ${response.status}`);
+              return [];
+            }
+            const data = await response.json();
+            return data.filter(d => d.Year != null && d.Entity != null);
+          } catch (error) {
+            console.warn(`Error fetching data for ${c}:`, error);
+            return [];
+          }
+        });
+        const allDataArrays = await Promise.all(allDataPromises);
+        const dataToDownload = allDataArrays.flat();
+        console.log('All global sector data fetched:', dataToDownload.length, 'rows');
+
+        if (dataToDownload.length === 0) {
+          alert('Ni podatkov za prenos. Preverite API povezavo.');
+          return;
+        }
+
+        const columns = [
+          'Entity', 'Code', 'Year',
+          'Carbon dioxide emissions from buildings',
+          'Carbon dioxide emissions from industry',
+          'Carbon dioxide emissions from land use change and forestry',
+          'Carbon dioxide emissions from other fuel combustion',
+          'Carbon dioxide emissions from transport',
+          'Carbon dioxide emissions from manufacturing and construction',
+          'Fugitive emissions of carbon dioxide from energy production',
+          'Carbon dioxide emissions from electricity and heat',
+          'Carbon dioxide emissions from bunker fuels'
+        ];
+        const headers = [
+          'Država', 'Koda', 'Leto',
+          'Zgradbe', 'Industrija', 'Spremembe rabe zemljišč', 'Druga goriva',
+          'Promet', 'Proizvodnja in gradbeništvo', 'Fugitivne emisije',
+          'Elektrika in toplota', 'Bunker goriva'
+        ];
+        const rowFormatter = data => columns.map(col => {
+          const value = data[col];
+          return value != null ? (typeof value === 'number' ? (value / 1000000).toFixed(2) : value.toString().replace(/,/g, '')) : '';
+        }).join(',');
+
+        downloadCSV(dataToDownload, 'co2_emissions_by_sectors.csv', headers, rowFormatter);
+      } catch (error) {
+        console.error('Error downloading all global sector data:', error);
+        alert('Napaka pri prenosu celotnih podatkov.');
+      }
+    } else {
+      if (!country || globalSectorData.length === 0) {
+        alert('Izberite državo ali posodobite graf za prenos prikazanih podatkov.');
+        return;
+      }
+
+      const headers = ['Leto', ...globalSectorChart.data.datasets.map(ds => ds.label.replace(/\s/g, '_'))];
+      const rowFormatter = row => {
+        const values = globalSectorChart.data.datasets.map(ds => {
+          const idx = globalSectorChart.data.labels.indexOf(row.Year);
+          return idx >= 0 ? (ds.data[idx] || 0).toFixed(2) : '0.00';
+        });
+        return `${row.Year},${values.join(',')}`;
+      };
+
+      downloadCSV(
+        globalSectorChart.data.labels.map(year => ({ Year: year })),
+        `co2_sectors_${country}_1990-2021.csv`,
+        headers,
+        rowFormatter
+      );
+    }
+  };
+
+  // Download handler for sector line chart
+  window.downloadSectorLineCSV = async function(dataType = 'displayed') {
+    const country = $('#unifiedCountrySelect').val() || 'World';
+
+    if (dataType === 'all') {
+      try {
+        const countriesResponse = await fetch('/api/countries');
+        if (!countriesResponse.ok) throw new Error(`Network response: ${countriesResponse.status}`);
+        const allCountries = (await countriesResponse.json()).filter(
+          c => !['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'].includes(c)
+        );
+
+        const allDataPromises = allCountries.map(async c => {
+          try {
+            const response = await fetch(`/api/emissions?country=${encodeURIComponent(c)}&startYear=1990&endYear=2022&includeFuel=true`);
+            if (!response.ok) {
+              console.warn(`Failed to fetch data for ${c}: ${response.status}`);
+              return [];
+            }
+            const data = await response.json();
+            return data.filter(d => d.year != null && d.country != null);
+          } catch (error) {
+            console.warn(`Error fetching data for ${c}:`, error);
+            return [];
+          }
+        });
+        const allDataArrays = await Promise.all(allDataPromises);
+        const dataToDownload = allDataArrays.flat();
+        console.log('All sector line data fetched:', dataToDownload.length, 'rows');
+
+        if (dataToDownload.length === 0) {
+          alert('Ni podatkov za prenos. Preverite API povezavo.');
+          return;
+        }
+
+        const columns = ['country', 'year', 'coal_co2', 'oil_co2', 'gas_co2', 'cement_co2', 'flaring_co2', 'other_co2'];
+        const headers = ['Država', 'Leto', 'Premog', 'Nafta', 'Plin', 'Cement', 'Sežiganje', 'Drugo'];
+        const rowFormatter = data => columns.map(col => {
+          const value = data[col];
+          return value != null ? (typeof value === 'number' ? value.toFixed(2) : value.toString().replace(/,/g, '')) : '';
+        }).join(',');
+
+        downloadCSV(dataToDownload, 'co2_fuel_type.csv', headers, rowFormatter);
+      } catch (error) {
+        console.error('Error downloading all sector line data:', error);
+        alert('Napaka pri prenosu celotnih podatkov.');
+      }
+    } else {
+      if (!country || sectorLineData.length === 0) {
+        alert('Izberite državo ali posodobite graf za prenos prikazanih podatkov.');
+        return;
+      }
+
+      const headers = ['Leto', ...sectorLineChart.data.datasets.map(ds => ds.label.replace(/\s/g, '_'))];
+      const rowFormatter = row => {
+        const values = sectorLineChart.data.datasets.map(ds => {
+          const idx = sectorLineChart.data.labels.indexOf(row.year);
+          return idx >= 0 ? (ds.data[idx] || 0).toFixed(2) : '0.00';
+        });
+        return `${row.year},${values.join(',')}`;
+      };
+
+      downloadCSV(
+        sectorLineData,
+        `co2_fuel_type_${country}_1990-2022.csv`,
+        headers,
+        rowFormatter
+      );
+    }
+  };
+
+  // Download handler for sector chart
+  window.downloadSectorCSV = async function(dataType = 'displayed') {
+    const country = $('#unifiedCountrySelect').val() || 'World';
+    const year = 2022;
+
+    if (dataType === 'all') {
+      try {
+        const countriesResponse = await fetch('/api/countries');
+        if (!countriesResponse.ok) throw new Error(`Network response: ${countriesResponse.status}`);
+        const allCountries = (await countriesResponse.json()).filter(
+          c => !['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'].includes(c)
+        );
+
+        const allDataPromises = allCountries.map(async c => {
+          try {
+            const response = await fetch(`/api/emissions?country=${encodeURIComponent(c)}&startYear=1990&endYear=2022&includeFuel=true`);
+            if (!response.ok) {
+              console.warn(`Failed to fetch data for ${c}: ${response.status}`);
+              return [];
+            }
+            const data = await response.json();
+            return data.filter(d => d.year != null && d.country != null);
+          } catch (error) {
+            console.warn(`Error fetching data for ${c}:`, error);
+            return [];
+          }
+        });
+        const allDataArrays = await Promise.all(allDataPromises);
+        const dataToDownload = allDataArrays.flat();
+        console.log('All sector data fetched:', dataToDownload.length, 'rows');
+
+        if (dataToDownload.length === 0) {
+          alert('Ni podatkov za prenos. Preverite API povezavo.');
+          return;
+        }
+
+        const columns = ['country', 'year', 'coal_co2', 'oil_co2', 'gas_co2', 'cement_co2', 'flaring_co2', 'other_co2'];
+        const headers = ['Država', 'Leto', 'Premog', 'Nafta', 'Plin', 'Cement', 'Sežiganje', 'Drugo'];
+        const rowFormatter = data => columns.map(col => {
+          const value = data[col];
+          return value != null ? (typeof value === 'number' ? value.toFixed(2) : value.toString().replace(/,/g, '')) : '';
+        }).join(',');
+
+        downloadCSV(dataToDownload, 'sector_data.csv', headers, rowFormatter);
+      } catch (error) {
+        console.error('Error downloading all sector data:', error);
+        alert('Napaka pri prenosu celotnih podatkov.');
+      }
+    } else {
+      if (!country || sectorData.length === 0) {
+        alert('Izberite državo ali posodobite graf za prenos prikazanih podatkov.');
+        return;
+      }
+
+      const headers = ['Sektor', 'CO2_Emisije_milijonov_ton'];
+      const rowFormatter = row => `${row.label.replace(/\s/g, '_')},${row.value.toFixed(2)}`;
+
+      downloadCSV(
+        sectorChart.data.labels.map((label, idx) => ({
+          label,
+          value: sectorChart.data.datasets[0].data[idx] || 0
+        })),
+        `sector_${country}_2022.csv`,
+        headers,
+        rowFormatter
+      );
+    }
+  };
+
   async function updateAllSectorCharts(country) {
     await Promise.all([
       updateSectorChart(country, 2022),
@@ -129,15 +382,20 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const response = await fetch(`/api/sectors/${encodeURIComponent(country)}?year=${year}`);
       if (!response.ok) throw new Error(`Network response: ${response.status}`);
-      const sectorData = await response.json();
+      const data = await response.json();
 
-      const sectorLabels = Object.keys(sectorData.sectors).map(s =>
+      const sectorLabels = Object.keys(data.sectors).map(s =>
         s.replace(/_co2$/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
       );
 
+      sectorData = sectorLabels.map((label, idx) => ({
+        label,
+        value: Object.values(data.sectors)[idx] || 0
+      }));
+
       sectorChart.data.labels = sectorLabels;
       sectorChart.data.datasets = [{
-        data: Object.values(sectorData.sectors),
+        data: Object.values(data.sectors),
         backgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0', '#FFCE56', '#9966FF', '#FF9F40', '#E7E9ED', '#F7464A'],
         borderColor: '#fff',
         borderWidth: 1
@@ -145,12 +403,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
       sectorChart.options.plugins.title.text = `Emisije CO₂ po sektorjih v ${country} (${year})`;
       sectorChart.update();
-    }catch (error) {
+    } catch (error) {
       console.error(`Error loading sector data for ${country}:`, error);
       sectorChart.data.labels = [];
       sectorChart.data.datasets = [];
       sectorChart.options.plugins.title.text = `Podatki za ${country} niso na voljo`;
       sectorChart.update();
+      sectorData = [];
     }
   }
 
@@ -164,14 +423,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (!emissionsData || emissionsData.length === 0) throw new Error('No data returned');
 
-      const sectorData = await Promise.all(
+      const sectorDataResponses = await Promise.all(
         emissionsData.map(async yearData => (await fetch(`/api/sectors/${encodeURIComponent(country)}?year=${yearData.year}`)).json())
       );
 
-      const combinedData = emissionsData.map((yearData, index) => ({
+      const combinedData = emissionsData.map((yearData, idx) => ({
         year: yearData.year,
-        ...sectorData[index].sectors
+        ...sectorDataResponses[idx].sectors
       }));
+
+      sectorLineData = combinedData;
 
       const sectors = [
         { key: 'coal_co2', label: 'Premog', color: '#FF6384' },
@@ -202,6 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
       sectorLineChart.data.datasets = [];
       sectorLineChart.options.plugins.title.text = `Podatki za ${country} niso na voljo`;
       sectorLineChart.update();
+      sectorLineData = [];
     }
   }
 
@@ -211,11 +473,13 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       const response = await fetch(`/api/sector-emissions?entity=${encodeURIComponent(country)}&year=1990:2021`);
       if (!response.ok) throw new Error(`Network response: ${response.status}`);
-      const sectorData = await response.json();
+      const data = await response.json();
 
-      if (!sectorData || sectorData.length === 0) throw new Error('No data returned');
+      if (!data || data.length === 0) throw new Error('No data returned');
 
-      const availableYears = [...new Set(sectorData.map(d => parseInt(d.Year)))].sort((a, b) => a - b);
+      globalSectorData = data;
+
+      const availableYears = [...new Set(data.map(d => parseInt(d.Year)))].sort((a, b) => a - b);
 
       const sectors = [
         { key: 'Carbon dioxide emissions from buildings', label: 'Zgradbe', color: '#FF6384' },
@@ -232,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const datasets = sectors.map(sector => ({
         label: sector.label,
         data: availableYears.map(year => {
-          const record = sectorData.find(d => parseInt(d.Year) === year);
+          const record = data.find(d => parseInt(d.Year) === year);
           const value = record && record[sector.key] ? parseFloat(record[sector.key]) : null;
           return isNaN(value) ? null : value / 1000000;
         }),
@@ -256,6 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
       globalSectorChart.data.datasets = [];
       globalSectorChart.options.plugins.title.text = `Podatki za ${country} niso na voljo`;
       globalSectorChart.update();
+      globalSectorData = [];
     }
   }
 
@@ -265,18 +530,21 @@ document.addEventListener('DOMContentLoaded', function() {
       sectorChart.data.datasets = [];
       sectorChart.options.plugins.title.text = 'Izberi državo za prikaz emisij po sektorjih';
       sectorChart.update();
+      sectorData = [];
     }
     if (sectorLineChart) {
       sectorLineChart.data.labels = [];
       sectorLineChart.data.datasets = [];
       sectorLineChart.options.plugins.title.text = 'Izberi državo za prikaz trendov po vrsti goriva';
       sectorLineChart.update();
+      sectorLineData = [];
     }
-    if (globalSectorCanvas) {
+    if (globalSectorChart) {
       globalSectorChart.data.labels = [];
       globalSectorChart.data.datasets = [];
       globalSectorChart.options.plugins.title.text = 'Izberi državo za prikaz globalnih emisij po sektorjih';
       globalSectorChart.update();
+      globalSectorData = [];
     }
   }
 

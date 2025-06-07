@@ -1,72 +1,44 @@
-console.log('sloveniamap.js loaded at', new Date().toISOString());
-
-let isMapInitialized = false;
-
-function initializeSloveniaMap() {
-    if (isMapInitialized) {
-        console.log('Slovenia map already initialized.');
-        return;
-    }
-    isMapInitialized = true;
-
-    console.log('Initializing Slovenia map...');
-
-    // DOM elements
-    const sloveniaContainer = document.getElementById('sloveniaContainer');
+async function initializeSloveniaMap() {
+    console.log('Inicializacija zemljevida Slovenije...', new Date().toISOString());
+    const loadingIndicator = document.getElementById('sloveniaContainer');
     const legendContainer = document.getElementById('legendContainer');
     const legend = document.getElementById('legend');
-
-    
-    console.log('Legend element:', legend);
-    console.log('Legend size:', legend.clientWidth, legend.clientHeight);
-
-
-    const svg = legend.querySelector('svg');
-    console.log('SVG inside legend:', svg);
-    console.log('SVG children count:', svg ? svg.children.length : 0);
-
-    if(svg) {
-    console.log('Circles:', svg.querySelectorAll('circle').length);
-    console.log('Texts:', svg.querySelectorAll('text').length);
-}
-
-
-
+ 
     // Validate DOM elements
-    if (!sloveniaContainer || !legendContainer || !legend) {
-        console.error('Slovenia map elements missing:', {
-            sloveniaContainer: !!sloveniaContainer,
+    if (!loadingIndicator || !legendContainer || !legend) {
+        console.error('Manjkajo elementi zemljevida:', {
+            sloveniaContainer: !!loadingIndicator,
             legendContainer: !!legendContainer,
             legend: !!legend
         });
-        if (sloveniaContainer) {
-            sloveniaContainer.innerHTML = '<p style="color: #fff;">Error: Map elements not found.</p>';
+        if (loadingIndicator) {
+            loadingIndicator.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle fa-sm me-2"></i>
+                    Napaka: Elementi zemljevida niso najdeni.
+                </div>`;
         }
         return;
     }
-
-    console.log('DOM elements found, proceeding...');
-
-    // Set container styles
-    sloveniaContainer.style.overflow = 'hidden';
-
+ 
+    loadingIndicator.innerHTML = '<p style="color: #fff;">Nalaganje...</p>';
+ 
     // CO2 data for Slovenia's statistical regions (2022 estimates)
     const sloveniaCo2Data = [
-    { region_code: 'SI031', region: 'Osrednjeslovenska', co2_per_capita: 6.8, co2: 3.88, population: 570000 },
-    { region_code: 'SI041', region: 'Podravska', co2_per_capita: 6.8, co2: 2.17, population: 320000 },
-    { region_code: 'SI042', region: 'Savinjska', co2_per_capita: 6.6, co2: 1.71, population: 260000 },
-    { region_code: 'SI021', region: 'Primorsko-notranjska', co2_per_capita: 6.5, co2: 0.78, population: 120000 },
-    { region_code: 'SI032', region: 'Zasavska', co2_per_capita: 6.4, co2: 0.32, population: 50000 },
-    { region_code: 'SI033', region: 'Posavska', co2_per_capita: 6.4, co2: 0.45, population: 70000 },
-    { region_code: 'SI034', region: 'Jugovzhodna Slovenija', co2_per_capita: 6.5, co2: 0.78, population: 120000 },
-    { region_code: 'SI022', region: 'Notranjsko-kraška', co2_per_capita: 6.3, co2: 0.33, population: 53000 },
-    { region_code: 'SI043', region: 'Koroška', co2_per_capita: 6.3, co2: 0.44, population: 70000 },
-    { region_code: 'SI044', region: 'Gorenjska', co2_per_capita: 6.6, co2: 1.06, population: 160000 },
-    { region_code: 'SI011', region: 'Pomurska', co2_per_capita: 6.4, co2: 0.76, population: 119000 },
-    { region_code: 'SI012', region: 'Goriška', co2_per_capita: 6.5, co2: 0.78, population: 120000 }
+        { region_code: 'SI031', region: 'Osrednjeslovenska', co2_per_capita: 6.8, co2: 3.88, population: 570000 },
+        { region_code: 'SI041', region: 'Podravska', co2_per_capita: 6.8, co2: 2.17, population: 320000 },
+        { region_code: 'SI042', region: 'Savinjska', co2_per_capita: 6.6, co2: 1.71, population: 260000 },
+        { region_code: 'SI021', region: 'Primorsko-notranjska', co2_per_capita: 6.5, co2: 0.78, population: 120000 },
+        { region_code: 'SI032', region: 'Zasavska', co2_per_capita: 6.4, co2: 0.32, population: 50000 },
+        { region_code: 'SI033', region: 'Posavska', co2_per_capita: 6.4, co2: 0.45, population: 70000 },
+        { region_code: 'SI034', region: 'Jugovzhodna Slovenija', co2_per_capita: 6.5, co2: 0.78, population: 120000 },
+        { region_code: 'SI022', region: 'Notranjsko-kraška', co2_per_capita: 6.3, co2: 0.33, population: 53000 },
+        { region_code: 'SI043', region: 'Koroška', co2_per_capita: 6.3, co2: 0.44, population: 70000 },
+        { region_code: 'SI044', region: 'Gorenjska', co2_per_capita: 6.6, co2: 1.06, population: 160000 },
+        { region_code: 'SI011', region: 'Pomurska', co2_per_capita: 6.4, co2: 0.76, population: 119000 },
+        { region_code: 'SI012', region: 'Goriška', co2_per_capita: 6.5, co2: 0.78, population: 120000 }
     ];
-
-
+ 
     // Mock historical CO2 data (2000–2022)
     const historicalCo2 = {};
     sloveniaCo2Data.forEach(item => {
@@ -79,73 +51,68 @@ function initializeSloveniaMap() {
             { year: 2022, co2: item.co2 }
         ];
     });
-
+ 
     let regionCo2 = {};
     let chartInstances = {};
-
-async function initMap() {
-    console.log('Fetching Slovenia GeoJSON from API endpoint...');
-    sloveniaContainer.innerHTML = '<p style="color: #fff;">Loading...</p>';
-
+ 
     try {
-        // Fetch from API endpoint instead of direct file
+        // Fetch GeoJSON data
+        console.log('Pridobivanje GeoJSON podatkov iz API-ja...');
         const response = await fetch('/api/slovenia-geojson');
-        if (!response.ok) throw new Error(`GeoJSON fetch failed: ${response.status} ${response.statusText}`);
+        if (!response.ok) throw new Error(`Napaka pri pridobivanju GeoJSON: ${response.status} ${response.statusText}`);
         const regions = await response.json();
-        console.log('GeoJSON loaded from API:', regions);
-
-        // Log the first few features' properties for debugging
-        if (regions.features && regions.features.length > 0) {
-            console.log('Sample GeoJSON properties:', regions.features.slice(0, 3).map(f => f.properties));
-        } else {
-            console.warn('GeoJSON has no features.');
-        }
-
-        // Prepare CO2 data (unchanged)
-        regionCo2 = {};
-        sloveniaCo2Data.forEach(item => {
-            regionCo2[item.region_code] = {
+        console.log('GeoJSON naložen:', regions);
+ 
+        // Prepare CO2 data
+        regionCo2 = sloveniaCo2Data.reduce((acc, item) => {
+            acc[item.region_code] = {
                 name: item.region,
                 value: item.co2_per_capita,
                 total_co2: item.co2,
                 population: item.population
             };
-        });
-
-        renderMap(regions);
+            return acc;
+        }, {});
+ 
+        // Hide loading indicator and show content
+        loadingIndicator.style.display = 'block';
+        legendContainer.style.display = 'block';
+ 
+        // Render map and legend
+        renderMap(regions, loadingIndicator, legend, regionCo2, historicalCo2, chartInstances);
+        renderLegend(legend, regionCo2);
     } catch (error) {
-        console.error('Map init error:', error);
-        sloveniaContainer.innerHTML = `
-            <p style="color: #fff;">
-                Error loading map data from API. Please try again later.
-                <br>Technical details: ${error.message}
-            </p>`;
+        console.error('Napaka pri inicializaciji zemljevida:', error);
+        loadingIndicator.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle fa-sm me-2"></i>
+                Napaka pri nalaganju podatkov zemljevida: ${error.message}
+            </div>`;
     }
 }
-function renderMap(regions) {
-    console.log('Rendering Slovenia map...');
-    sloveniaContainer.innerHTML = '';
-    legendContainer.style.display = 'block';
-
-    const width = Math.max(sloveniaContainer.clientWidth, 800);
-    const height = sloveniaContainer.clientHeight * 0.9;
-    console.log('Map dimensions:', { width, height });
-
-    const svg = d3.select(sloveniaContainer)
+ 
+function renderMap(regions, container, legend, regionCo2, historicalCo2, chartInstances) {
+    console.log('Risanje zemljevida Slovenije...');
+    container.innerHTML = '';
+ 
+    const width = Math.max(container.clientWidth, 800);
+    const height = container.clientHeight * 0.9;
+ 
+    const svg = d3.select(container)
         .append('svg')
         .attr('width', width)
         .attr('height', height);
-
+ 
     svg.append('defs')
         .append('clipPath')
         .attr('id', 'slovenia-clip')
         .append('rect')
         .attr('width', width)
         .attr('height', height);
-
+ 
     const g = svg.append('g')
         .attr('clip-path', 'url(#slovenia-clip)');
-
+ 
     const tooltip = d3.select('body')
         .append('div')
         .attr('id', 'sloveniaTooltip')
@@ -157,29 +124,29 @@ function renderMap(regions) {
         .style('font-size', '12px')
         .style('pointer-events', 'none')
         .style('display', 'none')
-        .style('z-index', '10')
+        .style('z-index', '1000')
         .style('box-shadow', '0 2px 8px rgba(0,0,0,0.1)')
         .style('max-width', '250px');
-
+ 
     const projection = d3.geoMercator()
         .scale(width * 15)
         .translate([width / 2, height / 2])
         .center([14.9955, 46.1512]);
-
+ 
     const path = d3.geoPath().projection(projection);
-
+ 
     const maxCo2 = Math.max(...Object.values(regionCo2).map(d => d.value || 0), 1);
     const colorScale = d3.scaleLinear()
-    .domain([0, maxCo2 * 0.5, maxCo2])
-    .range(["#d4f0ff", "#2c7fb8", "#081d58"]);  // Light blue → medium → dark blue
-
+        .domain([0, maxCo2 * 0.5, maxCo2])
+        .range(["#d4f0ff", "#2c7fb8", "#081d58"]);
+ 
     const zoom = d3.zoom()
         .scaleExtent([1, 8])
         .translateExtent([[0, 0], [width, height]])
         .on('zoom', (event) => g.attr('transform', event.transform));
-
+ 
     svg.call(zoom);
-
+ 
     const codeMapping = {
         'Osrednjeslovenska': 'SI031',
         'Podravska': 'SI041',
@@ -194,37 +161,35 @@ function renderMap(regions) {
         'Pomurska': 'SI011',
         'Goriška': 'SI012'
     };
-
-    // Track factory tooltip separately
+ 
     let activeFactory = null;
-
-    const paths = g.selectAll('path')
+ 
+    g.selectAll('path')
         .data(regions.features)
         .enter()
         .append('path')
         .attr('d', d => path(d) || null)
         .attr('fill', d => {
-            let code = codeMapping[d.properties.region];
-            if (!code || !regionCo2[code]) return '#cccccc';
-            return colorScale(regionCo2[code].value || 0);
+            const code = codeMapping[d.properties.region];
+            return code && regionCo2[code] ? colorScale(regionCo2[code].value || 0) : '#cccccc';
         })
         .attr('stroke', '#000')
         .attr('stroke-width', 0.5)
         .on('mouseover', function(event, d) {
-            if (activeFactory) return;  // Skip hover if factory tooltip active
-            let code = codeMapping[d.properties.region];
+            if (activeFactory) return;
+            const code = codeMapping[d.properties.region];
             if (!code || !regionCo2[code]) return;
             d3.select(this).attr('fill', '#ff0000');
-            showTooltip(regionCo2[code], historicalCo2[code], event, tooltip, projection, path, d);
+            showTooltip(regionCo2[code], historicalCo2[code], event, tooltip, projection, path, d, chartInstances);
         })
-        .on('mousemove', function(event, d) {
+        .on('mousemove', function(event) {
             if (activeFactory) return;
             tooltip.style('left', `${event.pageX + 10}px`)
                    .style('top', `${event.pageY + 10}px`);
         })
         .on('mouseout', function(event, d) {
             if (activeFactory) return;
-            let code = codeMapping[d.properties.region];
+            const code = codeMapping[d.properties.region];
             if (!code || !regionCo2[code]) return;
             d3.select(this).attr('fill', colorScale(regionCo2[code].value || 0));
             tooltip.style('display', 'none');
@@ -233,20 +198,18 @@ function renderMap(regions) {
                 delete chartInstances[code];
             }
         });
-
-    // Factory markers
+ 
     const biggestFactories = [
-    { name: "TEŠ (Thermal Power Plant Šoštanj)", coords: [15.1167, 46.3650], emoji: "🏭", emissions: "3.2 Mt CO₂" },
-    { name: "Krško Nuclear Power Plant", coords: [15.5050, 45.9490], emoji: "⚛️", emissions: "0.1 Mt CO₂" },
-    { name: "Salonit Anhovo Cement Plant", coords: [13.6819, 46.1531], emoji: "🏗️", emissions: "0.9 Mt CO₂" },
-    { name: "Lafarge Cement Plant Trbovlje", coords: [15.0478, 46.1535], emoji: "🏗️", emissions: "0.7 Mt CO₂" },
-    { name: "Pivka Steelworks", coords: [14.1300, 45.7383], emoji: "🏭", emissions: "0.5 Mt CO₂" },
-    { name: "Si.mobil (Telekom Slovenia - HQ)", coords: [14.5054, 46.0569], emoji: "🏢", emissions: "nepomembne emisije" },
-    { name: "Impol Steelworks", coords: [15.4833, 46.5675], emoji: "🏭", emissions: "0.6 Mt CO₂" }
+        { name: "TEŠ (Termoelektrarna Šoštanj)", coords: [15.1167, 46.3650], emoji: "🏭" },
+        { name: "Nuklearna elektrarna Krško", coords: [15.5050, 45.9490], emoji: "⚛️" },
+        { name: "Cementarna Salonit Anhovo", coords: [13.6819, 46.1531], emoji: "🏗️" },
+        { name: "Cementarna Lafarge Trbovlje", coords: [15.0478, 46.1535], emoji: "🏗️" },
+        { name: "Jeklarna Pivka", coords: [14.1300, 45.7383], emoji: "🏭" },
+        { name: "Si.mobil (Telekom Slovenija - HQ)", coords: [14.5054, 46.0569], emoji: "🏢" },
+        { name: "Jeklarna Impol", coords: [15.4833, 46.5675], emoji: "🏭" }
     ];
-
+ 
     const factoryGroup = g.append('g').attr('class', 'factory-markers');
-
     factoryGroup.selectAll('text')
         .data(biggestFactories)
         .enter()
@@ -260,33 +223,30 @@ function renderMap(regions) {
         .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'middle')
         .on('click', (event, d) => {
-    event.stopPropagation();
-    if (activeFactory === d.name) {
-        tooltip.style('display', 'none');
-        activeFactory = null;
-    } else {
-        activeFactory = d.name;
-        tooltip.style('display', 'block')
-            .html(`<strong>${d.name}</strong><br><span>Letne emisije: ${d.emissions}</span>`)
-            .style('left', `${event.pageX + 10}px`)
-            .style('top', `${event.pageY + 10}px`);
-    }
-});
-
-
-    // Clicking elsewhere hides factory tooltip
+            event.stopPropagation();
+            if (activeFactory === d.name) {
+                tooltip.style('display', 'none');
+                activeFactory = null;
+            } else {
+                activeFactory = d.name;
+                tooltip.style('display', 'block')
+                    .html(`<strong>${d.name}</strong>`)
+                    .style('left', `${event.pageX + 10}px`)
+                    .style('top', `${event.pageY + 10}px`);
+            }
+        });
+ 
     d3.select('body').on('click', () => {
         if (activeFactory) {
             tooltip.style('display', 'none');
             activeFactory = null;
         }
     });
-
-    renderLegend(colorScale, maxCo2);
-
+ 
+    // Handle window resize
     window.addEventListener('resize', () => {
-        const newWidth = sloveniaContainer.clientWidth;
-        const newHeight = sloveniaContainer.clientHeight * 0.9;
+        const newWidth = container.clientWidth;
+        const newHeight = container.clientHeight * 0.9;
         svg.attr('width', newWidth).attr('height', newHeight);
         svg.select('#slovenia-clip rect')
             .attr('width', newWidth)
@@ -294,40 +254,39 @@ function renderMap(regions) {
         projection.scale(newWidth * 15)
             .translate([newWidth / 2, newHeight / 2]);
         g.selectAll('path').attr('d', path);
+        factoryGroup.selectAll('text')
+            .attr('x', d => projection(d.coords)[0])
+            .attr('y', d => projection(d.coords)[1]);
         svg.call(zoom.transform, d3.zoomIdentity);
     });
 }
-
-function renderLegend(colorScale, maxValue) {
-    console.log('Rendering legend...');
+ 
+function renderLegend(legend, regionCo2) {
+    console.log('Risanje legende...');
     legend.innerHTML = '';
-
-    // Create and append the legend title
+ 
     const title = document.createElement('div');
     title.textContent = 'CO₂ emisije na prebivalca (tone)';
     title.style.color = '#fff';
     title.style.fontWeight = 'bold';
     title.style.marginBottom = '10px';
     legend.appendChild(title);
-
-    // Measure the legend container width after adding the title
+ 
     const containerWidth = legend.clientWidth || 200;
-    console.log('Legend container width:', containerWidth);
-
-    // Append the SVG with explicit width and height
     const svg = d3.select(legend)
         .append('svg')
         .attr('width', containerWidth)
         .attr('height', 50);
-
-    // Create the legend steps and values
+ 
+    const maxCo2 = Math.max(...Object.values(regionCo2).map(d => d.value || 0), 1);
     const steps = 5;
-    const values = d3.range(0, maxValue + (maxValue / steps), maxValue / steps);
+    const values = d3.range(0, maxCo2 + (maxCo2 / steps), maxCo2 / steps);
     const spacing = containerWidth / values.length;
-    console.log('Values:', values);
-    console.log('Spacing:', spacing);
-
-    // Append circles for each legend value
+ 
+    const colorScale = d3.scaleLinear()
+        .domain([0, maxCo2 * 0.5, maxCo2])
+        .range(["#d4f0ff", "#2c7fb8", "#081d58"]);
+ 
     svg.selectAll('circle')
         .data(values)
         .enter()
@@ -336,8 +295,7 @@ function renderLegend(colorScale, maxValue) {
         .attr('cy', 20)
         .attr('r', 10)
         .attr('fill', d => colorScale(d));
-
-    // Append text labels below each circle
+ 
     svg.selectAll('text')
         .data(values)
         .enter()
@@ -349,46 +307,49 @@ function renderLegend(colorScale, maxValue) {
         .attr('font-size', '12px')
         .text(d => d.toFixed(1));
 }
-
-
-    function showTooltip(data, historical, event, tooltip, projection, path, region) {
+ 
+function showTooltip(data, historical, event, tooltip, projection, path, region, chartInstances) {
     if (!data || !historical) {
         tooltip.style('display', 'none');
         return;
     }
-
+ 
     const chartId = `slovenia-co2-chart-${data.name.replace(/\s/g, '-')}`;
     const years = historical.map(d => d.year);
     const co2Values = historical.map(d => d.co2);
-
+ 
     const content = `
-        <h5 style="margin: 0 0 5px; font-size: 14px; color: #2d3748; font-weight: 700;">${data.name}</h5>
-        <table style="font-size: 12px; color: #2d3748; margin-bottom: 8px;">
-            <tr><td>CO₂ na prebivalca:</td><td style="padding-left: 8px;">${data.value.toFixed(2)} ton</td></tr>
-            <tr><td>Skupaj CO₂:</td><td style="padding-left: 8px;">${data.total_co2.toFixed(2)} Mt</td></tr>
-            <tr><td>Prebivalstvo:</td><td style="padding-left: 8px;">${data.population.toLocaleString()}</td></tr>
-        </table>
-        <div style="margin-top: 8px;">
-            <canvas id="${chartId}" style="width: 200px; height: 100px;"></canvas>
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white py-2">
+                <h5 class="mb-0 fs-6">${data.name}</h5>
+            </div>
+            <div class="card-body p-3">
+                <p class="mb-1"><strong>CO₂ na prebivalca:</strong> ${data.value.toFixed(2)} ton</p>
+                <p class="mb-1"><strong>Skupaj CO₂:</strong> ${data.total_co2.toFixed(2)} Mt</p>
+                <p class="mb-0"><strong>Prebivalstvo:</strong> ${data.population.toLocaleString()}</p>
+                <div style="margin-top: 8px;">
+                    <canvas id="${chartId}" style="width: 200px; height: 100px;"></canvas>
+                </div>
+            </div>
         </div>
     `;
     tooltip.html(content);
-
+ 
     const centroid = path.centroid(region);
     if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) {
         tooltip.style('display', 'none');
         return;
     }
-
+ 
     const [x, y] = centroid;
     const tooltipWidth = tooltip.node().offsetWidth;
     const tooltipHeight = tooltip.node().offsetHeight;
-
+ 
     tooltip
         .style('left', `${x - tooltipWidth / 2}px`)
         .style('top', `${y - tooltipHeight - 10}px`)
         .style('display', 'block');
-
+ 
     setTimeout(() => {
         const ctx = document.getElementById(chartId)?.getContext('2d');
         if (ctx) {
@@ -439,82 +400,16 @@ function renderLegend(colorScale, maxValue) {
                 }
             });
         } else {
-            console.error('No canvas for chart ID:', chartId);
+            console.error('Ni najdenega platna za grafikon:', chartId);
         }
     }, 0);
 }
-
-    // Call initMap directly
-    try {
-        console.log('Calling initMap directly...');
-        initMap();
-    } catch (error) {
-        console.error('Error in initMap:', error);
-    }
-}
-
-// Wait for DOM elements to be available
-function waitForMapElements() {
-    const sloveniaContainer = document.getElementById('sloveniaContainer');
-    if (sloveniaContainer) {
-        console.log('sloveniaContainer found, initializing map...');
-        initializeSloveniaMap();
-    } else {
-        console.log('sloveniaContainer not found, setting up observer...');
-        const observer = new MutationObserver((mutations, obs) => {
-            const container = document.getElementById('sloveniaContainer');
-            if (container) {
-                console.log('sloveniaContainer appeared in DOM, initializing map...');
-                obs.disconnect();
-                initializeSloveniaMap();
-            }
-        });
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    }
-}
-
-// Optional: Clear previous map (e.g., when switching tabs)
-function destroySloveniaMap() {
-    const sloveniaContainer = document.getElementById('sloveniaContainer');
-    if (sloveniaContainer) {
-        sloveniaContainer.innerHTML = '';
-    }
-    const legendContainer = document.getElementById('legendContainer');
-    if (legendContainer) {
-        legendContainer.style.display = 'none';
-    }
-    for (const key in chartInstances) {
-        if (chartInstances[key]) {
-            chartInstances[key].destroy();
-            delete chartInstances[key];
-        }
-    }
-    isMapInitialized = false;
-    console.log('Slovenia map destroyed.');
-}
-
-// Optional: debounce helper for resize throttling
-function debounce(fn, delay) {
-    let timer;
-    return (...args) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => fn.apply(this, args), delay);
-    };
-}
-
-// Export for external use if needed
-window.SloveniaMap = {
-    init: waitForMapElements,
-    destroy: destroySloveniaMap
-};
-
-// Auto-run if script loaded after DOMContentLoaded
+ 
+// Initialize map when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', waitForMapElements);
+    document.addEventListener('DOMContentLoaded', initializeSloveniaMap);
 } else {
-    waitForMapElements();
+    initializeSloveniaMap();
 }
-
+ 
+window.initializeSloveniaMap = initializeSloveniaMap;

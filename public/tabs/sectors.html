@@ -32,8 +32,17 @@
       <strong>sprememb rabe zemljišč</strong>, predvsem zaradi krčenja gozdov.
     </p>
     <div class="card shadow-sm">
-      <div class="card-header bg-transparent">
+      <div class="card-header bg-transparent position-relative">
         <h5 class="mb-0">Globalne emisije CO₂ po sektorjih (1990–2021)</h5>
+        <div class="dropdown">
+          <button class="download-icon-btn1" type="button" id="downloadGlobalSector" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Prenesi CSV podatke za globalne emisije po sektorjih">
+            <i class="fas fa-download"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="downloadGlobalSector">
+            <li><a class="dropdown-item" href="#" onclick="downloadGlobalSectorCSV('all')">Prenesi celotne podatke</a></li>
+            <li><a class="dropdown-item" href="#" onclick="downloadGlobalSectorCSV('displayed')">Prenesi prikazane podatke</a></li>
+          </ul>
+        </div>
       </div>
       <div class="card-body">
         <div class="chart-container" style="position: relative; height: 400px;">
@@ -53,8 +62,17 @@
       naftnimi viri imajo visoke emisije iz <strong>sežiganja odvečnih plinov</strong>.
     </p>
     <div class="card shadow-sm">
-      <div class="card-header bg-transparent">
+      <div class="card-header bg-transparent position-relative">
         <h5 class="mb-0">Trendi emisij CO₂ po vrstah goriva (1990–2022)</h5>
+        <div class="dropdown">
+          <button class="download-icon-btn1" type="button" id="downloadSectorLine" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Prenesi CSV podatke za emisije po vrsti goriva">
+            <i class="fas fa-download"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="downloadSectorLine">
+            <li><a class="dropdown-item" href="#" onclick="downloadSectorLineCSV('all')">Prenesi celotne podatke</a></li>
+            <li><a class="dropdown-item" href="#" onclick="downloadSectorLineCSV('displayed')">Prenesi prikazane podatke</a></li>
+          </ul>
+        </div>
       </div>
       <div class="card-body">
         <div class="chart-container" style="position: relative; height: 400px;">
@@ -84,6 +102,18 @@
   </div>
   <div class="col-md-6">
     <div class="card h-100 shadow-sm">
+      <div class="card-header bg-transparent position-relative">
+        <h5 class="mb-0">Emisije CO₂ po sektorjih</h5>
+        <div class="dropdown">
+          <button class="download-icon-btn1" type="button" id="downloadSector" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Prenesi CSV podatke za emisije po sektorjih">
+            <i class="fas fa-download"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="downloadSector">
+            <li><a class="dropdown-item" href="#" onclick="downloadSectorCSV('all')">Prenesi celotne podatke</a></li>
+            <li><a class="dropdown-item" href="#" onclick="downloadSectorCSV('displayed')">Prenesi prikazane podatke</a></li>
+          </ul>
+        </div>
+      </div>
       <div class="card-body pt-3">
         <div class="chart-container" style="position: relative; height: 400px;">
           <canvas id="sectorChart"></canvas>
@@ -92,24 +122,8 @@
     </div>
   </div>
 </div>
-  <script src="/js/core/popper.min.js"></script>
-  <script src="/js/core/bootstrap.min.js"></script>
-  <script src="/js/plugins/perfect-scrollbar.min.js"></script>
-  <script src="/js/plugins/smooth-scrollbar.min.js"></script>
-  <script src="/js/plugins/chartjs.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://unpkg.com/topojson-client@3"></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script src="/js/argon-dashboard.min.js?v=2.1.0"></script>
-  <script src="/js/dashboard.js"></script>
-  <script src="/js/kalkulator.js"></script>
-  <script src="/js/sectorsSvet.js"></script>
-  <script src="/js/globe.js"></script>
-  <script src="/js/animatedgraph.js"></script>
-  <script src="/js/load-tabs-world.js"></script>
-  <script src="/js/sidebar.js"></script>
-  
+
+<script src="/js/kalkulator.js"></script>
+<script src="/js/sectorsSvet.js"></script>
+<script src="/js/globe.js"></script>
+<script src="/js/load-tabs-world.js"></script>

@@ -12,22 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
       return data;
     } catch (error) {
       console.error('Error fetching sector data:', error);
-      showError('Napaka pri nalaganju podatkov o sektorjih.');
       return [];
     }
   }
 
-  function showError(message = 'Napaka pri nalaganju podatkov. Prosimo, osvežite stran ali poskusite kasneje.') {
-    const tabContent = document.getElementById('tabContent');
-    if (tabContent) {
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'alert alert-danger';
-      errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${message}`;
-      tabContent.prepend(errorDiv);
-    } else {
-      console.error('Tab content container not found');
-    }
-  }
+
 
   function parseEmissionValue(value) {
     if (value === '' || value === null || value === undefined) return 0;
@@ -76,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const topSector = document.getElementById('topSector');
       const topSectorEmissions = document.getElementById('topSectorEmissions');
       if (topSector && topSectorEmissions) {
-        topSector.textContent = shortLabelsSlovenian[maxIndex]; // Use Slovenian label
+        topSector.textContent = shortLabelsSlovenian[maxIndex];
         topSectorEmissions.textContent = `${values[maxIndex].toFixed(2)} Mt (2021)`;
       }
     } catch (error) {
@@ -94,19 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const data = await fetchSectorData('Slovenia', '1990:2021');
     if (!data.length) {
-      showError('Ni podatkov za trende emisij po sektorjih.');
       return;
     }
 
-    const years = [...new Set(data.map(d => d.Year))].sort();
+    window.sectorTrendData = data; 
+    window.sectorYears = [...new Set(data.map(d => d.Year))].sort(); 
+
     const datasets = sectors.map((sector, index) => ({
-      label: shortLabelsSlovenian[index], // Use Slovenian labels
-      data: years.map(year => {
+      label: shortLabelsSlovenian[index],
+      data: window.sectorYears.map(year => {
         const record = data.find(d => d.Year === year);
         return record ? parseEmissionValue(record[sector]) / 1000000 : 0;
       }),
       borderColor: colors[index],
-      backgroundColor: colors[index] + '33', // Add transparency
+      backgroundColor: colors[index] + '33',
       borderWidth: 2,
       fill: false,
       tension: 0.3,
@@ -115,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     new Chart(ctx, {
       type: 'line',
-      data: { labels: years, datasets },
+      data: { labels: window.sectorYears, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -149,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const worldData = await fetchSectorData('World', year);
 
     if (!sloveniaData.length || !europeData.length || !worldData.length) {
-      showError('Ni podatkov za primerjavo z Evropo ali svetom.');
       return;
     }
 
@@ -206,7 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const data = await fetchSectorData('Slovenia', year);
     if (!data.length) {
-      showError(`Ni podatkov za tortni graf sektorjev za leto ${year}.`);
       return;
     }
 
@@ -287,6 +275,58 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+function downloadCSV(data, filename, headers, rowFormatter) {
+    console.log('Generating CSV for:', filename, 'Data length:', data.length);
+    let csvContent = headers.join(',') + '\n';
+    data.forEach(row => {
+      try {
+        csvContent += rowFormatter(row) + '\n';
+      } catch (error) {
+        console.warn('Skipping invalid row:', row, error);
+      }
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Download handler for sectorTrendChart
+  window.downloadSectorTrendChartCSV = function() {
+    if (!window.sectorTrendData || !window.sectorYears || window.sectorYears.length === 0) {
+      alert('Ni podatkov za prenos. Prosimo, poskusite znova.');
+      return;
+    }
+
+    const headers = ['Leto', ...shortLabelsSlovenian.map(label => label.replace(/\s/g, '_'))];
+    const data = window.sectorYears.map(year => {
+      const record = window.sectorTrendData.find(d => d.Year === year);
+      const row = { year };
+      sectors.forEach((sector, index) => {
+        row[shortLabelsSlovenian[index]] = record ? parseEmissionValue(record[sector]) / 1000000 : 0;
+      });
+      return row;
+    });
+
+    const rowFormatter = row => [
+      row.year,
+      ...shortLabelsSlovenian.map(sector => row[sector].toFixed(2))
+    ].join(',');
+
+    downloadCSV(
+      data,
+      'slovenia_co2_emissions_by_sector_1990-2021.csv',
+      headers,
+      rowFormatter
+    );
+  };
+
   // Initialize charts
   async function initializeCharts() {
     try {
@@ -299,7 +339,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (typeof Chart === 'undefined') {
         console.error('Chart.js not loaded');
-        showError('Napaka pri nalaganju knjižnice za grafe.');
         return;
       }
 
@@ -307,14 +346,19 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSummaryCards(),
         createSectorTrendChart(),
         createComparisonCharts(),
-        createSectorPieChart(currentYear) // Initial year
+        createSectorPieChart(currentYear)
       ]);
 
       setupYearNavigation();
     } catch (error) {
       console.error('Error initializing charts:', error);
-      showError();
     }
+  }
+
+  document.getElementById('tabContent')?.addEventListener('tabContentLoaded', initializeCharts);
+
+  if (document.getElementById('sectorTrendChart')) {
+    initializeCharts();
   }
 
   // Run initialization when tab content is loaded

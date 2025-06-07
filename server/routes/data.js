@@ -102,7 +102,7 @@ router.get("/api/countries", (req, res) => {
 // Get emissions data with flexible filtering
 router.get("/api/emissions", (req, res) => {
   try {
-    const { country, metric, startYear, endYear } = req.query;
+    const { country, metric, startYear, endYear, includeFuel } = req.query;
     
     let filteredData = emissionsData;
     
@@ -111,45 +111,59 @@ router.get("/api/emissions", (req, res) => {
       filteredData = filteredData.filter(item => countries.includes(item.country));
     }
   
-  if (country) {
-    filteredData = filteredData.filter(item => item.country === country);
-  }
+    if (metric) {
+      filteredData = filteredData.filter(item => item[metric] !== undefined && item[metric] !== '');
+    }
   
-  if (metric) {
-    filteredData = filteredData.filter(item => item[metric] !== undefined);
-  }
+    if (startYear) {
+      filteredData = filteredData.filter(item => item.year >= parseInt(startYear));
+    }
   
-  if (startYear) {
-    filteredData = filteredData.filter(item => item.year >= parseInt(startYear));
-  }
+    if (endYear) {
+      filteredData = filteredData.filter(item => item.year <= parseInt(endYear));
+    }
   
-  if (endYear) {
-    filteredData = filteredData.filter(item => item.year <= parseInt(endYear));
-  }
+    // Format response
+    const response = filteredData.map(item => {
+      const baseResponse = {
+        year: item.year,
+        country: item.country,
+        iso_code: item.iso_code,
+        population: item.population,
+        gdp: item.gdp,
+        co2_per_gdp: item.co2_per_gdp,
+        energy_per_gdp: item.energy_per_gdp,
+        co2_growth_prct: item.co2_growth_prct,
+        co2_per_capita: item.co2_per_capita
+      };
+      
+      if (includeFuel === 'true') {
+        // Include fuel-specific columns for sector line chart
+        return {
+          ...baseResponse,
+          coal_co2: item.coal_co2 || 0,
+          oil_co2: item.oil_co2 || 0,
+          gas_co2: item.gas_co2 || 0,
+          cement_co2: item.cement_co2 || 0,
+          flaring_co2: item.flaring_co2 || 0,
+          other_co2: item.other_co2 || 0
+        };
+      }
+      
+      return {
+        ...baseResponse,
+        value: item[metric] || item.co2
+      };
+    }).sort((a, b) => a.year - b.year);
   
-  // Format response
-  const response = filteredData.map(item => ({
-  year: item.year,
-  value: item[metric] || item.co2,
-  country: item.country,
-  iso_code: item.iso_code,
-  population: item.population,
-  gdp: item.gdp,
-  co2_per_gdp: item.co2_per_gdp,
-  energy_per_gdp: item.energy_per_gdp,
-  co2_growth_prct: item.co2_growth_prct,
-  co2_per_capita: item.co2_per_capita
-  })).sort((a, b) => a.year - b.year);
-  
-   res.json(response);
+    res.json(response);
   } catch (error) {
     console.error('Error in emissions endpoint:', error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Get country summary statistics
-// Modify your existing summary endpoint
+
 router.get("/api/summary/:country", (req, res) => {
   const countryData = emissionsData.filter(item => item.country === req.params.country);
   
@@ -181,7 +195,6 @@ router.get("/api/summary/:country", (req, res) => {
   
   res.json(summary);
 });
-// Helper function to calculate trends
 function calculateTrend(data, metric) {
   if (data.length < 2) return 0;
   

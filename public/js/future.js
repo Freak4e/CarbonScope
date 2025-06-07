@@ -1,13 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Global variables to store chart data
+  let globalEmissionsData = [];
+  let sloveniaEmissionsData = [];
+
   // Function to fetch and process data for global emissions chart
   async function loadGlobalEmissionsChart() {
     try {
       const response = await fetch('/api/global-emissions?startYear=2000&endYear=2100');
       const data = await response.json();
+      
+      // Store data for CSV download
+      globalEmissionsData = data;
 
       // Separate historical (≤2023) and predicted (>2023) data
       const historicalData = data.filter(d => d.year <= 2023);
-      const predictedData = data.filter(d => d.year >= 2023); // Include 2023 for continuity
+      const predictedData = data.filter(d => d.year >= 2023);
 
       // Chart.js configuration for global emissions
       const ctx = document.getElementById('futureEmissionsLongTermChart').getContext('2d');
@@ -29,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
               data: predictedData.map(d => ({ x: d.year, y: d.upper_bound })),
               borderColor: 'rgba(255, 99, 132, 0.5)',
               backgroundColor: 'rgba(255, 99, 132, 0.1)',
-              fill: '+1', // Fill to the next dataset (lower bound)
+              fill: '+1',
               tension: 0.1,
               pointRadius: 0,
               borderDash: [5, 5],
@@ -48,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false, // Allow custom height
+          maintainAspectRatio: false,
           scales: {
             x: {
               type: 'linear',
@@ -57,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
               max: 2100,
               ticks: {
                 callback: function(value) {
-                  return Math.floor(value); // Ensure whole numbers
+                  return Math.floor(value);
                 },
               },
             },
@@ -70,8 +77,8 @@ document.addEventListener('DOMContentLoaded', function () {
             legend: { display: true },
             tooltip: {
               enabled: true,
-              mode: 'nearest', // Show tooltip for nearest point
-              intersect: false, // Allow tooltip when hovering in area, not just on line
+              mode: 'nearest',
+              intersect: false,
               callbacks: {
                 title: function(tooltipItems) {
                   const year = Math.floor(tooltipItems[0].parsed.x);
@@ -82,23 +89,22 @@ document.addEventListener('DOMContentLoaded', function () {
                   const datasetLabel = context.dataset.label || '';
                   let label = `${datasetLabel}: ${context.parsed.y.toFixed(2)} Gt`;
                   
-                  // For predicted years (>2023), show all three values when hovering
                   if (year > 2023) {
                     const datasetIndex = context.datasetIndex;
                     const dataPoint = context.chart.data.datasets[0].data.find(d => d.x === year);
                     const upperBound = context.chart.data.datasets[1].data.find(d => d.x === year);
                     const lowerBound = context.chart.data.datasets[2].data.find(d => d.x === year);
                     
-                    if (datasetIndex === 0) { // Main CO₂ line
+                    if (datasetIndex === 0) {
                       return [
                         `CO₂ Emissions: ${dataPoint.y.toFixed(2)} Gt`,
                         `Upper Bound: ${upperBound.y.toFixed(2)} Gt`,
                         `Lower Bound: ${lowerBound.y.toFixed(2)} Gt`
                       ];
                     }
-                    return label; // For upper/lower bound lines, show only their value
+                    return label;
                   }
-                  return label; // For historical data, show only the hovered dataset
+                  return label;
                 },
               },
             },
@@ -134,10 +140,13 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       const response = await fetch('/api/slovenia-emissions?startYear=2000&endYear=2100');
       const data = await response.json();
+      
+      // Store data for CSV download
+      sloveniaEmissionsData = data;
 
       // Separate historical (≤2023) and predicted (>2023) data
       const historicalData = data.filter(d => d.year <= 2023);
-      const predictedData = data.filter(d => d.year >= 2023); // Include 2023 for continuity
+      const predictedData = data.filter(d => d.year >= 2023);
 
       // Chart.js configuration for Slovenia emissions
       const ctx = document.getElementById('sloveniaEmissionsChart').getContext('2d');
@@ -159,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
               data: predictedData.map(d => ({ x: d.year, y: d.upper_bound })),
               borderColor: 'rgba(255, 99, 132, 0.5)',
               backgroundColor: 'rgba(255, 99, 132, 0.1)',
-              fill: '+1', // Fill to the next dataset (lower bound)
+              fill: '+1',
               tension: 0.1,
               pointRadius: 0,
               borderDash: [5, 5],
@@ -178,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false, // Allow custom height
+          maintainAspectRatio: false,
           scales: {
             x: {
               type: 'linear',
@@ -187,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
               max: 2100,
               ticks: {
                 callback: function(value) {
-                  return Math.floor(value); // Ensure whole numbers
+                  return Math.floor(value);
                 },
               },
             },
@@ -200,8 +209,8 @@ document.addEventListener('DOMContentLoaded', function () {
             legend: { display: true },
             tooltip: {
               enabled: true,
-              mode: 'nearest', // Show tooltip for nearest point
-              intersect: false, // Allow tooltip when hovering in area
+              mode: 'nearest',
+              intersect: false,
               callbacks: {
                 title: function(tooltipItems) {
                   const year = Math.floor(tooltipItems[0].parsed.x);
@@ -212,23 +221,22 @@ document.addEventListener('DOMContentLoaded', function () {
                   const datasetLabel = context.dataset.label || '';
                   let label = `${datasetLabel}: ${context.parsed.y.toFixed(4)} Gt`;
                   
-                  // For predicted years (>2023), show all three values when hovering
                   if (year > 2023) {
                     const datasetIndex = context.datasetIndex;
                     const dataPoint = context.chart.data.datasets[0].data.find(d => d.x === year);
                     const upperBound = context.chart.data.datasets[1].data.find(d => d.x === year);
                     const lowerBound = context.chart.data.datasets[2].data.find(d => d.x === year);
                     
-                    if (datasetIndex === 0) { // Main CO₂ line
+                    if (datasetIndex === 0) {
                       return [
                         `CO₂ Emissions: ${dataPoint.y.toFixed(4)} Gt`,
                         `Upper Bound: ${upperBound.y.toFixed(4)} Gt`,
                         `Lower Bound: ${lowerBound.y.toFixed(4)} Gt`
                       ];
                     }
-                    return label; // For upper/lower bound lines, show only their value
+                    return label;
                   }
-                  return label; // For historical data, show only the hovered dataset
+                  return label;
                 },
               },
             },
@@ -259,7 +267,70 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // Function to generate and download CSV
+  function downloadCSV(data, filename, isSlovenia = false) {
+    // Convert data to CSV format with Slovenian headers
+    let csvContent = 'Leto,Emisije_CO2,Zgornja_Meja,Spodnja_Meja\n';
+    data.forEach(row => {
+      // For Slovenia, convert Gt back to Mt for user-friendly output
+      const co2 = isSlovenia ? (row.co2 * 1000).toFixed(4) : row.co2.toFixed(2);
+      const upper = isSlovenia ? (row.upper_bound * 1000).toFixed(4) : row.upper_bound.toFixed(2);
+      const lower = isSlovenia ? (row.lower_bound * 1000).toFixed(4) : row.lower_bound.toFixed(2);
+      csvContent += `${row.year},${co2},${upper},${lower}\n`;
+    });
+
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link element to trigger download
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Download handlers for each chart
+  window.downloadGlobalCSV = function() {
+    if (globalEmissionsData.length === 0) {
+      alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
+      return;
+    }
+    downloadCSV(globalEmissionsData, 'globalne_emisije_co2.csv');
+  };
+
+  window.downloadSloveniaCSV = function() {
+    if (sloveniaEmissionsData.length === 0) {
+      alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
+      return;
+    }
+    downloadCSV(sloveniaEmissionsData, 'slovenija_emisije_co2.csv', true);
+  };
+
   // Initialize both charts
   loadGlobalEmissionsChart();
   loadSloveniaEmissionsChart();
+
+  // Navigation event listeners for sidebar
+  const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
+  const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+
+  svetSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const href = this.getAttribute('href');
+      window.location.assign(href);
+    });
+  });
+
+  slovenijaSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const href = this.getAttribute('href');
+      window.location.href = href;
+    });
+  });
 });

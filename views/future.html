@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="/css/sidebar.css">
   <link rel="stylesheet" href="/css/styles_slovenia.css">
   <style>
-    .text-dark { color: #2d3748 !important; }
+        .text-dark { color: #2d3748 !important; }
     .fs-6 { font-size: 1rem !important; }
     .fs-7 { font-size: 0.875rem !important; }
     .font-weight-bolder { font-weight: 700 !important; }
@@ -67,6 +67,26 @@
     .container.position-relative, .container.mt-3 { max-width: none !important; padding-left: 1rem; padding-right: 1rem; }
     .explanation-section a { color: #5e72e4; text-decoration: none; }
     .explanation-section a:hover { text-decoration: underline; }
+    .download-icon-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .download-icon-btn:hover {
+      color: #d1d1d1;
+    }
+    .card-header.bg-gradient-primary .download-icon-btn {
+  color: #fff;
+}
+.card-header.bg-gradient-primary .download-icon-btn:hover {
+  color: #d1e7ff;
+}
   </style>
 </head>
 <body class="g-sidenav-show bg-gray-100">
@@ -410,17 +430,20 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-7">
-    <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
-      <div class="card-header bg-gradient-primary text-white pb-0 border-0">
-        <h5 class="font-weight-bold text-white">Napoved emisij CO₂ 📈</h5>
-        <p class="text-white opacity-8 fs-7">Globalne emisije v gigatonah (Gt)</p>
-      </div>
-      <div class="card-body p-3">
-        <canvas id="futureEmissionsLongTermChart" height="400" aria-label="Napoved globalnih emisij CO₂"></canvas>
+   <div class="col-lg-7">
+      <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
+        <div class="card-header bg-gradient-primary text-white pb-0 border-0 position-relative">
+          <h5 class="font-weight-bold text-white">Napoved emisij CO₂ 📈</h5>
+          <p class="text-white opacity-8 fs-7">Globalne emisije v gigatonah (Gt)</p>
+          <button class="download-icon-btn" onclick="downloadGlobalCSV()" title="Prenesi CSV">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+        <div class="card-body p-3">
+          <canvas id="futureEmissionsLongTermChart" height="400" aria-label="Napoved globalnih emisij CO₂"></canvas>
+        </div>
       </div>
     </div>
-  </div>
 </div>
 
 
@@ -459,15 +482,19 @@
     </div>
   </div>
   <div class="col-lg-7">
-    <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
-      <div class="card-header bg-gradient-primary text-white pb-0 border-0">
-        <h5 class="font-weight-bold text-white">Napoved emisij CO₂ 📈</h5>
-        <p class="text-white opacity-8 fs-7">Emisije v milijonih ton (Mt)</p>
-      </div>
-      <div class="card-body p-3">
-        <canvas id="sloveniaEmissionsChart" height="400" aria-label="Napoved emisij CO₂ v Sloveniji"></canvas>
-      </div>
-    </div>
+          <div class="card shadow-sm border-0 z-index-2 h-100 animate__animated animate__fadeIn">
+            <div class="card-header bg-gradient-primary text-white pb-0 border-0 position-relative">
+              <h5 class="font-weight-bold text-white">Napoved emisij CO₂ 📈</h5>
+              <p class="text-white opacity-8 fs-7">Emisije v milijonih ton (Mt)</p>
+              <button class="download-icon-btn" onclick="downloadSloveniaCSV()" title="Prenesi CSV">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+            <div class="card-body p-3">
+              <canvas id="sloveniaEmissionsChart" height="400" aria-label="Napoved emisij CO₂ v Sloveniji"></canvas>
+            </div>
+          </div>
+        </div>
   </div>
 </div>
 

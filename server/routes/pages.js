@@ -14,5 +14,8 @@ router.get("/future", (req, res) => {
 router.get("/slovenia", (req, res) => {
   res.sendFile(path.join(__dirname, "../../views/slovenia.html"));
 });
+router.get("/data", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../data/co2-data.csv"));
+});
 
 module.exports = router;

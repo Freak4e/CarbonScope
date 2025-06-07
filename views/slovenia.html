@@ -6,7 +6,69 @@
   <link rel="icon" type="image/png" href="/img/co2.png">
   <title>CO2 odtis - Slovenija</title>
   <link rel="stylesheet" href="/css/sidebar.css">
-
+<style>
+   .text-dark { color: #2d3748 !important; }
+    .fs-6 { font-size: 1rem !important; }
+    .fs-7 { font-size: 0.875rem !important; }
+    .font-weight-bolder { font-weight: 700 !important; }
+    .bg-gradient-primary { background: linear-gradient(90deg, #007bff 0%, #0056b3 100%); }
+    .bg-light-primary { background: #e6f0ff; }
+    .transition-hover { transition: all 0.3s ease; }
+    .transition-hover:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important; }
+    .metric-icon-circle { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; line-height: 40px; text-align: center; font-size: 16px; }
+    h1.position-relative > span.position-relative,
+    h3.position-relative > span.position-relative {
+      position: relative; display: inline-block;
+    }
+    h1.position-relative > span.position-relative::before,
+    h1.position-relative > span.position-relative::after,
+    h3.position-relative > span.position-relative::before,
+    h3.position-relative > span.position-relative::after {
+      content: ""; position: absolute; top: 50%; width: 150px; height: 2px; background-color: #a4c0de;
+    }
+    h1.position-relative > span.position-relative::before,
+    h3.position-relative > span.position-relative::before {
+      right: 100%; margin-right: 15px;
+    }
+    h1.position-relative > span.position-relative::after,
+    h3.position-relative > span.position-relative::after {
+      left: 100%; margin-left: 15px;
+    }
+    @media (max-width: 768px) {
+      h1.position-relative > span.position-relative::before,
+      h1.position-relative > span.position-relative::after,
+      h3.position-relative > span.position-relative::before,
+      h3.position-relative > span.position-relative::after {
+        width: 20px;
+      }
+      h1.position-relative > span.position-relative::before,
+      h3.position-relative > span.position-relative::before {
+        margin-right: 10px;
+      }
+      h1.position-relative > span.position-relative::after,
+      h3.position-relative > span.position-relative::after {
+        margin-left: 10px;
+      }
+    }
+    .container.position-relative, .container.mt-3 { max-width: none !important; padding-left: 1rem; padding-right: 1rem; }
+    .explanation-section a { color: #5e72e4; text-decoration: none; }
+    .explanation-section a:hover { text-decoration: underline; }
+    .download-icon-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .download-icon-btn:hover {
+      color: #d1d1d1;
+    }
+    
+    </style>
   <link rel="stylesheet" href="/css/sidebar.css"> 
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
   <link href="/css/nucleo-icons.css" rel="stylesheet" />
@@ -113,7 +175,7 @@
       <ul class="navbar-nav ms-auto justify-content-end">
         <li class="nav-item d-flex align-items-center me-4">
           <a href="javascript:;" class="nav-link text-white font-weight-bold px-0" id="calculatorButton">
-            <i class="fa fa-calculator fs-4"></i>
+            <i class="fa fa-calculator fs-6"></i>
           </a>
         </li>
         <li class="nav-item d-xl-none ps-3 d-flex align-items-center me-4">
@@ -127,7 +189,7 @@
         </li>
         <li class="nav-item d-flex align-items-center me-4">
           <a href="/?tab=map.html" class="nav-link text-white font-weight-bold px-0 subtab" data-tab="map.html" id="globeButton">
-            <i class="fas fa-globe fs-4"></i>
+            <i class="fas fa-globe fs-6"></i>
           </a>
         </li>
       </ul>
@@ -371,74 +433,85 @@
   <script async defer src="https://buttons.github.io/buttons.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
-    const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+  const svetSubLinks = document.querySelectorAll('#svetSubmenu .nav-link');
+  const slovenijaSubLinks = document.querySelectorAll('#slovenijaSubmenu .nav-link');
+  const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
 
-    // Handle Slovenija subtabs
-    slovenijaSubLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const tabName = this.getAttribute('data-tab');
-        const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
-
-        // Update sidebar active states
-        svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
-        slovenijaSubLinks.forEach(sublink => sublink.classList.remove('active'));
-        this.classList.add('active');
-
-        // Update navbar active tab
-        tabButtons.forEach(button => {
-          button.classList.remove('active');
-          if (button.getAttribute('data-tab') === tabName) {
-            button.classList.add('active');
-          }
-        });
-
-        // Update URL
-        const href = this.getAttribute('href');
-        history.pushState(null, '', href);
-
-        // Trigger tab content load
-        const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tabName}"]`);
-        if (targetTabButton) {
-          const clickEvent = new Event('click', { bubbles: true });
-          targetTabButton.dispatchEvent(clickEvent);
-        }
-      });
-    });
-
-    // Handle Svet subtabs
-    svetSubLinks.forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const href = this.getAttribute('href');
-        try {
-          window.location.assign(href);
-        } catch (error) {
-          console.error('Navigation failed:', error);
-        }
-      });
-    });
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab') || 'overview.html';
+  // Function to update active states
+  function updateActiveStates(tabName) {
+    // Update sidebar active states
     svetSubLinks.forEach(sublink => sublink.classList.remove('active'));
-    slovenijaSubLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('data-tab') === tab) {
-        link.classList.add('active');
-      }
+    slovenijaSubLinks.forEach(sublink => {
+      sublink.classList.toggle('active', sublink.getAttribute('data-tab') === tabName);
     });
-    const tabButtons = document.querySelectorAll('#emissionTabs button[data-tab]');
+
+    // Update navbar active states
     tabButtons.forEach(button => {
-      button.classList.remove('active');
-      if (button.getAttribute('data-tab') === tab) {
-        button.classList.add('active');
+      button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
+    });
+
+    // Update URL
+    history.pushState(null, '', `/slovenia?tab=${tabName}`);
+
+    // Scroll to tabs (optional, as tabs are already in view in slovenia.html)
+    const tabsElement = document.querySelector('#emissionTabs');
+    if (tabsElement) {
+      setTimeout(() => {
+        tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
+  // Handle Slovenija subtabs (sidebar)
+  slovenijaSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      updateActiveStates(tabName);
+
+      // Trigger tab content load
+      const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tabName}"]`);
+      if (targetTabButton) {
         const clickEvent = new Event('click', { bubbles: true });
-        button.dispatchEvent(clickEvent);
+        targetTabButton.dispatchEvent(clickEvent);
       }
     });
   });
+
+  // Handle navbar tabs
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      const tabName = this.getAttribute('data-tab');
+      updateActiveStates(tabName);
+    });
+  });
+
+  // Handle Svet subtabs
+  svetSubLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const href = this.getAttribute('href');
+      try {
+        window.location.assign(href);
+      } catch (error) {
+        console.error('Navigation failed:', error);
+      }
+    });
+  });
+
+  // Handle initial page load for Slovenija
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab') || 'overview.html';
+  updateActiveStates(tab);
+
+  // Trigger tab content load on page load
+  const targetTabButton = document.querySelector(`#emissionTabs button[data-tab="${tab}"]`);
+  if (targetTabButton) {
+    const clickEvent = new Event('click', { bubbles: true });
+    targetTabButton.dispatchEvent(clickEvent);
+  }
+});
 </script>
 </body>
 </html>
