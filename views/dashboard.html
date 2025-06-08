@@ -357,77 +357,79 @@
       </li>
     </ul>
     <div class="tab-content mt-3" id="tabContent"></div>
-    <div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Kalkulator CO₂ za prevoz</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zapri"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-5">
-                <div class="form-group">
-                  <label for="startPoint">Začetna lokacija</label>
-                  <input type="text" class="form-control" id="startPoint" placeholder="Vnesite začetno lokacijo">
+<div class="modal fade" id="co2CalculatorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Kalkulator CO₂ za prevoz</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zapri"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="startPoint">Začetna lokacija</label>
+              <input type="text" class="form-control" id="startPoint" placeholder="Vnesite začetno lokacijo">
+              <small class="text-muted opomba" style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">Primer: Glavni trg 1, 2000 Maribor, Slovenija</small>
+            </div>
+            <div class="form-group mt-3">
+              <label for="endPoint">Končna lokacija</label>
+              <input type="text" class="form-control" id="endPoint" placeholder="Vnesite končno lokacijo">
+              <small class="text-muted opomba" style="font-size: 0.75rem; display: block; margin-top: 0.25rem;">Primer: Trg republike 1, 1000 Ljubljana, Slovenija</small>
+            </div>
+            <div class="transport-modes mt-4">
+              <h6>Izberite način prevoza:</h6>
+              <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
+                <button type="button" class="btn btn-outline-primary transport-mode" data-mode="walking" style="padding: 5px 8px; min-width: 40px;">
+                  <i class="fas fa-walking" style="font-size: 1.2rem;"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary transport-mode" data-mode="cycling" style="padding: 5px 8px; min-width: 40px;">
+                  <i class="fas fa-bicycle" style="font-size: 1.2rem;"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary transport-mode active" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
+                  <i class="fas fa-car" style="font-size: 1.2rem;"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary transport-mode" data-mode="bus" style="padding: 5px 8px; min-width: 40px;">
+                  <i class="fas fa-bus" style="font-size: 1.2rem;"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40px;">
+                  <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
+                </button>
+              </div>
+            </div>
+            <div class="results mt-4 p-3 bg-light rounded">
+              <h5>Rezultati</h5>
+              <div class="row">
+                <div class="col-6">
+                  <p><strong>Razdalja:</strong></p>
+                  <p><strong>Emisije CO₂:</strong></p>
                 </div>
-                <div class="form-group mt-3">
-                  <label for="endPoint">Končna lokacija</label>
-                  <input type="text" class="form-control" id="endPoint" placeholder="Vnesite končno lokacijo">
-                </div>
-                <div class="transport-modes mt-4">
-                  <h6>Izberite način prevoza:</h6>
-                  <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
-                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="walking" style="padding: 5px 8px; min-width: 40px;">
-                      <i class="fas fa-walking" style="font-size: 1.2rem;"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="cycling" style="padding: 5px 8px; min-width: 40px;">
-                      <i class="fas fa-bicycle" style="font-size: 1.2rem;"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-primary transport-mode active" data-mode="driving" style="padding: 5px 8px; min-width: 40px;">
-                      <i class="fas fa-car" style="font-size: 1.2rem;"></i>
-                    </button>
-                  </div>
-                  <div class="btn-group d-flex flex-wrap" role="group" style="gap: 5px;">
-                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="bus" style="padding: 5px 8px; min-width: 40px;">
-                      <i class="fas fa-bus" style="font-size: 1.2rem;"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-primary transport-mode" data-mode="airplane" style="padding: 5px 8px; min-width: 40 |px;">
-                      <i class="fas fa-plane" style="font-size: 1.2rem;"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="results mt-4 p-3 bg-light rounded">
-                  <h5>Rezultati</h5>
-                  <div class="row">
-                    <div class="col-6">
-                      <p><strong>Razdalja:</strong></p>
-                      <p><strong>Emisije CO₂:</strong></p>
-                    </div>
-                    <div class="col-6">
-                      <p id="distanceResult">-</p>
-                      <p id="co2Result">-</p>
-                    </div>
-                  </div>
+                <div class="col-6">
+                  <p id="distanceResult">-</p>
+                  <p id="co2Result">-</p>
                 </div>
               </div>
-              <div class="col-md-7">
-                <div id="routeMap" style="height: 400px; width: 100%; border-radius: 15px;"></div>
-                <div class="mt-2" id="co2Comparison"></div>
-                <div class="calculation-overlay" id="calculationOverlay" style="display: none;">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Nalagam...</span>
-                  </div>
-                  <p class="mt-2">Računam...</p>
-                </div>
-              </div>    
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
-            <button type="button" class="btn btn-primary" id="calculateBtn">Izračunaj</button>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <div id="routeMap" style="height: 400px; width: 100%; border-radius: 15px;"></div>
+            <div class="mt-2" id="co2Comparison"></div>
+            <div class="calculation-overlay" id="calculationOverlay" style="display: none;">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Nalagam...</span>
+              </div>
+              <p class="mt-2">Računam...</p>
+            </div>
           </div>
         </div>
+      </div> 
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zapri</button>
+        <button type="button" class="btn btn-primary" id="calculateBtn">Izračunaj</button>
       </div>
-    </div>
+    </div> 
+  </div> 
+</div>
   </main>
   <script src="/js/core/popper.min.js"></script>
   <script src="/js/core/bootstrap.min.js"></script>
