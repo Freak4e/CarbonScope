@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Store data for CSV download
       globalEmissionsData = data;
 
-      // Separate historical (≤2023) and predicted (>2023) data
+      // Separate historical (≤2023) and predicted (≥2023) data
       const historicalData = data.filter(d => d.year <= 2023);
       const predictedData = data.filter(d => d.year >= 2023);
 
@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
           datasets: [
             {
-              label: 'Global CO₂ Emissions (Gt)',
-              data: data.map(d => ({ x: d.year, y: d.co2 })),
+              label: 'CO₂ emisije', // Historical data
+              data: historicalData.map(d => ({ x: d.year, y: d.co2 })),
               borderColor: '#5e72e4',
               backgroundColor: 'rgba(94, 114, 228, 0.1)',
               fill: false,
@@ -32,7 +32,16 @@ document.addEventListener('DOMContentLoaded', function () {
               pointRadius: 0,
             },
             {
-              label: 'Upper Bound (Predicted)',
+              label: 'Najverjetneje', // Predicted data
+              data: predictedData.map(d => ({ x: d.year, y: d.co2 })),
+              borderColor: '#f39c12', // Orange for predicted
+              backgroundColor: 'rgba(243, 156, 18, 0.1)',
+              fill: false,
+              tension: 0.1,
+              pointRadius: 0,
+            },
+            {
+              label: 'Zgornja meja',
               data: predictedData.map(d => ({ x: d.year, y: d.upper_bound })),
               borderColor: 'rgba(255, 99, 132, 0.5)',
               backgroundColor: 'rgba(255, 99, 132, 0.1)',
@@ -42,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
               borderDash: [5, 5],
             },
             {
-              label: 'Lower Bound (Predicted)',
+              label: 'Spodnja meja',
               data: predictedData.map(d => ({ x: d.year, y: d.lower_bound })),
               borderColor: 'rgba(75, 192, 192, 0.5)',
               backgroundColor: 'rgba(75, 192, 192, 0.1)',
@@ -69,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
               },
             },
             y: {
-              title: { display: true, text: 'CO₂ Emissions (Gt)' },
+              title: { display: true, text: 'CO₂ Emisije (Gt)' },
               beginAtZero: false,
             },
           },
@@ -88,21 +97,19 @@ document.addEventListener('DOMContentLoaded', function () {
                   const year = Math.floor(context.parsed.x);
                   const datasetLabel = context.dataset.label || '';
                   let label = `${datasetLabel}: ${context.parsed.y.toFixed(2)} Gt`;
-                  
-                  if (year > 2023) {
-                    const datasetIndex = context.datasetIndex;
-                    const dataPoint = context.chart.data.datasets[0].data.find(d => d.x === year);
-                    const upperBound = context.chart.data.datasets[1].data.find(d => d.x === year);
-                    const lowerBound = context.chart.data.datasets[2].data.find(d => d.x === year);
-                    
-                    if (datasetIndex === 0) {
+
+                  if (year >= 2023 && context.datasetIndex <= 1) { // Handle "Najverjetneje" and historical for predicted years
+                    const dataPoint = context.chart.data.datasets[1].data.find(d => d.x === year); // Predicted CO2
+                    const upperBound = context.chart.data.datasets[2].data.find(d => d.x === year);
+                    const lowerBound = context.chart.data.datasets[3].data.find(d => d.x === year);
+                    if (context.datasetIndex === 1) { // Only for "Najverjetneje"
                       return [
-                        `CO₂ Emissions: ${dataPoint.y.toFixed(2)} Gt`,
-                        `Upper Bound: ${upperBound.y.toFixed(2)} Gt`,
-                        `Lower Bound: ${lowerBound.y.toFixed(2)} Gt`
+                        `Najverjetneje: ${dataPoint.y.toFixed(2)} Gt`,
+                        `Zgornja meja: ${upperBound.y.toFixed(2)} Gt`,
+                        `Spodnja meja: ${lowerBound.y.toFixed(2)} Gt`
                       ];
                     }
-                    return label;
+                    return null; // Skip historical dataset tooltip for years ≥2023
                   }
                   return label;
                 },
@@ -144,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Store data for CSV download
       sloveniaEmissionsData = data;
 
-      // Separate historical (≤2023) and predicted (>2023) data
+      // Separate historical (≤2023) and predicted (≥2023) data
       const historicalData = data.filter(d => d.year <= 2023);
       const predictedData = data.filter(d => d.year >= 2023);
 
@@ -155,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
           datasets: [
             {
-              label: 'Slovenia CO₂ Emissions (Gt)',
-              data: data.map(d => ({ x: d.year, y: d.co2 })),
+              label: 'CO₂ emisije', // Historical data
+              data: historicalData.map(d => ({ x: d.year, y: d.co2 })),
               borderColor: '#5e72e4',
               backgroundColor: 'rgba(94, 114, 228, 0.1)',
               fill: false,
@@ -164,17 +171,26 @@ document.addEventListener('DOMContentLoaded', function () {
               pointRadius: 0,
             },
             {
-              label: 'Upper Bound (Predicted)',
+              label: 'Najverjetneje', // Predicted data
+              data: predictedData.map(d => ({ x: d.year, y: d.co2 })),
+              borderColor: '#f39c12', // Orange for predicted
+              backgroundColor: 'rgba(243, 156, 18, 0.1)',
+              fill: false,
+              tension: 0.1,
+              pointRadius: 0,
+            },
+            {
+              label: 'Zgornja meja',
               data: predictedData.map(d => ({ x: d.year, y: d.upper_bound })),
               borderColor: 'rgba(255, 99, 132, 0.5)',
               backgroundColor: 'rgba(255, 99, 132, 0.1)',
               fill: '+1',
-              tension: 0.1,
+              tension: null,
               pointRadius: 0,
               borderDash: [5, 5],
             },
             {
-              label: 'Lower Bound (Predicted)',
+              label: 'Spodnja meja',
               data: predictedData.map(d => ({ x: d.year, y: d.lower_bound })),
               borderColor: 'rgba(75, 192, 192, 0.5)',
               backgroundColor: 'rgba(75, 192, 192, 0.1)',
@@ -201,9 +217,10 @@ document.addEventListener('DOMContentLoaded', function () {
               },
             },
             y: {
-              title: { display: true, text: 'CO₂ Emissions (Gt)' },
+              title: { display: true, text: 'CO₂ Emisije (Gt)' },
               beginAtZero: true,
             },
+            tension: 0.1,
           },
           plugins: {
             legend: { display: true },
@@ -220,21 +237,19 @@ document.addEventListener('DOMContentLoaded', function () {
                   const year = Math.floor(context.parsed.x);
                   const datasetLabel = context.dataset.label || '';
                   let label = `${datasetLabel}: ${context.parsed.y.toFixed(4)} Gt`;
-                  
-                  if (year > 2023) {
-                    const datasetIndex = context.datasetIndex;
-                    const dataPoint = context.chart.data.datasets[0].data.find(d => d.x === year);
-                    const upperBound = context.chart.data.datasets[1].data.find(d => d.x === year);
-                    const lowerBound = context.chart.data.datasets[2].data.find(d => d.x === year);
-                    
-                    if (datasetIndex === 0) {
+
+                  if (year >= 2023 && context.datasetIndex <= 1) { // Handle "Najverjetneje" and historical for predicted years
+                    const dataPoint = context.chart.data.datasets[1].data.find(d => d.x === year); // Predicted CO2
+                    const upperBound = context.chart.data.datasets[2].data.find(d => d.x === year);
+                    const lowerBound = context.chart.data.datasets[3].data.find(d => d.x === year);
+                    if (context.datasetIndex === 1) { // Only for "Najverjetneje"
                       return [
-                        `CO₂ Emissions: ${dataPoint.y.toFixed(4)} Gt`,
-                        `Upper Bound: ${upperBound.y.toFixed(4)} Gt`,
-                        `Lower Bound: ${lowerBound.y.toFixed(4)} Gt`
+                        `Najverjetneje: ${dataPoint.y.toFixed(4)} Gt`,
+                        `Zgornja meja: ${upperBound.y.toFixed(4)} Gt`,
+                        `Spodnja meja: ${lowerBound.y.toFixed(4)} Gt`
                       ];
                     }
-                    return label;
+                    return null; // Skip historical dataset tooltip for years ≥2023
                   }
                   return label;
                 },

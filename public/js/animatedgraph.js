@@ -72,14 +72,16 @@ document.addEventListener('DOMContentLoaded', function () {
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: [chartData[startYearIndex].year],
+          labels: chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.year), // Show selected range initially
           datasets: [{
             label: 'Globalne emisije CO₂ (milijarde ton)',
-            data: [chartData[startYearIndex].co2],
+            data: chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.co2), // Show selected range initially
             borderColor: '#4CAF50',
             backgroundColor: 'rgba(76, 175, 80, 0.2)',
             fill: true,
-            tension: 0.4
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 0
           }]
         },
         options: {
@@ -91,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             title: {
               display: true,
-              text: `Emisije CO₂ do leta ${chartData[startYearIndex].year}`
+              text: `Emisije CO₂ od ${chartData[startYearIndex].year} do ${chartData[endYearIndex].year}`
             }
           },
           scales: {
@@ -135,11 +137,15 @@ document.addEventListener('DOMContentLoaded', function () {
       startHandle.style.pointerEvents = 'none';
       endHandle.style.pointerEvents = 'none';
       
+      // Reset chart to startYearIndex
+      chartInstance.data.labels = [chartData[startYearIndex].year];
+      chartInstance.data.datasets[0].data = [chartData[startYearIndex].co2];
+      chartInstance.options.plugins.title.text = `Emisije CO₂ do leta ${chartData[startYearIndex].year}`;
+      chartInstance.update('none');
+      
       const yearRange = endYearIndex - startYearIndex + 1;
-      // Base duration for the entire animation (in seconds)
       const baseDurationSec = Math.min(20, Math.max(5, yearRange * 0.2)); // 5s to 20s, scales with range
       const minIntervalMs = 50; // Minimum time per step
-      // Calculate interval per year (ms per year)
       let intervalMs = yearRange > 1 ? (baseDurationSec * 1000) / yearRange : 1000;
       intervalMs = Math.max(minIntervalMs, intervalMs);
       
@@ -162,6 +168,11 @@ document.addEventListener('DOMContentLoaded', function () {
       playButton.innerHTML = '<i class="fas fa-play"></i>';
       startHandle.style.pointerEvents = 'auto';
       endHandle.style.pointerEvents = 'auto';
+      // Restore selected range data
+      chartInstance.data.labels = chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.year);
+      chartInstance.data.datasets[0].data = chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.co2);
+      chartInstance.options.plugins.title.text = `Emisije CO₂ od ${chartData[startYearIndex].year} do ${chartData[endYearIndex].year}`;
+      chartInstance.update('none');
     }
 
     function resetGraphState() {
@@ -178,7 +189,10 @@ document.addEventListener('DOMContentLoaded', function () {
       startHandle.setAttribute('aria-valuenow', chartData[0].year);
       endHandle.setAttribute('aria-valuenow', chartData[chartData.length - 1].year);
       if (chartInstance) {
-        updateChart(0);
+        chartInstance.data.labels = chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.year);
+        chartInstance.data.datasets[0].data = chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.co2);
+        chartInstance.options.plugins.title.text = `Emisije CO₂ od ${chartData[startYearIndex].year} do ${chartData[endYearIndex].year}`;
+        chartInstance.update('none');
       }
     }
 
@@ -225,8 +239,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (!isPlaying) {
-        currentYearIndex = startYearIndex;
-        updateChart(currentYearIndex);
+        // Update chart to show full selected range
+        chartInstance.data.labels = chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.year);
+        chartInstance.data.datasets[0].data = chartData.slice(startYearIndex, endYearIndex + 1).map(d => d.co2);
+        chartInstance.options.plugins.title.text = `Emisije CO₂ od ${chartData[startYearIndex].year} do ${chartData[endYearIndex].year}`;
+        chartInstance.update('none');
       }
     }
 
@@ -268,17 +285,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to generate and download CSV
     function downloadCSV(data, filename, headers, rowFormatter) {
-      // Convert data to CSV format
       let csvContent = headers.join(',') + '\n';
       data.forEach(row => {
         csvContent += rowFormatter(row) + '\n';
       });
-
-      // Create a Blob with the CSV content
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-
-      // Create a temporary link element to trigger download
       const link = document.createElement('a');
       link.setAttribute('href', url);
       link.setAttribute('download', filename);

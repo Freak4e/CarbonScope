@@ -384,9 +384,17 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!response.ok) throw new Error(`Network response: ${response.status}`);
       const data = await response.json();
 
-      const sectorLabels = Object.keys(data.sectors).map(s =>
-        s.replace(/_co2$/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-      );
+      const sectorLabels = Object.keys(data.sectors).map(key => {
+       const slovenianLabels = {
+    'coal_co2': 'Premog',
+    'oil_co2': 'Nafta',
+    'gas_co2': 'Plin',
+    'cement_co2': 'Cement',
+    'flaring_co2': 'Sežiganje',
+    'other_co2': 'Drugo'
+       };
+       return slovenianLabels[key] || key.replace(/_co2$/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      });
 
       sectorData = sectorLabels.map((label, idx) => ({
         label,

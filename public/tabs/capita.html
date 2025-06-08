@@ -131,6 +131,9 @@
             <h5 class="font-weight-bold text-white">Emisije CO₂ na prebivalca skozi čas 📈</h5>
             <p class="text-white opacity-8 fs-7">Letne emisije CO₂ na prebivalca (v tonah) za Slovenijo od 1991</p>
           </div>
+      <button class="download-icon-btn" type="button" onclick="downloadPerCapitaSloCSV()" aria-label="Prenesi CSV podatke za emisije CO₂ na prebivalec v Slovenija" title="Prenesi podatke v CSV formatu">
+    <i class="fas fa-download"></i>
+</button>
           <div class="card-body p-3">
             <div class="chart-wrapper">
               <canvas id="trend_chart" height="250" aria-label="Graf letnih emisij CO₂ na prebivalca v Sloveniji"></canvas>
@@ -206,7 +209,7 @@
           </div>
           <div class="card-body p-3">
             <div class="chart-wrapper">
-              <canvas id="rollingAverageChart" height="250" aria-label="5-letno drseče povprečje emisij CO₂ na prebivalca"></canvas>
+              <canvas id="rollingAverageChart" height="300" aria-label="5-letno drseče povprečje emisij CO₂ na prebivalca"></canvas>
             </div>
           </div>
         </div>
@@ -219,7 +222,7 @@
           </div>
           <div class="card-body p-3">
             <div class="chart-wrapper">
-              <canvas id="yearlyChangeChart" height="250" aria-label="Letne spremembe emisij CO₂ na prebivalca"></canvas>
+              <canvas id="yearlyChangeChart" height="300" aria-label="Letne spremembe emisij CO₂ na prebivalca"></canvas>
             </div>
           </div>
         </div>
@@ -323,6 +326,7 @@
 
 <!-- Custom CSS -->
 <style>
+/* Existing styles unchanged */
 .row.mb-4 .custom-col .card {
   min-height: 150px;
   display: flex;
@@ -450,20 +454,32 @@ h3.position-relative > span.position-relative::after {
   box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
 }
 
-/* Chart container styles */
 .chart-container {
-  max-height: 350px; /* Fixed height for all chart containers */
-  overflow: hidden; /* Prevent content overflow */
+  max-height: 350px;
+  overflow: hidden; 
+}
+
+.chart-container:has(#trend_chart) {
+  max-height: 500px; 
 }
 
 .chart-wrapper {
   position: relative;
-  height: 250px; /* Fixed height for canvas and buttons */
+  height: 250px;
+  width: 100%;
+}
+
+.chart-wrapper:has(#trend_chart) {
+  height: 300px; 
+}
+
+.chart-wrapper canvas#trend_chart {
+  max-height: 250px !important; 
   width: 100%;
 }
 
 .chart-wrapper canvas {
-  max-height: 200px !important; /* Canvas height to leave space for buttons */
+  max-height: 200px !important; 
   width: 100%;
 }
 
@@ -496,15 +512,27 @@ h3.position-relative > span.position-relative::after {
   }
 
   .chart-container {
-    max-height: 300px; /* Slightly smaller for mobile */
+    max-height: 300px; 
+  }
+
+  .chart-container:has(#trend_chart) {
+    max-height: 450px;
   }
 
   .chart-wrapper {
-    height: 220px; /* Adjusted for mobile */
+    height: 220px; 
+  }
+
+  .chart-wrapper:has(#trend_chart) {
+    height: 350px;
   }
 
   .chart-wrapper canvas {
-    max-height: 180px !important; /* Adjusted canvas height */
+    max-height: 180px !important; 
+  }
+
+  .chart-wrapper canvas#trend_chart {
+    max-height: 250px !important; 
   }
 
   .chart-buttons {
@@ -515,5 +543,25 @@ h3.position-relative > span.position-relative::after {
     font-size: 0.8rem; /* Smaller buttons on mobile */
     padding: 5px 10px;
   }
+  .chart-container:has(#rollingAverageChart, #yearlyChangeChart) {
+  max-height: 350px; /* Increase from 300px to 350px */
+}
+.chart-wrapper:has(#rollingAverageChart, #yearlyChangeChart) {
+  height: 270px; /* Increase from 220px to 270px */
+}
+.chart-wrapper canvas#rollingAverageChart,
+.chart-wrapper canvas#yearlyChangeChart {
+  max-height: 220px !important; /* Increase from 180px to 220px */
+}
+}
+.chart-container:has(#rollingAverageChart, #yearlyChangeChart) {
+  max-height: 400px; /* Increase from 350px to 400px */
+}
+.chart-wrapper:has(#rollingAverageChart, #yearlyChangeChart) {
+  height: 300px; /* Increase from 250px to 300px */
+}
+.chart-wrapper canvas#rollingAverageChart,
+.chart-wrapper canvas#yearlyChangeChart {
+  max-height: 250px !important; /* Increase from 200px to 250px */
 }
 </style>
