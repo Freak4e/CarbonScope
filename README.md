@@ -1,5 +1,7 @@
 # CarbonScope
 
+🔗 [💻 Preizkusi demo različico tukaj](https://carbonscope.onrender.com)
+
 ## Opis in vizija projekta
 
 CarbonScope je interaktivna spletna aplikacija, namenjena poglobljeni analizi in vizualizaciji emisij CO₂ tako za Slovenijo kot za svet. Z uporabo zanesljivih podatkovnih virov, naprednih vizualizacij in napovednih modelov omogoča uporabnikom celosten vpogled v razvoj emisij skozi čas, primerjavo med državami, sektorji in regijami ter izračun ogljičnega odtisa na različnih nivojih.
@@ -101,12 +103,12 @@ Za lokalni zagon projekta CO2-Odtis sledite naslednjim korakom:
 
 1. Klonirajte repozitorij:
    ```bash
-   git clone https://github.com/Freak4e/OpsiCO2.git
+   git clone https://github.com/Freak4e/CarbonScope.git
    ```
 
 2. Premaknite se v mapo projekta:
    ```bash
-   cd OpsiCO2
+   cd CarbonScope
    ```
 
 3. Namestite vse odvisnosti:
