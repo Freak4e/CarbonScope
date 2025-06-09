@@ -1,0 +1,22 @@
+CarbonScope
+ 
+Interaktivna spletna rešitev za analizo, vizualizacijo in napoved emisij CO₂ v Sloveniji in po svetu.
+
+Leto izdelave: 2025
+
+Konstantin Mihajlov  
+Anastasija Todorov  
+Matej Filipov
+
+Domača stran: https://carbonscope.onrender.com 
+Vir podatkov: https://ourworldindata.org/co2-emissions  
+Vir podatkov: https://www.stat.si/  
+Vir podatkov: https://www.arso.gov.si/  
+Vir podatkov: https://climateactiontracker.org/  
+Koda: https://github.com/Freak4e/CarbonScope
+
+Kategorizacija: spletna aplikacija
+
+Oznake: OdprtiPodatki, Bootstrap, CSV, Leaflet, Express, NodeJS, JavaScript, Python, ChartJS, AI, REST, GitHub, Jupyter, AgilenRazvoj
+ 
+CarbonScope je interaktivna spletna aplikacija, ki omogoča pregled in analizo emisij CO₂ v Sloveniji in po svetu. Namenjena je izobraževanju, ozaveščanju in podpori trajnostnim odločitvam. Uporabnikom nudi vizualizacije emisij po državah, sektorjih, virih goriva ter regijah v Sloveniji. Na voljo je tudi kalkulator emisij glede na način prevoza in napovedi emisij s pomočjo preprostih modelov strojnega učenja. Projekt temelji na odprtokodnih podatkih in je zgrajen s pomočjo tehnologij kot so Node.js, Express, Bootstrap in Leaflet. Prilagojen je za prikaz na različnih napravah, podatki pa se dinamično obdelujejo iz lokalnih CSV in GeoJSON datotek. CarbonScope želi povezati podatke z razumevanjem in spodbuditi uporabnike, da razmišljajo o svojem vplivu na okolje skozi podatke, ki jih sami lahko raziščejo.
