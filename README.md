@@ -34,11 +34,19 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
 
 ### Svetovni pogled
 
-- Interaktivna primerjava emisij CO₂ med državami.
-- Vizualizacija svetovnih emisij po sektorjih (promet, energetika, proizvodnja in gradbeništvo itd.).
+- Vizualizacija svetovnih CO2 emisij.
+- CO2 emisij po sektorjih (promet, energetika, proizvodnja in gradbeništvo itd.)
 - Interaktivna primerjava držav (skupni CO₂, CO₂ na prebivalca, CO₂ glede na BDP).
 - Interaktivni svetovni zemljevid z emisijami CO₂ in podatki o populaciji.
 - Napoved prihodnjih svetovnih emisij na podlagi učnega modela.
+
+ ### Analiza emisij za Slovenijo
+
+- Emisije CO₂ na prebivalca skozi leta.
+- Razčlenitev emisij po vrsti goriva (premog, plin, nafta ipd.).
+- Prikaz emisij po sektorjih (promet, industrija, energetika, stavbe, ipd.).
+- Interaktivni zemljevid emisij po regijah.
+- Napoved emisij v prihodnosti na podlagi lokalno prilagojenega modela.
 
 ### Kalkulator emisij glede na način prevoza
 
@@ -50,13 +58,6 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
   - z letalom
 - Prikaz emisij in prihrankov v g CO₂ za vsako izbiro.
 
-### Analiza emisij za Slovenijo
-
-- Emisije CO₂ na prebivalca skozi leta.
-- Razčlenitev emisij po vrsti goriva (premog, plin, nafta ipd.).
-- Prikaz emisij po sektorjih (promet, industrija, energetika, stavbe, ipd.).
-- Interaktivni zemljevid emisij po regijah.
-- Napoved emisij v prihodnosti na podlagi lokalno prilagojenega modela.
 
 ## Tehnološki sklad
 
