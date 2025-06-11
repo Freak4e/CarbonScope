@@ -313,8 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 50);
   });
 
-  window.initMap = initMap;
-  window.clearMap = clearMap;
   window.geocodeLocation = geocodeLocation;
   window.getRoute = getRoute;
   window.calculateRoute = calculateRoute;

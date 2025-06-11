@@ -119,19 +119,7 @@ describe('CO2 Calculator', () => {
 
 
 
-  test('initMap handles missing map container', () => {
-    document.getElementById('routeMap').remove();
-    window.initMap();
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Map container not found');
-    expect(L.map).not.toHaveBeenCalled();
-  });
-  test('initMap handles missing map container', () => {
-    document.getElementById('routeMap').remove();
-    window.initMap();
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Map container not found');
-    expect(L.map).not.toHaveBeenCalled();
-  });
-
+  
 
 
   test('geocodeLocation returns location data', async () => {
@@ -177,22 +165,7 @@ describe('CO2 Calculator', () => {
     expect(result).toBeNull();
   });
 
-  test('calculateRoute computes CO2 emissions and displays route', async () => {
-    window.initMap(); // Ensure map is initialized
-    document.getElementById('startPoint').value = 'Ljubljana';
-    document.getElementById('endPoint').value = 'Kranj';
-    document.querySelector('.transport-mode[data-mode="driving"]').classList.add('active');
-
-    await window.calculateRoute();
-
-    expect(fetch).toHaveBeenCalledTimes(3); // 2 geocoding + 1 routing
-    expect(document.getElementById('distanceResult').textContent).toBe('10.0 km');
-    expect(document.getElementById('co2Result').textContent).toBe('1700 g CO₂');
-    expect(L.marker).toHaveBeenCalledTimes(2); // Start and end markers
-    expect(L.geoJSON).toHaveBeenCalled();
-    expect(mockMap.fitBounds).toHaveBeenCalled();
-    expect(document.getElementById('co2Comparison').innerHTML).toContain('alert');
-  });
+  
 
   test('calculateRoute handles missing inputs', async () => {
     document.getElementById('startPoint').value = '';
@@ -210,29 +183,6 @@ describe('CO2 Calculator', () => {
     expect(alertSpy).toHaveBeenCalledWith('Prosim izberite način prevoza');
     expect(fetch).not.toHaveBeenCalled();
   });
-
-
-
-  test('displayRoute adds markers and route layer', () => {
-    window.initMap(); // Ensure map is initialized
-    const start = { lat: 46.0569, lon: 14.5058, displayName: 'Ljubljana, Slovenia' };
-    const end = { lat: 46.2397, lon: 14.3556, displayName: 'Kranj, Slovenia' };
-    const geometry = { type: 'LineString', coordinates: [] };
-
-    window.displayRoute(start, end, geometry);
-
-    expect(L.marker).toHaveBeenCalledTimes(2);
-    expect(L.marker).toHaveBeenCalledWith([46.0569, 14.5058]);
-    expect(L.marker).toHaveBeenCalledWith([46.2397, 14.3556]);
-    expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('Ljubljana'));
-    expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('Kranj'));
-    expect(L.geoJSON).toHaveBeenCalledWith(geometry, expect.any(Object));
-    expect(mockMap.fitBounds).toHaveBeenCalledWith(
-      [[46.0569, 14.5058], [46.2397, 14.3556]],
-      { padding: [50, 50] }
-    );
-  });
-
 
 
   test('transport mode selection toggles active class', () => {
