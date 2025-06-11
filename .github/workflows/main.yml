@@ -1,4 +1,4 @@
-name: CI (Test Only)
+name: CI/CD Pipeline
 
 on:
   push:
@@ -16,16 +16,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies (with dev)
         run: npm ci --legacy-peer-deps
+        working-directory: ./
 
       - name: Run tests
         run: npm test
+        working-directory: ./
         env:
           NODE_ENV: test
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install production dependencies
+        run: npm install --omit=dev --legacy-peer-deps
+        working-directory: ./
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./
+        continue-on-error: true
+
+ 
