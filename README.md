@@ -63,29 +63,29 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
 Pri razvoju projekta CarbonScope so bile uporabljene naslednje tehnologije:
 
 - **HTML** <br>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/512px-HTML5_logo_and_wordmark.svg.png" alt="HTML Logo" width="100">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/512px-HTML5_logo_and_wordmark.svg.png" alt="HTML Logo" width="50">
 - **CSS**  <br>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" alt="CSS Logo" width="100">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" alt="CSS Logo" width="50">
 - **Bootstrap 5** <br>
-  <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png" alt="Bootstrap Logo" width="100">
+  <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png" alt="Bootstrap Logo" width="50">
 - **JavaScript** <br>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript Logo" width="100">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript Logo" width="40">
 - **Node.js + Express**  
   <img src="https://qualitapps.com/wp-content/uploads/2023/02/102.png" alt="Node.js Logo" width="100">
 
 ### Vizualizacija
 
 - **Chart.js**  <br>
-  <img src="https://www.chartjs.org/img/chartjs-logo.svg" alt="Chart.js Logo" width="100">
+  <img src="https://www.chartjs.org/img/chartjs-logo.svg" alt="Chart.js Logo" width="50">
 - **D3.js** <br>
-  <img src="https://d3js.org/logo.svg" alt="D3.js Logo" width="100">
+  <img src="https://d3js.org/logo.svg" alt="D3.js Logo" width="50">
 - **Leaflet** - mapa<br>
   <img src="https://leafletjs.com/docs/images/logo.png" alt="Leaflet Logo" width="100">
 
 ### Modeli in napovedi
 
 - **Python** – uporabljen v Jupyter Notebook za razvoj modelov strojnega učenja za projekcijo emisij CO₂ v prihodnosti na svetovni in nacionalni ravni.  
-  <img src="https://cdn.iconscout.com/icon/free/png-256/free-python-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-5-pack-logos-icons-3030224.png?f=webp" alt="Python Logo" width="100">
+  <img src="https://cdn.iconscout.com/icon/free/png-256/free-python-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-5-pack-logos-icons-3030224.png?f=webp" alt="Python Logo" width="50">
 
 ## Namestitev in nadaljnji razvoj
 
