@@ -62,11 +62,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install Render CLI
+        run: curl -fsSL https://cli.render.com/install.sh | bash
+
       - name: Deploy to Render
-        uses: render-oss/deploy@v1
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render services deploy ${{ secrets.RENDER_SERVICE_ID }} \
+            --token ${{ secrets.RENDER_API_KEY }} \
+            --wait
         env:
           RENDER_INSTALL_COMMAND: npm install --omit=dev --legacy-peer-deps
           RENDER_START_COMMAND: npm start
