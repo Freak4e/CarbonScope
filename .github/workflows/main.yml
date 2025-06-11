@@ -23,7 +23,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies (with dev)
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         working-directory: ./
 
       - name: Run tests
