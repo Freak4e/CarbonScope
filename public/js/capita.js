@@ -3,10 +3,15 @@ async function initializePerCapitaCharts() {
     const loadingIndicator = document.getElementById('loadingIndicator');
     const contentContainer = document.getElementById('contentContainer');
 
+    if (!loadingIndicator || !contentContainer) {
+        throw new Error('Required DOM elements missing');
+    }
+
     let chartInstance = null;
     let animationInterval = null;
     let isPlaying = false;
     let currentYearIndex = 0;
+    let sloveniaData = [];
 
     try {
         // Fetch data
@@ -32,7 +37,7 @@ async function initializePerCapitaCharts() {
         }
 
         // Fallback data
-        const sloveniaData = sloData.length ? sloData : Array.from({ length: 33 }, (_, i) => ({
+        sloveniaData = sloData.length ? sloData : Array.from({ length: 33 }, (_, i) => ({
             year: 1991 + i,
             co2_per_capita: i < 9 ? 10.0 - (10.0 - 9.03) * (i / 8) : 9.03 - (9.03 - 6.0) * ((i - 9) / 23),
             population: 2000000,
@@ -64,16 +69,16 @@ async function initializePerCapitaCharts() {
         loadingIndicator.style.display = 'none';
         contentContainer.style.display = 'block';
 
-        // Trend Line Chart with Full Data Initially
+        // Trend Line Chart
         const trendCtx = document.getElementById('trend_chart')?.getContext('2d');
         if (trendCtx) {
             chartInstance = new Chart(trendCtx, {
                 type: 'line',
                 data: {
-                    labels: sloveniaData.map(d => d.year), // Show all years initially
+                    labels: sloveniaData.map(d => d.year),
                     datasets: [{
                         label: 'Ton CO₂ na prebivalca',
-                        data: sloveniaData.map(d => d.co2_per_capita), // Show all data initially
+                        data: sloveniaData.map(d => d.co2_per_capita),
                         borderColor: '#20c997',
                         backgroundColor: 'rgba(32, 201, 151, 0.2)',
                         fill: true,
@@ -158,17 +163,28 @@ async function initializePerCapitaCharts() {
                         y: { title: { display: true, text: 'Ton CO₂ na prebivalca' }, beginAtZero: true },
                         x: { title: { display: true, text: 'Leto' } }
                     },
-                    animation: {
-                        duration: 0 // Disable default animation for manual control
-                    }
+                    animation: { duration: 0 }
                 }
             });
 
-            // Animation functions (unchanged from original)
+            // Animation functions
             function updateChart(yearIndex) {
                 if (!chartInstance || !sloveniaData[yearIndex]) return;
                 chartInstance.data.labels = sloveniaData.slice(0, yearIndex + 1).map(d => d.year);
-                chartInstance.data.datasets[0].data = sloveniaData.slice(0, yearIndex + 1).map(d => d.co2_per_capita);
+                if (!chartInstance.data.datasets[0]) {
+                    chartInstance.data.datasets = [{
+                        label: 'Ton CO₂ na prebivalca',
+                        data: sloveniaData.slice(0, yearIndex + 1).map(d => d.co2_per_capita),
+                        borderColor: '#20c997',
+                        backgroundColor: 'rgba(32, 201, 151, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }];
+                } else {
+                    chartInstance.data.datasets[0].data = sloveniaData.slice(0, yearIndex + 1).map(d => d.co2_per_capita);
+                }
                 chartInstance.options.plugins.title = {
                     display: true,
                     text: `Emisije CO₂ na prebivalca do leta ${sloveniaData[yearIndex].year}`
@@ -177,15 +193,30 @@ async function initializePerCapitaCharts() {
             }
 
             function startAnimation() {
-                if (isPlaying) return;
+                if (!chartInstance || isPlaying) return;
                 isPlaying = true;
-                document.getElementById('playButton').innerHTML = '<i class="fas fa-pause"></i> Zaustavi';
-                document.getElementById('playButton').classList.replace('btn-primary', 'btn-warning');
-                document.getElementById('stopButton').disabled = false;
+                const playButton = document.getElementById('playButton');
+                const stopButton = document.getElementById('stopButton');
+                playButton.innerHTML = '<i class="fas fa-pause"></i> Zaustavi';
+                playButton.classList.replace('btn-primary', 'btn-warning');
+                stopButton.disabled = false;
+                    stopButton.disabled = false;
                 currentYearIndex = 0;
-                // Reset chart to first data point
                 chartInstance.data.labels = [sloveniaData[0].year];
-                chartInstance.data.datasets[0].data = [sloveniaData[0].co2_per_capita];
+                if (!chartInstance.data.datasets[0]) {
+                    chartInstance.data.datasets = [{
+                        label: 'Ton CO₂ na prebivalca',
+                        data: [sloveniaData[0].co2_per_capita],
+                        borderColor: '#20c997',
+                        backgroundColor: 'rgba(32, 201, 151, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }];
+                } else {
+                    chartInstance.data.datasets[0].data = [sloveniaData[0].co2_per_capita];
+                }
                 chartInstance.options.plugins.title = {
                     display: true,
                     text: `Emisije CO₂ na prebivalca do leta ${sloveniaData[0].year}`
@@ -193,7 +224,7 @@ async function initializePerCapitaCharts() {
                 chartInstance.update('none');
                 const yearRange = sloveniaData.length;
                 const baseDurationMs = 5000;
-                const minIntervalMs = 20; 
+                const minIntervalMs = 20;
                 let intervalMs = yearRange > 1 ? (baseDurationMs / yearRange) : 1000;
                 intervalMs = Math.max(minIntervalMs, intervalMs);
                 animationInterval = setInterval(() => {
@@ -207,15 +238,29 @@ async function initializePerCapitaCharts() {
             }
 
             function stopAnimation() {
-                if (!isPlaying) return;
+                if (!chartInstance || !isPlaying) return;
                 isPlaying = false;
                 clearInterval(animationInterval);
-                document.getElementById('playButton').innerHTML = '<i class="fas fa-play"></i> Predvajaj';
-                document.getElementById('playButton').classList.replace('btn-warning', 'btn-primary');
-                document.getElementById('stopButton').disabled = true;
-                // Restore full dataset
+                const playButton = document.getElementById('playButton');
+                const stopButton = document.getElementById('stopButton');
+                playButton.innerHTML = '<i class="fas fa-play"></i> Predvajaj';
+                playButton.classList.replace('btn-warning', 'btn-primary');
+                stopButton.disabled = true;
                 chartInstance.data.labels = sloveniaData.map(d => d.year);
-                chartInstance.data.datasets[0].data = sloveniaData.map(d => d.co2_per_capita);
+                if (!chartInstance.data.datasets[0]) {
+                    chartInstance.data.datasets = [{
+                        label: 'Ton CO₂ na prebivalca',
+                        data: sloveniaData.map(d => d.co2_per_capita),
+                        borderColor: '#20c997',
+                        backgroundColor: 'rgba(32, 201, 151, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }];
+                } else {
+                    chartInstance.data.datasets[0].data = sloveniaData.map(d => d.co2_per_capita);
+                }
                 chartInstance.options.plugins.title = {
                     display: true,
                     text: 'Emisije CO₂ na prebivalca (1991–2023)'
@@ -228,14 +273,11 @@ async function initializePerCapitaCharts() {
             const stopButton = document.getElementById('stopButton');
             if (playButton && stopButton) {
                 playButton.addEventListener('click', () => {
-                    if (isPlaying) {
-                        stopAnimation();
-                    } else {
-                        startAnimation();
-                    }
+                    if (isPlaying) stopAnimation();
+                    else startAnimation();
                 });
                 stopButton.addEventListener('click', stopAnimation);
-                stopButton.disabled = true; // Initially disabled
+                stopButton.disabled = true;
             } else {
                 console.error('Play or stop button not found');
             }
@@ -407,7 +449,31 @@ async function initializePerCapitaCharts() {
             console.error('Cumulative emissions chart canvas not found');
         }
 
-// Utility to download CSV
+        // Download handler
+        window.downloadPerCapitaSloCSV = function() {
+            if (!sloveniaData.length || !sloveniaData.every(row => row.year && typeof row.co2_per_capita === 'number')) {
+                alert('Podatki še niso naloženi ali so neveljavni. Počakajte trenutek in poskusite znova.');
+                return;
+            }
+            downloadCSV(
+                sloveniaData,
+                'slovenija_co2_na_prebivalca_1991-2023.csv',
+                ['Leto', 'CO2_na_prebivalca_t'],
+                row => `${row.year},${row.co2_per_capita.toFixed(2)}`
+            );
+        };
+
+    } catch (error) {
+        loadingIndicator.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle fa-sm me-2"></i>
+                Napaka: ${error.message}
+            </div>
+        `;
+        console.error('Error initializing charts:', error);
+    }
+}
+
 function downloadCSV(data, filename, headers, rowFormatter) {
     let csvContent = headers.join(',') + '\n';
     data.forEach(row => {
@@ -424,37 +490,24 @@ function downloadCSV(data, filename, headers, rowFormatter) {
     URL.revokeObjectURL(url);
 }
 
-// Download handler for Slovenia per capita data
-window.downloadPerCapitaSloCSV = function() {
-    if (sloveniaData.length === 0) {
-        alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
-        return;
-    }
-    downloadCSV(
-        sloveniaData,
-        'slovenija_co2_na_prebivalca_1991-2023.csv',
-        ['Leto', 'CO2_na_prebivalca_t'],
-        row => `${row.year},${row.co2_per_capita.toFixed(2)}`
-    );
-};
-
-    } catch (error) {
-        loadingIndicator.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle fa-sm me-2"></i>
-                Napaka: ${error.message}
-            </div>
-        `;
-        console.error('Error initializing charts:', error);
-    }
-
-
-   
-}
-
-
 // Expose initialization function
 window.initializePerCapitaCharts = initializePerCapitaCharts;
 
-// Run initialization
-initializePerCapitaCharts();
+// Initialize when DOM is ready
+function ensureDOMReady(callback) {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(callback, 0);
+    } else {
+        document.addEventListener('DOMContentLoaded', callback);
+    }
+}
+
+ensureDOMReady(() => {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) {
+        initializePerCapitaCharts();
+    } else {
+        console.warn('Loading indicator not found, retrying in 100ms...');
+        setTimeout(() => ensureDOMReady(() => initializePerCapitaCharts()), 100);
+    }
+});

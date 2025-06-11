@@ -531,6 +531,9 @@ document.addEventListener('DOMContentLoaded', function() {
       globalSectorData = [];
     }
   }
+  window.updateSectorChart = updateSectorChart;
+  window.updateSectorLineChart = updateSectorLineChart;
+  window.updateGlobalSectorChart = updateGlobalSectorChart;
 
   function clearAllCharts() {
     if (sectorChart) {
