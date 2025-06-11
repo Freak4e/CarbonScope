@@ -19,17 +19,11 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
   - [🚶‍♂️ Kalkulator emisij glede na način prevoza](#🚶‍♂️-kalkulator-emisij-glede-na-način-prevoza)
   - [🇸🇮 Analiza emisij za Slovenijo](#🇸🇮-analiza-emisij-za-slovenijo)
 - [🧪 Tehnološki sklad](#tehnološki-sklad)
-  - [🔧 Frontend](#🔧-frontend)
-  - [🗂️ Podatkovni viri](#🗂️-podatkovni-viri)
   - [📈 Vizualizacija](#📈-vizualizacija)
   - [🤖 Modeli in napovedi](#🤖-modeli-in-napovedi)
 - [💻 Namestitev in nadaljnji razvoj](#namestitev-in-nadaljnji-razvoj)
   - [🛠️ Lokalna namestitev](#🔧-lokalna-namestitev)
-  - [🚀 Nadaljnji razvoj](#🔮-nadaljnji-razvoj)
 - [📊 Podatkovni viri](#podatkovni-viri)
-  - [🌍 Svetovni podatki o emisijah CO₂](#🌍-svetovni-podatki-o-emisijah-co₂)
-  - [🇸🇮 Slovenski podatki](#🇸🇮-slovenski-podatki)
-  - [📈 Napovedi emisij](#📈-napovedi-emisij)
   - [💻 Uporabljeni GitHub repozitorij za podatke](#💻-uporabljeni-github-repozitorij-za-podatke)
 - [📓 Napovedni modeli (Jupyter Notebook)](#napovedni-modeli-jupyter-notebook)
 - [👨‍💻 Avtorji](#avtorji)
@@ -41,8 +35,8 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
 ### Svetovni pogled
 
 - Interaktivna primerjava emisij CO₂ med državami.
-- Vizualizacija svetovnih emisij po sektorjih (promet, energetika, industrija itd.).
-- Prikaz zgodovinskih trendov emisij skozi čas (po državah in globalno).
+- Vizualizacija svetovnih emisij po sektorjih (promet, energetika, proizvodnja in gradbeništvo itd.).
+- Interaktivna primerjava držav (skupni CO₂, CO₂ na prebivalca, CO₂ glede na BDP).
 - Interaktivni svetovni zemljevid z emisijami CO₂ in podatki o populaciji.
 - Napoved prihodnjih svetovnih emisij na podlagi učnega modela.
 
@@ -59,67 +53,68 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
 ### Analiza emisij za Slovenijo
 
 - Emisije CO₂ na prebivalca skozi leta.
-- Razčlenitev emisij po vrsti goriva (premog, plin, obnovljivi viri ipd.).
-- Prikaz emisij po sektorjih (promet, industrija, stanovanjski sektor, kmetijstvo, ipd.).
+- Razčlenitev emisij po vrsti goriva (premog, plin, nafta ipd.).
+- Prikaz emisij po sektorjih (promet, industrija, energetika, stavbe, ipd.).
 - Interaktivni zemljevid emisij po regijah.
 - Napoved emisij v prihodnosti na podlagi lokalno prilagojenega modela.
 
 ## Tehnološki sklad
 
-Pri razvoju projekta CarbonScope so uporabljene naslednje tehnologije in podatkovne oblike:
+Pri razvoju projekta CarbonScope so bile uporabljene naslednje tehnologije:
 
-### Frontend
-
-- **Node.js** – okolje za izvajanje JavaScript kode na strežni strani.
-- **Express.js** – minimalistični spletni strežnik za izdelavo API-jev in strežbo vsebine.
-- **JavaScript (ES6+)** – logika za interakcijo, prikaz podatkov, delo z API-ji in dogodki.
-- **Bootstrap 5** – za hitro postavitev odzivnega in estetskega vmesnika.
-- **CSS** – za dodatno prilagajanje izgleda komponent.
-- **Leaflet** (in/ali Mapbox) – za prikaz interaktivnih zemljevidov z emisijami in populacijo.
-
-### Podatkovni viri
-
-- **CSV datoteke** – za hranjenje strukturiranih podatkov (emisije po letih, sektorjih, regijah, državah ipd.).
-- **GeoJSON datoteke** – za prikaz zemljevidov (slovenske regije, svetovne države).
-- **Ročno pripravljeni ali uvoženi nabori podatkov** iz javno dostopnih virov (npr. Our World in Data, Statistični urad RS, IEA).
+- **HTML** <br>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/512px-HTML5_logo_and_wordmark.svg.png" alt="HTML Logo" width="100">
+- **CSS**  <br>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" alt="CSS Logo" width="100">
+- **Bootstrap 5** <br>
+  <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo-shadow.png" alt="Bootstrap Logo" width="100">
+- **JavaScript** <br>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript Logo" width="100">
+- **Node.js + Express**  
+  <img src="https://qualitapps.com/wp-content/uploads/2023/02/102.png" alt="Node.js Logo" width="100">
 
 ### Vizualizacija
 
-- **Chart.js** / **Recharts** – za prikaz linijskih, stolpčnih in tortnih grafov.
-- **Interaktivni zemljevidi** z označenimi regijami ali državami ter podatki ob prehodu miške.
+- **Chart.js**  <br>
+  <img src="https://www.chartjs.org/img/chartjs-logo.svg" alt="Chart.js Logo" width="100">
+- **D3.js** <br>
+  <img src="https://d3js.org/logo.svg" alt="D3.js Logo" width="100">
+- **Leaflet** - mapa<br>
+  <img src="https://leafletjs.com/docs/images/logo.png" alt="Leaflet Logo" width="100">
 
 ### Modeli in napovedi
 
-- **Umetna inteligenca / strojno učenje** (osnovni napovedni model): za projekcijo emisij CO₂ v prihodnosti, na svetovni in nacionalni ravni.
-- Napovedni modeli so osnovani na časovnih vrstah iz zgodovinskih podatkov.
+- **Python** – uporabljen v Jupyter Notebook za razvoj modelov strojnega učenja za projekcijo emisij CO₂ v prihodnosti na svetovni in nacionalni ravni.  
+  <img src="https://cdn.iconscout.com/icon/free/png-256/free-python-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-5-pack-logos-icons-3030224.png?f=webp" alt="Python Logo" width="100">
 
 ## Namestitev in nadaljnji razvoj
 
 ### Lokalna namestitev
 
-Za lokalni zagon projekta CO2-Odtis sledite naslednjim korakom:
+Za lokalni zagon projekta CarbonScope sledite naslednjim korakom:
 
-1. Klonirajte repozitorij:
-   ```bash
-   git clone https://github.com/Freak4e/CarbonScope.git
-   ```
+### Predpogoji
 
+- **Node.js**: Prepričajte se, da imate nameščen Node.js (priporočena različica 16.x ali novejša). Prenesete ga lahko z [uradne spletne strani](https://nodejs.org/).  
+  
 2. Premaknite se v mapo projekta:
    ```bash
    cd CarbonScope
    ```
 
-3. Namestite vse odvisnosti:
+3. Odprite projekt v Visual Studio Code ali vašem priljubljenem urejevalniku kode.
+
+4. Namestite vse odvisnosti (vključno z Express.js):
    ```bash
    npm install
    ```
 
-4. Zaženite razvojni strežnik:
+5. Zaženite razvojni strežnik:
    ```bash
    npm run dev
    ```
 
-5. Odprite brskalnik in obiščite:
+6. Odprite brskalnik in obiščite:
    ```
    http://localhost:3000
    ```
@@ -128,67 +123,40 @@ Projekt bo zagnan lokalno v razvojnem okolju.
 
 ---
 
-### Nadaljnji razvoj
-
-Možnosti za nadgradnjo in razširitev projekta vključujejo:
-
-- Integracija z realnimi API-ji za dinamične posodobitve podatkov (npr. podatki v živo).
-- Izboljšava napovednega modela z uporabo naprednejših tehnik (npr. LSTM, regresija, Prophet).
-- Uporaba podatkovnih baz (npr. PostgreSQL ali Firebase) za shranjevanje podatkov namesto CSV.
-- Dodajanje uporabniških profilov z možnostjo spremljanja osebnega ogljičnega odtisa.
-- Večjezična podpora (angleščina/slovenščina).
-- Mobilna optimizacija in PWA (Progressive Web App) različica.
-
 ## Podatkovni viri
 
 Pri izdelavi projekta CarbonScope so bili uporabljeni naslednji viri podatkov:
-
-### Svetovni podatki o emisijah CO₂
 
 - [Our World in Data – CO₂ Emissions Dataset](https://ourworldindata.org/co2-emissions)  
   Obsežen in ažuren nabor podatkov o emisijah CO₂ za skoraj vse države sveta, z dolgo zgodovino meritev.
 - [IEA – International Energy Agency](https://www.iea.org/reports/global-energy-co2-status-report-2023)  
   Uradni podatki o energetski porabi in emisijah s strani mednarodne agencije.
-- [Global Carbon Atlas](http://www.globalcarbonatlas.org/)  
-  Interaktivni atlas za spremljanje globalnih in regionalnih emisij ogljika.
-- [UN Data – Carbon Dioxide Emissions](http://data.un.org/)  
-  Podatki Združenih narodov o izpustih ogljikovega dioksida po državah.
+- Kombinirani podatki, sestavljeni iz različnih CSV datotek, pridobljenih iz različnih spletnih strani.
 
-### Slovenski podatki
+Za primerjavo našega modela za napovedovanje prihodnjih emisij CO₂ smo raziskali in analizirali podatke ter projekcije iz naslednjih virov, da bi preverili skladnost in verodostojnost naših rezultatov:
 
-- [Statistični urad Republike Slovenije (SURS)](https://www.stat.si/)  
-  Uradni statistični podatki o različnih okoljskih in energetskih kazalnikih za Slovenijo.
-- [Agencija RS za okolje (ARSO)](https://www.arso.gov.si/)  
-  Okoljski podatki in poročila za Slovenijo, vključno z emisijami in stanjem okolja.
+- [EIA – Outlook for Future Emissions](https://www.eia.gov/energyexplained/energy-and-the-environment/outlook-for-future-emissions.php)  
+  Podatki in napovedi o prihodnjih emisijah, ki jih zagotavlja ameriška uprava za energijo.
+- [Statista – Projected CO₂ Emissions](https://www.statista.com/statistics/1426279/projected-co2-emissions-from-combustion-and-industrial-processes/)  
+  Projekcije globalnih emisij CO₂ iz izgorevanja in industrijskih procesov do leta 2050, razdeljene po različnih scenarijih.
+- [Carbon Brief – Global CO₂ Emissions Peak Analysis](https://www.carbonbrief.org/analysis-global-co2-emissions-could-peak-as-soon-as-2023-iea-data-reveals/)  
+  Analiza, ki temelji na podatkih IEA in napoveduje možen vrhunec globalnih emisij CO₂ že leta 2023.
 
-### Napovedi emisij
+#### Uporabljeni GitHub repozitorij za podatke
 
-- [Climate Action Tracker – Emission Projections](https://climateactiontracker.org/)  
-  Neodvisna analiza in projekcije emisij glede na podnebne cilje in politike držav.
-- [IEA – Global Energy and Climate Model](https://www.iea.org/reports/world-energy-model)  
-  Modeli in napovedi za globalno energetsko porabo in emisije CO₂.
-- [EDGAR – Emissions Database for Global Atmospheric Research](https://edgar.jrc.ec.europa.eu/)  
-  Podrobna baza emisijskih podatkov, ki podpira znanstvene študije in politike.
-- [IPCC Data Distribution Centre](https://www.ipcc-data.org/)  
-  Podpora dostopu do podnebnih napovedi in modelov, ki so osnova za globalne emisijske scenarije.
-
-
-### Uporabljeni GitHub repozitorij za podatke
-
-- [owid/co2-data](https://github.com/owid/co2-data) – javni repozitorij z obsežnimi CSV-ji o svetovnih emisijah, ki jih vzdržuje Our World in Data.
+- [owid/co2-data](https://github.com/owid/co2-data) - javni repozitorij z obsežnimi CSV-ji o svetovnih emisijah, ki jih vzdržuje Our World in Data.
 
 ## Napovedni modeli (Jupyter Notebook)
 
 V repozitoriju je vključen tudi Python Jupyter Notebook (`notebooks/co2_forecasting.ipynb`), kjer so implementirani osnovni napovedni modeli za prihodnje CO₂ emisije.
 
-Modeli vključujejo:
+Vključeni modeli strojnega učenja:
 - Linearna regresija
-- Eksponentno glajenje (Exponential Smoothing)
-- Prophet (Facebookovo ogrodje za časovne vrste)
-- Vizualizacije napovedi za svet in Slovenijo
-
-Notebook omogoča hitro testiranje in primerjavo metod za napoved emisij do leta 2050. Primeren je tudi kot osnova za nadaljnje izboljšave in vključevanje bolj naprednih metod (npr. LSTM, ARIMA).
-
+- Naključnega gozda (Random Forest)
+- Gradient Boosting Regressor,
+- Support Vector Regressor (Podporni vektorji),
+- Decision Tree Regressor (Odločitveno drevo)...
+  
 > 📁 Lokacija: `notebooks/co2_forecasting.ipynb`
 
 ## Avtorji
