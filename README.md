@@ -1,14 +1,13 @@
 # CarbonScope
 
-🔗 [💻 Preizkusi demo različico tukaj](https://carbonscope.onrender.com)
+🔗 [💻 Preizkusi našo spletno stran - CarbonScope](https://carbonscope.onrender.com)
 
 ## Opis in vizija projekta
 
-CarbonScope je interaktivna spletna aplikacija, namenjena poglobljeni analizi in vizualizaciji emisij CO₂ tako za Slovenijo kot za svet. Z uporabo zanesljivih podatkovnih virov, naprednih vizualizacij in napovednih modelov omogoča uporabnikom celosten vpogled v razvoj emisij skozi čas, primerjavo med državami, sektorji in regijami ter izračun ogljičnega odtisa na različnih nivojih.
+CarbonScope je interaktivna spletna aplikacija, zasnovana za poglobljeno analizo in vizualizacijo emisij CO₂ v Sloveniji in po svetu. Aplikacija združuje zanesljive podatke iz različnih virov, kot so CSV datoteke in druge oblike podatkovnih datotek, pridobljenih iz priznanih spletnih strani. Z uporabo naprednih vizualizacijskih orodij, kot so dinamični grafi, interaktivni zemljevidi, animacije trendov, napovedni modeli omogoča uporabnikom celovit vpogled v razvoj emisij skozi čas, primerjavo med državami, sektorji in regijami ter izračun ogljičnega odtisa (npr. za potovanja ali vsakodnevno porabo).
 
-**Vizija projekta** je prispevati k boljši ozaveščenosti o podnebnih spremembah in podpreti trajnostne odločitve posameznikov, organizacij in oblikovalcev politik z enostavno dostopnimi in vizualno privlačnimi orodji za spremljanje in napovedovanje emisij CO₂.
+Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raznolikih podatkov o emisijah CO₂ z vsega sveta in posebej za Slovenijo osvetljuje trende, vzorce in vplive podnebnih sprememb. CarbonScope želi z interaktivnimi vizualizacijami, napovednimi modeli in orodji, kot so kalkulatorji ogljičnega odtisa, omogočiti uporabnikom, da razumejo in zmanjšajo svoj vpliv na okolje.
 
-Z vključitvijo napovednih modelov in interaktivnih kalkulatorjev potovanj želimo uporabnikom pokazati, kako njihove odločitve vplivajo na okolje ter jih spodbuditi k bolj trajnostnim načinom življenja.
 
 
 ## Vsebina
@@ -34,7 +33,7 @@ Z vključitvijo napovednih modelov in interaktivnih kalkulatorjev potovanj želi
   - [💻 Uporabljeni GitHub repozitorij za podatke](#💻-uporabljeni-github-repozitorij-za-podatke)
 - [📓 Napovedni modeli (Jupyter Notebook)](#napovedni-modeli-jupyter-notebook)
 - [👨‍💻 Avtorji](#avtorji)
-- [📝 Licenca](#licenca)
+
 
 
 ## Funkcionalnosti
@@ -54,9 +53,8 @@ Z vključitvijo napovednih modelov in interaktivnih kalkulatorjev potovanj želi
   - s kolesom
   - z avtom
   - z avtobusom
-  - z vlakom
   - z letalom
-- Prikaz emisij in prihrankov v kg CO₂ za vsako izbiro.
+- Prikaz emisij in prihrankov v g CO₂ za vsako izbiro.
 
 ### Analiza emisij za Slovenijo
 
@@ -195,16 +193,12 @@ Notebook omogoča hitro testiranje in primerjavo metod za napoved emisij do leta
 
 ## Avtorji
 
-Projekt CarbonScope so razvili študenti:
+Projekt CarbonScope je bil razvit s strastjo in predanostjo s strani našega tima:
 
-- **Konstantin Mihajlov**
-- **Anastasija Todorov**
-- **Matej Filipov**
+| <img src="https://em-content.zobj.net/source/apple/81/male-technologist-type-1-2_1f468-1f3fb-200d-1f4bb.png" alt="Konstantin Mihajlov" width="100" height="100" style="border-radius:50%; border: 3px solid #2ecc71;"> | <img src="https://em-content.zobj.net/source/apple/81/female-technologist_1f469-200d-1f4bb.png" alt="Anastasija Todorov" width="110" height="100" style="border-radius:50%; border: 3px solid #3498db;"> | <img src="https://angeloalbanese.it/_next/image?url=%2FangeloMacbook.png&w=1200&q=100" alt="Matej Filipov" width="140" height="135" style="border-radius:50%; border: 3px solid #e74c3c;"> |
+|:---:|:---:|:---:|
+| **Konstantin Mihajlov**<br>Razvijalec<br>[<img src="https://img.icons8.com/fluent-systems-regular/512/40C057/github.png" alt="GitHub Profile" width="30" height="30">](https://github.com/kmihajlov) | **Anastasija Todorov**<br>Razvijalka<br>[<img src="https://img.icons8.com/fluent-systems-regular/512/40C057/github.png" alt="GitHub Profile" width="30" height="30">](https://github.com/AnjaTodorov) | **Matej Filipov**<br>Razvijalec<br>[<img src="https://img.icons8.com/fluent-systems-regular/512/40C057/github.png" alt="GitHub Profile" width="30" height="30">](https://github.com/Freak4e) |
 
-Vsi člani ekipe so enakovredno sodelovali pri razvoju, načrtovanju, analizi podatkov in pripravi vizualizacij.
 
-## Licenca
-
-Ta projekt je odprtokoden in je na voljo pod licenco MIT.
 
 
