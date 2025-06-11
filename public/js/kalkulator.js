@@ -312,4 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
       window.scrollTo(0, scrollPosition);
     }, 50);
   });
+
+  window.initMap = initMap;
+  window.clearMap = clearMap;
+  window.geocodeLocation = geocodeLocation;
+  window.getRoute = getRoute;
+  window.calculateRoute = calculateRoute;
+  window.displayRoute = displayRoute;
+  window.getMotivationalMessage = getMotivationalMessage;
 });
