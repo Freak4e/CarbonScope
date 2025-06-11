@@ -196,8 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Function to generate and download CSV
-  function downloadCSV(data, filename, headers, rowFormatter) {
-    // Log data for debugging
+  window.downloadCSV = function(data, filename, headers, rowFormatter) {
     console.log('Generating CSV for:', filename, 'Data:', data);
 
     // Convert data to CSV format
@@ -222,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }
+  };
 
   // Download handlers for top countries charts
   window.downloadTotalEmissionsCSV = function() {
@@ -230,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
       return;
     }
-    downloadCSV(
+    window.downloadCSV(
       topCountriesData,
       'total_co2_emissions.csv',
       ['Year', 'Country', 'CO2_Emissions_Billion_Tonnes'],
@@ -243,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('Podatki še niso naloženi. Počakajte trenutek in poskusite znova.');
       return;
     }
-    downloadCSV(
+    window.downloadCSV(
       topCountriesData,
       'global_share_co2_emissions.csv',
       ['Year', 'Country', 'Share_Global_CO2_Percent'],
