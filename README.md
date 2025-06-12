@@ -15,17 +15,17 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
 - [🔝 CarbonScope](#carbonscope)
 - [🌟 Opis in vizija projekta](#opis-in-vizija-projekta)
 - [⚙️ Funkcionalnosti](#funkcionalnosti)
-  - [🌍 Svetovni pogled](#🌍-svetovni-pogled)
-  - [🚶‍♂️ Kalkulator emisij glede na način prevoza](#🚶‍♂️-kalkulator-emisij-glede-na-način-prevoza)
-  - [🇸🇮 Analiza emisij za Slovenijo](#🇸🇮-analiza-emisij-za-slovenijo)
+  - [🌍 Svetovni pogled](#svetovni-pogled)
+  - [<img src="https://static-00.iconduck.com/assets.00/slovenia-emoji-2048x2048-7nr82oab.png" alt="SI" width="17"> Analiza emisij za Slovenijo](#analiza-emisij-za-slovenijo)
+  - [🚶‍♂️ Kalkulator emisij glede na način prevoza](#kalkulator-emisij-glede-na-način-prevoza)
 - [🧪 Tehnološki sklad](#tehnološki-sklad)
-  - [📈 Vizualizacija](#📈-vizualizacija)
-  - [🤖 Modeli in napovedi](#🤖-modeli-in-napovedi)
-- [💻 Namestitev in nadaljnji razvoj](#namestitev-in-nadaljnji-razvoj)
-  - [🛠️ Lokalna namestitev](#🔧-lokalna-namestitev)
-- [📊 Podatkovni viri](#podatkovni-viri)
-  - [💻 Uporabljeni GitHub repozitorij za podatke](#💻-uporabljeni-github-repozitorij-za-podatke)
+  - [📈 Vizualizacija](#vizualizacija)
+  - [🤖 Modeli in napovedi](#modeli-in-napovedi)
+- [💻 Namestitev](#namestitev)
+  - [🛠️ Lokalna namestitev](#modeli-in-napovedi)
 - [📓 Napovedni modeli (Jupyter Notebook)](#napovedni-modeli-jupyter-notebook)
+- [📊 Podatkovni viri](#podatkovni-viri)
+  - [💻 Uporabljeni GitHub repozitorij za podatke](#uporabljeni-github-repozitorij-za-podatke)
 - [👨‍💻 Avtorji](#avtorji)
 
 
@@ -56,7 +56,7 @@ Vizija projekta je ustvariti pregledno in privlačno platformo, ki z uporabo raz
   - z avtom
   - z avtobusom
   - z letalom
-- Prikaz emisij in prihrankov v g CO₂ za vsako izbiro.
+- Prikaz proizvedenih emisij CO₂ v gramih za vsako izbiro prevoza.
 
 
 ## Tehnološki sklad
@@ -88,15 +88,15 @@ Pri razvoju projekta CarbonScope so bile uporabljene naslednje tehnologije:
 - **Python** – uporabljen v Jupyter Notebook za razvoj modelov strojnega učenja za projekcijo emisij CO₂ v prihodnosti na svetovni in nacionalni ravni.  
   <img src="https://cdn.iconscout.com/icon/free/png-256/free-python-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-5-pack-logos-icons-3030224.png?f=webp" alt="Python Logo" width="50">
 
-## Namestitev in nadaljnji razvoj
+## Namestitev
 
 ### Lokalna namestitev
 
 Za lokalni zagon projekta CarbonScope sledite naslednjim korakom:
 
-### Predpogoji
+#### Predpogoji
 
-- **Node.js**: Prepričajte se, da imate nameščen Node.js (priporočena različica 16.x ali novejša). Prenesete ga lahko z [uradne spletne strani](https://nodejs.org/).  
+1. **Node.js**: Prepričajte se, da imate nameščen Node.js (priporočena različica 16.x ali novejša). Prenesete ga lahko z [uradne spletne strani](https://nodejs.org/).  
   
 2. Premaknite se v mapo projekta:
    ```bash
@@ -124,6 +124,20 @@ Projekt bo zagnan lokalno v razvojnem okolju.
 
 ---
 
+## Napovedni modeli (Jupyter Notebook)
+
+V repozitoriju je vključen tudi Python Jupyter Notebook (`notebooks/co2_forecasting.ipynb`), kjer so implementirani osnovni napovedni modeli za prihodnje CO₂ emisije.
+
+Vključeni modeli strojnega učenja:
+- Linearna regresija
+- Naključnega gozda (Random Forest)
+- Gradient Boosting Regressor,
+- Support Vector Regressor (Podporni vektorji),
+- Decision Tree Regressor (Odločitveno drevo)...
+  
+> 📁 Lokacija: `notebooks/co2_forecasting.ipynb`
+
+
 ## Podatkovni viri
 
 Pri izdelavi projekta CarbonScope so bili uporabljeni naslednji viri podatkov:
@@ -147,18 +161,6 @@ Za primerjavo našega modela za napovedovanje prihodnjih emisij CO₂ smo razisk
 
 - [owid/co2-data](https://github.com/owid/co2-data) - javni repozitorij z obsežnimi CSV-ji o svetovnih emisijah, ki jih vzdržuje Our World in Data.
 
-## Napovedni modeli (Jupyter Notebook)
-
-V repozitoriju je vključen tudi Python Jupyter Notebook (`notebooks/co2_forecasting.ipynb`), kjer so implementirani osnovni napovedni modeli za prihodnje CO₂ emisije.
-
-Vključeni modeli strojnega učenja:
-- Linearna regresija
-- Naključnega gozda (Random Forest)
-- Gradient Boosting Regressor,
-- Support Vector Regressor (Podporni vektorji),
-- Decision Tree Regressor (Odločitveno drevo)...
-  
-> 📁 Lokacija: `notebooks/co2_forecasting.ipynb`
 
 ## Avtorji
 
